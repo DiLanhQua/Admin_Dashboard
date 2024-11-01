@@ -1,0 +1,80 @@
+@charset "UTF-8";
+.dialog-content {
+  text-align: center;
+  margin-bottom: 16px;
+}
+.dialog-content .MuiTypography-body2 {
+  margin-bottom: 4px;
+}
+
+.grid-item {
+  display: flex;
+  align-items: center;
+  margin-bottom: 16px;
+}
+
+.title {
+  font-size: 18px;
+  /* Làm cho chữ đậm hơn */
+  text-transform: uppercase;
+  font-weight: bold;
+  /* Makes the text bold */
+  font-size: 2rem;
+}
+
+.boxContainer {
+  border: 2px solid rgb(95, 169, 255);
+  border-radius: 10px;
+  padding: 20px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+}
+
+.code-label {
+  /* Add your desired styles here */
+  font-weight: bold;
+  text-transform: uppercase;
+  font-size: 1.2rem;
+  /* Any other styling you want */
+}
+
+.codeCoupons {
+  color: rgb(0, 0, 0);
+  padding: 10px;
+  border-radius: 4px;
+  background-color: rgba(223, 238, 255, 0.1);
+}
+
+.discountCoupons {
+  margin-top: 1%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 2%;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+  border-radius: 8px;
+  max-width: 300px;
+  width: 100%;
+  margin-left: 20%;
+}
+
+.date {
+  font-size: 14px;
+}
+
+.block-span {
+  margin-top: 5px;
+  padding: 2PX;
+}
+
+.statusChipContainer {
+  margin-top: 5px;
+  cursor: pointer;
+  /* Con trỏ dạng pointer để thể hiện có thể nhấn */
+  display: inline-block;
+  border-radius: 8px;
+  /* Góc bo tròn */
+  background-color: #f5f5f5;
+  /* Màu nền nhẹ */
+  transition: background-color 0.3s ease;
+  /* Thêm hiệu ứng khi hover */
+}/*# sourceMappingURL=details.css.map */
