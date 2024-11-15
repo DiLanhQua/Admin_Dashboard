@@ -71,35 +71,27 @@ export default function UserPage() {
   useEffect(() => {
     if (Array.isArray(dataCustomer)) {
       const initialData = dataCustomer.map((item) => ({
-        id: item?._id,
-        name: item?.name,
-        address: item?.address,
-        email: item?.email,
-        sdt: item?.sdt,
-        sex: item?.sex,
-        membership: item?.membership,
-        totalAmount: item?.totalAmount,
-        status: item?.isBlocked ? "blocked" : "active",
-        cart:
-          item?.cart?.map((cartItem) => ({
-            name: cartItem.name,
-            price: cartItem.price,
-            quantity: cartItem.quantity,
-          })) || [],
+        UserName: item?.UserName,
+        Email: item?.Email,
+        Phone: item?.Phone,
+        FullName: item?.FullName,
+        Address: item?.Address,
+        Role: item?.Role,
+        Image: item?.Image,
+        
       }));
       setItems(initialData);
     }
   }, [dataCustomer]);
 
   const columns = [
-    { label: "Họ và tên", field: "name" },
-    { label: "Địa chỉ", field: "address" },
-    { label: "Email", field: "email" },
-    { label: "Số điện thoại", field: "sdt" },
-    { label: "Giới tính", field: "sex" },
-    { label: "Loại thành viên", field: "membership" },
-    { label: "Tổng tiền", field: "totalAmount" },
-    { label: "Trạng thái", field: "status" },
+    { label: "Tên tài khoản", field: "UserName" },
+    { label: "Email", field: "Email" },
+    { label: "Số điện thoại", field: "Phone" },
+    { label: "Họ và tên", field: "FullName" },
+    { label: "Địa chỉ", field: "Address" },
+    { label: "Vai trò tài khoản", field: "Role" },
+    { label: "Hình ảnh", field: "Image" },
   ];
 
   // Handle delete customer
