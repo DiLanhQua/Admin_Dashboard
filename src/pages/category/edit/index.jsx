@@ -73,24 +73,19 @@ function CategoryEdit() {
     }
   };
   
- // CategoryEdit.js
 useEffect(() => {
   const loadCategoryData = async () => {
     try {
-      // Gửi yêu cầu GET để lấy dữ liệu danh mục từ API
       const response = await axios.get(`https://localhost:7048/api/Category/get-category-by-id/${id}`);
       const categoryData = response.data;
-
-      // Nếu lấy được dữ liệu, cập nhật các giá trị cho form
       if (categoryData) {
         formik.setValues({
           CategoryName: categoryData.categoryName || "",
-          Picture: categoryData.image || "", // Giá trị hình ảnh nếu có
+          Picture: categoryData.image || "", 
         });
 
-        // Nếu có hình ảnh, tạo preview cho ảnh
         if (categoryData.image) {
-          setPreview(categoryData.image);  // Giả sử hình ảnh là một URL hoặc chuỗi base64
+          setPreview(categoryData.image);  
         }
       } else {
         handleToast("error", "Dữ liệu danh mục không hợp lệ");
@@ -101,7 +96,6 @@ useEffect(() => {
     }
   };
 
-  // Gọi hàm khi component được render lần đầu tiên
   loadCategoryData();
 }, [id]);
 
