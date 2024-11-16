@@ -1,7 +1,7 @@
 import sendRequest from "../utils/resquest";
 
 const CustomerService = {
-  getAll: () => sendRequest("get", "/customers/"),
+  getAll: () => sendRequest("get", "/Account/get-all-account"),
   updateCustomer: (id, data) => sendRequest("put", `/customers/${id}`, data),
   deleteCustomer: (id) => sendRequest("delete", `/customers/${id}`),
   createCustomer: (data) => sendRequest("post", "/customers/register", data),
