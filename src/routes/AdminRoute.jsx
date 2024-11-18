@@ -35,6 +35,8 @@ import EditProduct from "../pages/product/update";
 import TagPage from "../pages/tags";
 import ShippingPage from "../pages/shippingConfig";
 
+
+
 const AdminRoute = () => {
   return (
     <>
@@ -46,6 +48,7 @@ const AdminRoute = () => {
       <Route path="category" element={<CategoryPage />} />
       <Route path="category/create" element={<CategoryCreate />} />
       <Route path="category/update/:id" element={<CategoryEdit />} />
+      
 
       <Route path="brand" element={<BrandPage />} />
 

@@ -47,20 +47,7 @@ const menuItems = {
             },
           ],
         },
-        {
-          id: "collections",
-          title: "Bộ sưu tập",
-          type: "collapse",
-          icon: "feather icon-book",
-          children: [
-            {
-              id: "collection-list",
-              title: "Danh sách bộ sưu tập",
-              type: "item",
-              url: "/dashboard/collection",
-            },
-          ],
-        },
+
         {
           id: "products",
           title: "Sản phẩm",

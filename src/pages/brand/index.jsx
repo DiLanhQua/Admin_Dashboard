@@ -1,155 +1,128 @@
+import { useState, useEffect } from "react";
 import { Grid } from "@mui/material";
 import ReusableTable from "../../components/Table";
-import * as Yup from "yup";
-import { useCallback, useEffect, useState } from "react";
-import BrandForm from "./create";
-import { useDispatch, useSelector } from "react-redux";
-import {
-  createBrand,
-  deleteBrand,
-  getBrand,
-  resetState,
-  updateBrand,
-} from "../../redux/slices/brand";
-import { DeleteConfirmationModal, handleToast } from "./../../utils/toast";
+import BrandForm from "./create/index";
+import axios from "axios";
+import { handleToast } from "../../utils/toast";
 
 export default function BrandPage() {
-  const dispatch = useDispatch();
   const [isUpdate, setIsUpdate] = useState(false);
   const [items, setItems] = useState([]);
+  const [maxPageSize, setMaxPageSize] = useState(50); // Giá trị tối đa cho trang
+  const [rowsPerPage, setRowsPerPage] = useState(5); // Kích thước mặc định mỗi trang
+  const [page, setPage] = useState(0); // Trang hiện tại
+
+
   const [initialValues, setInitialValues] = useState({
-    name: "",
+    BrandName: "",
     image: "",
-    description: "",
-    slug: "",
+    country: "",
   });
 
   const columns = [
-    { label: "Tên thương hiệu", field: "name" },
+    { label: "Tên thương hiệu", field: "BrandName" },
     { label: "Hình", field: "image" },
+    { label: "Xuất xứ", field: "country" },
   ];
 
-  // Handle brand edit
-  const handleEdit = (index) => {
+  const fetchBrands = async () => {
+    try {
+      const response = await axios.get(
+        `https://localhost:7048/api/Brand/get-all-brand?maxPageSize=${maxPageSize}&PageSize=${rowsPerPage}&PageNumber=${page + 1}`);
+      if (response.data && Array.isArray(response.data.data)) {
+        setItems(
+          response.data.data.map((item) => ({
+            id: item.id,
+            BrandName: item.brandName,
+            image: item.image,
+            country: item.country,
+          }))
+        );
+      } else {
+        handleToast("error", "Dữ liệu không hợp lệ hoặc trống.");
+      }
+    } catch (error) {
+      handleToast("error", "Lỗi khi tải danh sách thương hiệu");
+      console.error("Error loading brands:", error);
+    }
+  };
+
+  useEffect(() => {
+    fetchBrands();
+  }, [maxPageSize, rowsPerPage, page]);
+
+
+  const handleEdit = (brand) => {
     setInitialValues({
-      id: index?.id,
-      name: index?.name,
-      image: index?.image,
-      description: index?.description,
-      slug: index?.slug,
+      id: brand.id,
+      BrandName: brand.BrandName,
+      image: brand.image,
+      country: brand.country,
     });
     setIsUpdate(true);
   };
 
-  const handleDelete = useCallback(
-    (index) => {
-      DeleteConfirmationModal({
-        title: "Xác nhận xóa thương hiệu",
-        content: "Bạn có chắc chắn muốn xóa thương hiệu này không?",
-        okText: "Xóa",
-        cancelText: "Hủy",
-        icon: "warning",
-        confirmButtonText: "Xóa",
-        onConfirm: () =>
-          dispatch(deleteBrand(index.id)).then((res) => {
-            if (res.type === "brand/deleteBrand/fulfilled") {
-              handleToast("success", "Xóa thương hiệu thành công");
-              dispatch(getBrand());
-            } else {
-              handleToast("error", "Xóa thương hiệu thất bại");
-            }
-          }),
-      });
-    },
-    [dispatch]
-  );
+  const handleAdd = async (formData) => {
 
-  const onSubmit = (values) => {
-    if (isUpdate) {
-      console.log(values);
-      dispatch(updateBrand({ brandId: values.id, data: values })).then(
-        (res) => {
-          if (res.type === "brand/updateBrand/fulfilled") {
-            handleToast("success", "Cập nhật thương hiệu thành công");
-            dispatch(getBrand());
-          } else {
-            handleToast("error", "Cập nhật thương hiệu thất bại");
-          }
-        }
-      );
-      setIsUpdate(false);
-    } else {
-      dispatch(createBrand(values));
-      setInitialValues({
-        name: "",
-        image: "",
-        category: "",
-        description: "",
-        slug: "",
+    try {
+      console.log("FormData gửi lên:", formData);
+
+      await axios.post("https://localhost:7048/api/Brand/add-brand", formData, {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+        },
       });
+      fetchBrands();
+      setInitialValues({ BrandName: "", image: "", country: "" });
+      handleToast("success", "Thương hiệu đã được thêm thành công");
+    } catch (error) {
+      console.error("Error adding brand:", error);
+      handleToast("error", "Lỗi khi thêm thương hiệu");
     }
   };
 
-  const validationSchema = Yup.object().shape({
-    name: Yup.string().required("Tên thương hiệu không được để trống"),
-    description: Yup.string(),
-  });
-
-  const status = useSelector((state) => state.brand.status);
-  const data = useSelector((state) => state.brand.data);
-  const createStatus = useSelector((state) => state.brand.createStatus);
-
-  useEffect(() => {
-    dispatch(getBrand());
-  }, [dispatch]);
-
-  useEffect(() => {
-    if (status === "success" && data) {
-      setItems(
-        data.map((item) => ({
-          id: item._id,
-          name: item.name,
-          image: item.image,
-          category: item.category,
-          description: item.description,
-        }))
-      );
+  const handleUpdate = async (formData) => {
+    try {
+      await axios.put(`https://localhost:7048/api/Brand/update-brand-by-id/${initialValues.id}`, formData);
+      fetchBrands();
+      setIsUpdate(false);
+      setInitialValues({ BrandName: "", image: "", country: "" });
+      handleToast("success", "Thương hiệu đã được cập nhật thành công");
+    } catch (error) {
+      console.error("Error updating brand:", error);
+      handleToast("error", "Lỗi khi cập nhật thương hiệu");
     }
-    dispatch(resetState({ key: "status", value: "idle" }));
-  }, [status, data, dispatch]);
+  };
 
-  useEffect(() => {
-    if (createStatus === "success") {
-      dispatch(getBrand());
-      handleToast("success", "Thêm thương hiệu thành công");
+  const handleDelete = async (id) => {
+    try {
+      await axios.delete(`https://localhost:7048/api/Brand/delete-brand-by-id/${id}`);
+      fetchBrands();
+    } catch (error) {
+      console.error("Error deleting brand:", error);
+      handleToast("error", "Lỗi khi xóa thương hiệu");
     }
-    if (createStatus === "failed") {
-      handleToast("error", "Thêm thương hiệu thất bại");
-    }
-    dispatch(resetState({ key: "createStatus", value: "idle" }));
-  }, [createStatus, dispatch]);
+  };
 
   return (
-    <>
-      <Grid container spacing={2}>
-        <Grid item xs={5}>
-          <ReusableTable
-            columns={columns}
-            data={items}
-            handleEdit={handleEdit}
-            handleDelete={handleDelete}
-          />
-        </Grid>
-        <Grid item xs={7}>
-          <BrandForm
-            title={isUpdate ? "Cập nhật thương hiệu" : "Thêm thương hiệu"}
-            onSubmit={onSubmit}
-            initialValues={initialValues}
-            validationSchema={validationSchema}
-            isUpdate={isUpdate}
-          />
-        </Grid>
+    <Grid container spacing={2}>
+      <Grid item xs={5}>
+        <ReusableTable
+          columns={columns}
+          data={items}
+          handleEdit={handleEdit}
+          handleDelete={handleDelete}
+        />
       </Grid>
-    </>
+      <Grid item xs={7}>
+        <BrandForm
+          title={isUpdate ? "Cập nhật thương hiệu" : "Thêm thương hiệu"}
+          onAdd={handleAdd}
+          onUpdate={handleUpdate}
+          initialValues={initialValues}
+          isUpdate={isUpdate}
+        />
+      </Grid>
+    </Grid>
   );
 }
