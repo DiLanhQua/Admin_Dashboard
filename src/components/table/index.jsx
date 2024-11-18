@@ -20,6 +20,8 @@ const ReusableTable = ({
   buttonAdd,
   optionStatus,
   StatusOrder,
+  handleApprove,
+  handleReject,
 }) => {
   const [search, setSearch] = useState("");
   const [statusFilter, setStatusFilter] = useState(""); // State for filtering by `status`
@@ -148,6 +150,8 @@ const ReusableTable = ({
                   handleDelete={handleDelete}
                   columns={columns}
                   handleEye={handleEye}
+                  handleApprove={() => handleApprove(row.id)}  // Truyền row.id ở đây
+  handleReject={() => handleReject(row.id)} 
                 />
               ))}
           </TableBody>
@@ -164,6 +168,7 @@ const ReusableTable = ({
   );
 };
 
+// Prop validation with prop-types
 ReusableTable.propTypes = {
   handleDelete: propTypes.func,
   handleEdit: propTypes.func.isRequired,
@@ -174,6 +179,8 @@ ReusableTable.propTypes = {
   buttonAdd: propTypes.func,
   optionStatus: propTypes.array,
   StatusOrder: propTypes.array,
+  handleApprove: propTypes.func.isRequired,  // Added prop validation for handleApprove
+  handleReject: propTypes.func.isRequired,   // Added prop validation for handleReject
 };
 
 export default ReusableTable;
