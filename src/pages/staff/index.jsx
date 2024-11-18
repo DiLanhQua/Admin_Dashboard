@@ -1,122 +1,292 @@
 import { useDispatch, useSelector } from "react-redux";
-import ReusableTable from "../../components/Table";
-import EyeStaff from "./details";
-import { useEffect, useState } from "react";
+// import ReusableTable from "../../components/Table";
+// import EyeStaff from "./details";
+import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { deleteStaff, getStaff, resetState } from "../../redux/slices/staff";
 import { DeleteConfirmationModal, handleToast } from "../../utils/toast";
-import LoadingWrapper from "../../components/loading/LoadingWrapper";
-import formatCurrency from "../../config/formatCurrency";
+import { Row, Col, Card ,Modal, Button} from 'react-bootstrap';
+// import axios from 'axios';
+import { getStaffAPI, getDeStaffAPI, getDeLoginAPI } from "./js/AxiosStaff";
+import "../staff/css/staff.css";
+import EyeStaff from './details/index'; 
 
 export default function StaffPage() {
-  const [open, setOpen] = useState(false);
-  const [selectedData, setSelectedData] = useState(null);
   const navigate = useNavigate();
-  const dispatch = useDispatch();
+  // const dispatch = useDispatch();
   const [items, setItems] = useState([]);
 
-  const { error, data: staff } = useSelector((state) => state.staff);
-  const statusDelete = useSelector((state) => state.staff.deleteStatus);
+  const [selectedEmployee, setSelectedEmployee] = useState(null);
+
+  const [searchTerm, setSearchTerm] = useState("");
+  const [currentPage, setCurrentPage] = useState(1);
+  const [customersPerPage, setCustomersPerPage] = useState(5);
+  const [open, setOpen] = useState(false);
+
+  const [showDetailModal, setShowDetailModal] = useState(false);
+  const handleShow = () => setShowDetailModal(true);
+  const handleClose = () => setShowDetailModal(false);
+  const [account, setAccount] = useState();
+  const [login, setLogin] = useState();
   useEffect(() => {
-    if (error) {
-      handleToast("error", error.mes, "top-right");
-    }
-    dispatch(resetState({ key: "error", value: null }));
-  }, [error, dispatch]);
+    const GetStall = async () => {
+      try {
+        const res = await getStaffAPI(customersPerPage, currentPage);
+        console.log("DỮ LIỆU:", res.data);
+        if (Array.isArray(res.data)) { 
+          setItems(res.data); 
+        } else {
+          setItems([]);  
+        }
+      } catch (er) {
+        console.error("Không thể xuất danh sách: ", er);
+      }
+    };
 
-  useEffect(() => {
-    dispatch(getStaff());
-  }, [dispatch]);
+    GetStall();
+  }, [customersPerPage, currentPage]); 
 
-  const columns = [
-    { label: "Họ tên", field: "name" },
-    { label: "Email", field: "email" },
-    { label: "Tỉ lệ hoa hồng", field: "commission" },
-    { label: "Cơ sở", field: "base" },
-    { label: "Lương cố định", field: "fixedSalary" },
-    { label: "Trạng thái", field: "status" },
-  ];
+  const detaile = async (id) =>{
+    
+         const response = await getDeStaffAPI(id);
+         const responsee = await getDeLoginAPI(id);
+          setAccount(response);
+          setLogin(responsee);
+          // handleShow(); 
+          console.log("de: "+ response );
+      handleShow(); 
+    };
+    
 
-  const handleEdit = (index) => {
-    if (index && index.id) {
-      const id = index.id;
-      navigate(`/dashboard/staff/edit/${id}`);
+  // const DetailStall = 
+  const indexOfLastCustomer = currentPage * customersPerPage;
+  const indexOfFirstCustomer = indexOfLastCustomer - customersPerPage;
+
+  // Lọc ra dữ liệu của trang hiện tại
+  const currentCustomers = items.slice(indexOfFirstCustomer, indexOfLastCustomer);
+
+  // Tính tổng số trang
+  const totalPages = Math.ceil(items.length / customersPerPage);
+
+  const handlePageChange = (newPage) => {
+    if (newPage >= 1 && newPage <= totalPages) {
+      setCurrentPage(newPage);
     }
   };
+  const openDetailModal = (employee) => {
+    setSelectedEmployee(employee);
+    handleShow(); 
+};
+const CTNV = async (id) => {
+  try {
+    const response = await getDeStaffAPI(id);
+    navigate(`/dashboard/staff/edit/${id}`);
+    return response.data;
+  } catch (err) {
+    console.error("Lỗi: " + err);
+  }
+};
 
-  useEffect(() => {
-    if (statusDelete === "success") {
-      handleToast("success", "Xóa nhân viên thành công", "top-right");
-      dispatch(getStaff());
-      dispatch(resetState({ key: "deleteStatus", value: "idle" }));
-    }
-    if (statusDelete === "failed") {
-      handleToast("error", "Xóa nhân viên thất bại", "top-right");
-      dispatch(resetState({ key: "deleteStatus", value: "idle" }));
-    }
-  }, [statusDelete, dispatch]);
-  const handleDelete = (index) => {
-    DeleteConfirmationModal({
-      title: "Xác nhận xóa nhân viên",
-      content: "Bạn có chắc chắn muốn xóa nhân viên này?",
-      okText: "Xóa",
-      cancelText: "Hủy",
-      icon: "warning",
-      confirmButtonText: "Xóa",
-      onConfirm: () => dispatch(deleteStaff(index.id)),
-    });
-  };
-  const handleEye = (index) => {
-    setSelectedData(index);
-    setOpen(true);
-  };
-
-  const handleClose = () => {
-    setOpen(false);
-  };
-
-  useEffect(() => {
-    const mappedItems = Array.isArray(staff)
-      ? staff.map((item) => ({
-          id: item._id || "",
-          name: item.name || "",
-          role: item.role || "",
-          phone: item.phone || "",
-          email: item.email || "",
-          commission: item.commissionRate || "",
-          base: item.base || "",
-          fixedSalary: formatCurrency(item.fixedSalary, "VND", "vi-VN") || "",
-          status: item.isBlocked === true ? "blocked" : "active",
-          avatar: item.avatar || "",
-          startDate: item.startDate || "",
-          department: item.department || "",
-          totalSalary: (item.commissionRate || 0) + (item.fixedSalary || 0),
-        }))
-      : [];
-    if (mappedItems.length > 0) {
-      setItems(mappedItems);
-    }
-  }, [staff]);
-
+const roleNames = {
+  1: "Quản lý",
+  2: "Nhân viên",
+  0: "Khách hàng"
+};
   return (
     <>
-      <LoadingWrapper>
-        <ReusableTable
-          handleEdit={handleEdit}
-          handleDelete={handleDelete}
-          data={items}
-          columns={columns}
-          handleEye={handleEye}
-          navigate={"/dashboard/staff/create"}
-        />
-      </LoadingWrapper>
-      <EyeStaff
-        open={open}
-        handleClose={handleClose}
-        selectedData={selectedData}
-        handleDelete={handleDelete}
-        handleEdit={handleEdit}
-      />
+      <React.Fragment>
+        <Row>
+          <Col sm={12}>
+            <Card>
+
+              {/* Left side: Search Input and Filters */}
+
+
+
+              <div className="bg-light rounded text-center h-100 p-4">
+                <div className="d-flex align-items-center justify-content-between mb-4">
+                  <div className="form-floating">
+                    <input
+                      type="text" // Thay đổi từ "password" thành "text" cho tìm kiếm
+                      className="form-control"
+                      id="search"
+                      value={searchTerm}
+                      onChange={(e) => setSearchTerm(e.target.value)}
+                      placeholder="Tìm kiếm"
+                      required
+                    />
+                    <label htmlFor="search">Tìm kiếm</label> {/* Thay đổi nhãn từ "Mật Khẩu" thành "Tìm kiếm" */}
+                  </div>
+
+
+                  <a href="/dashboard/staff/create"
+                    className="create-stall"
+
+                  >
+                    Thêm mới
+                  </a>
+                </div>
+                <div className="table-responsive">
+                  <table className="table">
+                    <thead>
+                      <tr>
+                        <th scope="col">#</th>
+                        <th scope="col">Họ tên</th>
+                        <th scope="col">Địa chỉ</th>
+                        <th scope="col">Email</th>
+                        <th scope="col">Số điện thoại</th>
+                        <th scope="col">Tên đăng nhập</th>
+                        <th scope="col">Thao tác</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {currentCustomers?.map((item, stt) => (
+                        <tr key={item.id}>
+                          <th scope="row">{indexOfFirstCustomer + stt + 1}</th>
+                          <td>{item.fullName}</td>
+                          <td>{item.address || "Chưa có địa chỉ"}</td>
+                          <td>{item.email || "Chưa có email"}</td>
+                          <td>{item.phone || "Chưa có số điện thoại"}</td>
+                          <td>{item.userName || "Chưa có tên đăng nhập"}</td>
+                          <td>
+                          <Button variant="primary" onClick={() => detaile(item.id)}>
+        Xem 
+      </Button>
+
+      {/* Modal hiển thị thông tin chi tiết nhân viên */}
+      <Modal  show={showDetailModal} onHide={handleClose} size="lg">
+        <Modal.Header closeButton>
+          <Modal.Title>Thông Tin Chi Tiết Nhân Viên</Modal.Title>
+        </Modal.Header>
+        <Modal.Body >
+          {account ? (
+            <div className="dialog">
+              <div className="dialog-content">
+                <div className="avatar-container">
+                  <img
+                    src={account?.image || '/static/images/avatar/1.jpg'}
+                    alt="Profile Image"
+                    className="avatar"
+                  />
+                  <h3 className="name">{account?.fullName}</h3>
+                  <p className="role"> Role: {roleNames[account?.role] || "Không xác định"}</p>
+                  
+                </div>
+
+                <div className="info-grid">
+                  <div className="info-item">
+                    <span className="icon">&#x1F4C5;</span>
+                    <p className="p-item">Id: {login?.accountId}</p>
+                  </div>
+                  <div className="info-item">
+                    <span className="icon">&#x2709;</span>
+                    <p className="p-item">Email: {account?.email}</p>
+                  </div>
+                  <div className="info-item">
+                    <span className="icon">&#x1F464;</span>
+                    <p className="p-item">Tên đăng nhập: {account?.userName}</p>
+                  </div>
+                  <div className="info-item">
+  <span className="icon"><i class=" fas fa-solid fa-lock"></i></span>
+  <p className="p-item">Mật khẩu: {account?.password}</p>
+</div>
+                  <div className="info-item">
+                    <span className="icon">&#x1F4F1;</span>
+                    <p className="p-item">SĐT: {account?.phone}</p>
+                  </div>
+                  <div className="info-item">
+  {login?.action === 'Chờ xác nhận' ? (
+    <span className="icon red-icon">&#x1F534;</span> // Icon màu đỏ
+  ) : (
+    <span className="icon green-icon">&#x1F7E2;</span> // Icon màu xanh
+  )}
+  <p className="p-item">Trạng Thái: {login?.action}</p>
+</div>
+
+                  
+                </div>
+                <div className="in-item">
+                <div className="info-item">
+                    <span className="icon">
+                    <i className="fas fa-map-marker-alt"/>
+                     </span>
+                    <p className="p-item">Địa chỉ: {account?.address}</p>
+                  </div>
+                  <div className="info-item">
+                    <span className="icon"><i class="fas fa-regular fa-clock"></i></span>
+                    <p className="p-item">Ngày tạo: {login?.timeStamp}</p>
+                  </div>
+                  <div className="info-item">
+                    <span className="icon"><i class="fas fa-solid fa-book-open"></i></span>
+                    <p className="p-item">Mô Tả: {login?.description}</p>
+                  </div>
+                </div>
+                <div className="dialog-actions">
+                  <button className="close-btn" onClick={handleClose}>Đóng</button>
+                </div>
+              </div>
+            </div>
+          ) : (
+            <p>Đang tải thông tin...</p>
+          )}
+        </Modal.Body>
+      </Modal>
+                            <button className="btn btn-warning ml-2" onClick={() => CTNV(item.id)}>
+                              Sửa
+                            </button>
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+
+
+                  </table>
+                  <div
+                    style={{
+                      display: "flex",
+                      justifyContent: "space-between",
+                      alignItems: "center",
+                      marginTop: "10px",
+                    }}
+                  >
+                    <span>Bản ghi trang:</span>
+                    <select
+                      style={{ padding: "5px" }}
+                      value={customersPerPage}
+                      onChange={(e) => setCustomersPerPage(Number(e.target.value))}
+                    >
+                      <option value="5">5</option>
+                      <option value="10">10</option>
+                      <option value="15">15</option>
+                    </select>
+                    <span>{`${indexOfFirstCustomer + 1}-${Math.min(
+                      indexOfLastCustomer,
+                      items.length
+                    )}`}</span>
+                    <div>
+                      <button
+                        style={{ padding: "5px", marginRight: "5px" }}
+                        onClick={() => handlePageChange(currentPage - 1)}
+                        disabled={currentPage === 1}
+                      >
+                        &lt;
+                      </button>
+                      <button
+                        style={{ padding: "5px" }}
+                        onClick={() => handlePageChange(currentPage + 1)}
+                        disabled={currentPage === totalPages}
+                      >
+                        &gt;
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+             
+            </Card>
+          </Col>
+        </Row>
+      </React.Fragment>
     </>
   );
 }
