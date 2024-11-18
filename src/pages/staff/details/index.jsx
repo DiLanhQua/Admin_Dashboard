@@ -24,72 +24,47 @@ import { fDateVN } from "../../../utils/format-time";
 
 export default function EyeStaff({ open, handleClose, selectedData }) {
   return (
-    <Dialog open={open} onClose={handleClose} fullWidth maxWidth="sm">
-      <DialogContent>
-        <Box sx={{ textAlign: "center", mb: 2 }}>
-          {/* Avatar */}
-          <Avatar
-            src={selectedData?.avatar || "/static/images/avatar/1.jpg"}
-            alt="Profile Image"
-            sx={{
-              width: { xs: 80, md: 100 },
-              height: { xs: 80, md: 100 },
-              margin: "0 auto",
-              mb: 2,
-            }}
-          />
-          <Typography variant="h6" fontWeight="bold">
-            {selectedData?.name}
-          </Typography>
-          <Typography variant="body2" color="textSecondary">
-            {selectedData?.role}
-          </Typography>
-        </Box>
+    <div class="dialog">
+  <div class="dialog-content">
+    <div class="avatar-container">
+      <img src="selectedData?.Image || '/static/images/avatar/1.jpg'" alt="Profile Image" class="avatar"/>
+      <h3 class="name">selectedData?.FullName</h3>
+      <p class="role">Role: selectedData?.Role</p>
+    </div>
 
-        <Grid container spacing={2}>
-          <Grid item xs={12} sm={6} display="flex" alignItems="center">
-            <CakeIcon sx={{ marginRight: 1 }} />
-            <Typography>
-              {fDateVN(selectedData?.startDate, "dd MMM yyyy")}
-            </Typography>
-          </Grid>
-          <Grid item xs={12} sm={6} display="flex" alignItems="center">
-            <RateReviewIcon sx={{ marginRight: 1 }} />
-            <Typography>{selectedData?.commission}</Typography>
-          </Grid>
-          <Grid item xs={12} sm={6} display="flex" alignItems="center">
-            <BusinessIcon sx={{ marginRight: 1 }} />
-            <Typography>{selectedData?.department}</Typography>
-          </Grid>
-          <Grid item xs={12} sm={6} display="flex" alignItems="center">
-            <EmailIcon sx={{ marginRight: 1 }} />
-            <Typography>{selectedData?.email}</Typography>
-          </Grid>
-          <Grid item xs={12} sm={6} display="flex" alignItems="center">
-            <LocationOnIcon sx={{ marginRight: 1 }} />
-            <Typography>{selectedData?.base}</Typography>
-          </Grid>
-          <Grid item xs={12} sm={6} display="flex" alignItems="center">
-            <PriceCheckIcon sx={{ marginRight: 1 }} />
-            <Typography>{selectedData?.fixedSalary}</Typography>
-          </Grid>
-          <Grid item xs={12} sm={6} display="flex" alignItems="center">
-            <AttachMoneyIcon sx={{ marginRight: 1 }} />
-            <Typography>{selectedData?.totalSalary}</Typography>
-          </Grid>
-          <Grid item xs={12} sm={6} display="flex" alignItems="center">
-            {selectedData?.status && (
-              <StatusChip status={selectedData?.status} />
-            )}
-          </Grid>
-        </Grid>
-      </DialogContent>
-      <DialogActions>
-        <Button onClick={handleClose} color="primary">
-          Đóng
-        </Button>
-      </DialogActions>
-    </Dialog>
+    <div class="info-grid">
+      <div class="info-item">
+        <span class="icon">&#x1F4C5;</span>
+        <p>Id: selectedData?.Id</p>
+      </div>
+      <div class="info-item">
+        <span class="icon">&#x1F464;</span>
+        <p>UserName: selectedData?.UserName</p>
+      </div>
+      <div class="info-item">
+        <span class="icon">&#x2709;</span>
+        <p>Email: selectedData?.Email</p>
+      </div>
+      <div class="info-item">
+        <span class="icon">&#x1F4F1;</span>
+        <p>Phone: selectedData?.Phone</p>
+      </div>
+      <div class="info-item">
+        <span class="icon">&#x1F4CD;</span>
+        <p>Address: selectedData?.Address</p>
+      </div>
+      <div class="info-item">
+        <span class="icon">&#x1F4B0;</span>
+        <p>Role: selectedData?.Role</p>
+      </div>
+    </div>
+
+    <div class="dialog-actions">
+      <button class="close-btn" onclick="handleClose()">Đóng</button>
+    </div>
+  </div>
+</div>
+
   );
 }
 
