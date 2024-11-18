@@ -9,7 +9,7 @@ export default function BrandPage() {
   const [isUpdate, setIsUpdate] = useState(false);
   const [items, setItems] = useState([]);
   const [maxPageSize, setMaxPageSize] = useState(50); 
-  const [rowsPerPage, setRowsPerPage] = useState(5); 
+  const [rowsPerPage, setRowsPerPage] = useState(100); 
   const [page, setPage] = useState(0); 
 
 
