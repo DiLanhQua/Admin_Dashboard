@@ -12,12 +12,14 @@ import productReducer from "./slices/product";
 import attributeReducer from "./slices/attribute";
 import tagReducer from "./slices/tags";
 
+
 import shippingUnitsReducer from "./slices/shipping";
 
 import webConfigReducer from "./slices/webComfig";
 import paymentReducer from "./slices/paynents";
 import couponReducer from "./slices/coupon";
 import bannerCollectionReducer from "./slices/BannerCollection";
+
 
 const store = configureStore({
   reducer: {
@@ -26,6 +28,9 @@ const store = configureStore({
     customer: customerReducer,
     post: postReducer,
     category: categoryReducer,
+
+
+
     icon: iconReducer,
     brand: brandReducer,
     collection: collectionReducer,

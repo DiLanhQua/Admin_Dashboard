@@ -1,4 +1,5 @@
 import * as React from "react";
+import axios from "axios";
 import Box from "@mui/material/Box";
 import Button from "@mui/material/Button";
 import CssBaseline from "@mui/material/CssBaseline";
@@ -11,6 +12,8 @@ import Stack from "@mui/material/Stack";
 import MuiCard from "@mui/material/Card";
 import { styled } from "@mui/material/styles";
 import ForgotPassword from "../ForgotPassword/ForgotPassword";
+import { useNavigate } from "react-router-dom";
+
 const Card = styled(MuiCard)(({ theme }) => ({
   display: "flex",
   flexDirection: "column",
@@ -36,27 +39,27 @@ const BackgroundContainer = styled("div")({
   left: 0,
   right: 0,
   bottom: 0,
-  zIndex: -1, // Ensures the background stays behind the form
+  zIndex: -1,
   backgroundImage: `url("https://firebasestorage.googleapis.com/v0/b/e-commerce-shop-443f6.appspot.com/o/background%2Fbackground%20ecommerce.png?alt=media&token=0b18035b-1d5b-4e1a-b916-ce03c4333a76")`,
   backgroundSize: "cover",
   backgroundPosition: "center",
-  filter: "blur(0.2px)", // Blur only the background image
+  filter: "blur(0.2px)",
 });
 
 const SignInContainer = styled(Stack)(({ theme }) => ({
-  minHeight: "100vh", // Full viewport height
+  minHeight: "100vh",
   padding: theme.spacing(2),
-  alignItems: "center", // Center horizontally
-  justifyContent: "center", // Center vertically
-  position: "relative", // So the background stays behind the content
+  alignItems: "center",
+  justifyContent: "center",
+  position: "relative",
   [theme.breakpoints.up("sm")]: {
     padding: theme.spacing(4),
   },
 }));
 
 export default function SignIn() {
-  const [emailError, setEmailError] = React.useState(false);
-  const [emailErrorMessage, setEmailErrorMessage] = React.useState("");
+   const navigate = useNavigate();
+  const [usernameError, setUsernameError] = React.useState(false);
   const [passwordError, setPasswordError] = React.useState(false);
   const [passwordErrorMessage, setPasswordErrorMessage] = React.useState("");
   const [open, setOpen] = React.useState(false);
@@ -69,37 +72,44 @@ export default function SignIn() {
     setOpen(false);
   };
 
-  const handleSubmit = (event) => {
+  const handleSubmit = async (event) => {
     event.preventDefault();
-    if (emailError || passwordError) {
-      console.log("Please fix the errors in the form.");
+    if (!validateInputs()) {
       return;
     }
-    const data = {
-      email: document.getElementById("email").value,
-      password: document.getElementById("password").value,
+
+     const data = {
+        userName: document.getElementById("username").value,
+        password: document.getElementById("password").value,
     };
     console.log(data);
+    try {
+      const response = await axios.post("https://localhost:7048/api/Account/login", data);
+      console.log("Đăng nhập thành công:", response.data);
+      alert("Đăng nhập thành công!");
+      navigate("/dashboard");
+    } catch (error) {
+      console.error("Lỗi đăng nhập:", error.response?.data || error.message);
+      alert("Đăng nhập thất bại! Vui lòng kiểm tra lại thông tin.");
+    }
   };
 
   const validateInputs = () => {
-    const email = document.getElementById("email");
+    const username = document.getElementById("username");
     const password = document.getElementById("password");
 
     let isValid = true;
 
-    if (!email.value || !/\S+@\S+\.\S+/.test(email.value)) {
-      setEmailError(true);
-      setEmailErrorMessage("Vui lòng nhập địa chỉ email hợp lệ.");
+    if (!username.value) {
+      setUsernameError(true);
       isValid = false;
     } else {
-      setEmailError(false);
-      setEmailErrorMessage("");
+      setUsernameError(false);
     }
 
-    if (!password.value || password.value.length < 6) {
+    if (!password.value || password.value.length < 5) {
       setPasswordError(true);
-      setPasswordErrorMessage("Mật khẩu phải dài ít nhất 6 ký tự.");
+      setPasswordErrorMessage("Mật khẩu phải dài ít nhất 5 ký tự.");
       isValid = false;
     } else {
       setPasswordError(false);
@@ -134,21 +144,18 @@ export default function SignIn() {
             }}
           >
             <FormControl>
-              <FormLabel htmlFor="email">Email</FormLabel>
+              <FormLabel htmlFor="username">Tài khoản</FormLabel>
               <TextField
-                error={emailError}
-                helperText={emailErrorMessage}
-                id="email"
-                type="email"
-                name="email"
-                placeholder="your@email.com"
-                autoComplete="email"
+                error={usernameError}
+                id="username"
+                type="text"
+                name="username"
+                placeholder="Tên tài khoản"
                 autoFocus
                 required
                 fullWidth
                 variant="outlined"
-                color={emailError ? "error" : "primary"}
-                sx={{ ariaLabel: "email" }}
+                color={usernameError ? "error" : "primary"}
               />
             </FormControl>
             <FormControl>
@@ -180,12 +187,7 @@ export default function SignIn() {
               />
             </FormControl>
             <ForgotPassword open={open} handleClose={handleClose} />
-            <Button
-              type="submit"
-              fullWidth
-              variant="contained"
-              onClick={validateInputs}
-            >
+            <Button type="submit" fullWidth variant="contained">
               Đăng nhập
             </Button>
           </Box>

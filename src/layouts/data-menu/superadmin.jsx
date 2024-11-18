@@ -47,20 +47,20 @@ const menuItems = {
             },
           ],
         },
-        {
-          id: "collections",
-          title: "Bộ sưu tập",
-          type: "collapse",
-          icon: "feather icon-book",
-          children: [
-            {
-              id: "collection-list",
-              title: "Danh sách bộ sưu tập",
-              type: "item",
-              url: "/dashboard/collection",
-            },
-          ],
-        },
+        // {
+        //   id: "collections",
+        //   title: "Bộ sưu tập",
+        //   type: "collapse",
+        //   icon: "feather icon-book",
+        //   children: [
+        //     {
+        //       id: "collection-list",
+        //       title: "Danh sách bộ sưu tập",
+        //       type: "item",
+        //       url: "/dashboard/collection",
+        //     },
+        //   ],
+        // },
         {
           id: "products",
           title: "Sản phẩm",
@@ -144,93 +144,93 @@ const menuItems = {
           icon: "feather icon-tag",
           url: "/dashboard/coupons",
         },
-        {
-          id: "tags",
-          title: "Tags",
-          type: "item",
-          icon: "feather icon-tag",
-          url: "/dashboard/tags",
-        },
-        {
-          id: "comfig",
-          title: "Cấu hình",
-          type: "collapse",
-          icon: "feather icon-settings",
-          children: [
-            {
-              id: "site-config",
-              title: "Cấu hình trang web",
-              type: "item",
-              url: "/dashboard/webconfig",
-            },
-            {
-              id: "email-config",
-              title: "Cấu hình banner",
-              type: "item",
-              url: "/dashboard/bannercollection",
-            },
-            {
-              id: "payment-config",
-              title: "Cấu hình thanh toán",
-              type: "item",
-              url: "/dashboard/paymentconfig",
-            },
-            {
-              id: "shipping-config",
-              title: "Cấu hình vận chuyển",
-              type: "item",
-              url: "/dashboard/shippingConfig",
-            },
+        // {
+        //   id: "tags",
+        //   title: "Tags",
+        //   type: "item",
+        //   icon: "feather icon-tag",
+        //   url: "/dashboard/tags",
+        // },
+        // {
+        //   id: "comfig",
+        //   title: "Cấu hình",
+        //   type: "collapse",
+        //   icon: "feather icon-settings",
+        //   children: [
+        //     {
+        //       id: "site-config",
+        //       title: "Cấu hình trang web",
+        //       type: "item",
+        //       url: "/dashboard/webconfig",
+        //     },
+        //     {
+        //       id: "email-config",
+        //       title: "Cấu hình banner",
+        //       type: "item",
+        //       url: "/dashboard/bannercollection",
+        //     },
+        //     {
+        //       id: "payment-config",
+        //       title: "Cấu hình thanh toán",
+        //       type: "item",
+        //       url: "/dashboard/paymentconfig",
+        //     },
+        //     {
+        //       id: "shipping-config",
+        //       title: "Cấu hình vận chuyển",
+        //       type: "item",
+        //       url: "/dashboard/shippingConfig",
+        //     },
 
-          ],
-        },
-        {
-          id: "warehouse",
-          title: "Kho hàng",
-          type: "collapse",
-          icon: "feather icon-package",
-          children: [
-            {
-              id: "add-warehouse",
-              title: "Thêm kho hàng",
-              type: "item",
-              url: "/dashboard/warehouse/create",
-            },
-            {
-              id: "warehouse-list",
-              title: "Danh sách kho hàng",
-              type: "item",
-              url: "/dashboard/warehouse",
-            },
-          ],
-        },
-        {
-          id: "Post",
-          title: "Bài đăng",
-          type: "collapse",
-          icon: "feather icon-file-text",
-          children: [
-            {
-              id: "add-blog",
-              title: "Thêm bài viết",
-              type: "item",
-              url: "/dashboard/post/create",
-            },
-            {
-              id: "post-list",
-              title: "Danh sách bài đăng",
-              type: "item",
-              url: "/dashboard/post",
-            },
-          ],
-        },
-        {
-          id: "history",
-          title: "Lịch sử Thao tác",
-          type: "item",
-          icon: "feather icon-clock",
-          url: "/dashboard/history",
-        },
+        //   ],
+        // },
+        // {
+        //   id: "warehouse",
+        //   title: "Kho hàng",
+        //   type: "collapse",
+        //   icon: "feather icon-package",
+        //   children: [
+        //     {
+        //       id: "add-warehouse",
+        //       title: "Thêm kho hàng",
+        //       type: "item",
+        //       url: "/dashboard/warehouse/create",
+        //     },
+        //     {
+        //       id: "warehouse-list",
+        //       title: "Danh sách kho hàng",
+        //       type: "item",
+        //       url: "/dashboard/warehouse",
+        //     },
+        //   ],
+        // },
+        // {
+        //   id: "Post",
+        //   title: "Bài đăng",
+        //   type: "collapse",
+        //   icon: "feather icon-file-text",
+        //   children: [
+        //     {
+        //       id: "add-blog",
+        //       title: "Thêm bài viết",
+        //       type: "item",
+        //       url: "/dashboard/post/create",
+        //     },
+        //     {
+        //       id: "post-list",
+        //       title: "Danh sách bài đăng",
+        //       type: "item",
+        //       url: "/dashboard/post",
+        //     },
+        //   ],
+        // },
+        // {
+        //   id: "history",
+        //   title: "Lịch sử Thao tác",
+        //   type: "item",
+        //   icon: "feather icon-clock",
+        //   url: "/dashboard/history",
+        // },
         {
           id: "auth",
           title: "Tài khoản",
