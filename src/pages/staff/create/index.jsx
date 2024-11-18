@@ -1,244 +1,377 @@
-import { Grid, Box, Typography, Paper, Button } from "@mui/material";
-import { useFormik } from "formik";
-import CustomInputField from "../../../components/InputField";
-import CustomDropdown from "../../../components/Dropdown";
-import Textarea from "../../../components/textarea";
-import { StaffSchema } from "../validade/create";
+import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import { handleToast } from "../../../utils/toast";
-import ImageUploader from "../../../components/upload";
-import { useDispatch, useSelector } from "react-redux";
-import { createStaff, resetState } from "../../../redux/slices/staff";
-import { useEffect } from "react";
+// import { createStaff, resetState } from "../../../redux/slices/staff";
+import React, { useState } from "react";
+// import axios from 'axios';
+// import "../staff/css/staff.css";
+import { Card } from 'react-bootstrap';
+import MapPicker from '../Map/MapPicker';
 
-const options = {
-  roles: [
-    { value: "1", label: "Quản trị viên" },
-    { value: "2", label: "Biên tập viên" },
-    { value: "3", label: "Nhân viên" },
-  ],
-  departments: [
-    { value: "Sale", label: "Marketing" },
-    { value: "Support", label: "Hỗ trợ viên" },
-    { value: "Warehouse", label: "Kho" },
-    { value: "Accounting", label: "Kế toán" },
-  ],
-  bases: [
-    { value: "cơ sở 1", label: "cơ sở 1" },
-    { value: "cơ sở 2", label: "cơ sở 2" },
-  ],
-};
+import {postStaffAPI} from "../js/AxiosStaff";
 
 function AddStaff() {
+  const [image, setImage] = useState(null);
+  const [imagePreview, setImagePreview] = useState(null); // Thêm state để lưu hình ảnh xem trước
+  const [fullName, setFullName] = useState("");
+  const [userName, setUserName] = useState("");
+  const [email, setEmail] = useState("");
+  const [phone, setPhone] = useState("");
+  const [address, setAddress] = useState("");
+  const [role, setRole] = useState("");
+  const [password, setPassword] = useState("");
+  const [showMap, setShowMap] = useState(false);
+  const [isLoading, setIsLoading] = useState(false); 
+  const [selectedLocation, setSelectedLocation] = useState(null);
   const navigate = useNavigate();
   const dispatch = useDispatch();
-  const error = useSelector((state) => state.staff.statusCreate);
-  const status = useSelector((state) => state.staff.statusCreate);
-  const formik = useFormik({
-    initialValues: {
-      name: "",
-      email: "",
-      phone: "",
-      address: "",
-      role: "",
-      department: "",
-      base: "",
-      fixedSalary: "",
-      description: "",
-      avatar: "",
-      password: "",
-      confirmPassword: "",
-    },
-    validationSchema: StaffSchema,
-    onSubmit: async (values) => {
-      await dispatch(createStaff(values));
-    },
-  });
 
-  useEffect(() => {
-    if (status === "success") {
-      formik.resetForm();
-      dispatch(resetState());
-      handleToast("success", "Thêm nhân viên thành công", "top-right");
-    }
-    if (error) {
-      handleToast("error", error.mes, "top-right");
-    }
-  }, [status, error, dispatch]);
+  const error = useSelector((state) => state.staff.error); // Lấy lỗi từ redux
+  const status = useSelector((state) => state.staff.statusCreate); // Trạng thái tạo nhân viên
 
-  const handleUploadComplete = (url) => {
-    console.log("Image uploaded:", url);
-    formik.setFieldValue("avatar", url);
+  // Nếu bạn muốn sử dụng formik, có thể khởi tạo ở đây
+  // const formik = useFormik({
+  //   initialValues: {
+  //     name: "",
+  //     email: "",
+  //     phone: "",
+  //     address: "",
+  //     role: "",
+  //     department: "",
+  //     base: "",
+  //     fixedSalary: "",
+  //     description: "",
+  //     avatar: "",
+  //     password: "",
+  //     confirmPassword: "",
+  //   },
+  //   validationSchema: StaffSchema,
+  //   onSubmit: async (values) => {
+  //     await dispatch(createStaff(values)); // Gửi dữ liệu tạo nhân viên
+  //   },
+  // });
+
+  // useEffect(() => {
+  //   if (status === "success") {
+  //     // Nếu trạng thái tạo nhân viên thành công
+  //     // formik.resetForm(); // Nếu sử dụng formik, reset form ở đây
+  //     // dispatch(resetState()); // Reset lại trạng thái
+  //     handleToast("success", "Thêm nhân viên thành công", "top-right"); // Hiển thị thông báo thành công
+  //   }
+  //   if (error) {
+  //     // Nếu có lỗi
+  //     handleToast("error", error.mes, "top-right"); // Hiển thị thông báo lỗi
+  //   }
+  // }, [status, error, dispatch]);
+  // const handleUploadComplete = (url) => {
+  //   console.log("Image uploaded:", url);
+  //   formik.setFieldValue("avatar", url);
+  // };
+
+  // const handleDelete = () => {
+  //   formik.setFieldValue("avatar", "");
+  //   setImagePreview(null); // Xóa hình ảnh xem trước khi xóa avatar
+  // };
+
+  // const getErrorProps = (name) => ({
+  //   error: formik.touched[name] && Boolean(formik.errors[name]),
+  //   helperText: formik.touched[name] && formik.errors[name],
+  // });
+  const validateForm = () => {
+    if (!fullName || !userName || !email || !phone || !address || !role || !password ) {
+      handleToast("error", "Vui lòng điền đầy đủ thông tin.", "top-right");
+      return false;
+    }
+  
+    if (fullName.length <= 5 || /\d/.test(fullName)) {
+      handleToast("error", "Họ và tên phải dài hơn 5 ký tự và không chứa số.", "top-right");
+      return false;
+    }
+  
+    const usernameRegex = /^[a-zA-Z0-9_]+$/; 
+    if (!usernameRegex.test(userName)) {
+      handleToast("error", "Tên người dùng không hợp lệ. Không được chứa dấu cách hoặc ký tự đặc biệt.", "top-right");
+      return false;
+    }
+  
+    const phoneRegex = /^0389\d{6,8}$/; 
+    if (!phoneRegex.test(phone)) {
+      handleToast("error", "Số điện thoại không hợp lệ. Phải bắt đầu bằng 0389 và dài từ 10 đến 12 chữ số.", "top-right");
+      return false;
+    }
+  
+    if (password.length < 5) {
+      handleToast("error", "Mật khẩu phải ít nhất 5 ký tự.", "top-right");
+      return false;
+    }
+    setIsLoading(true);
+    return true;
+  };
+  
+  const addnv = async (e) => {
+    e.preventDefault();
+    if (!validateForm()) return;
+    const formData = new FormData();
+    formData.append('fullName', fullName);
+    formData.append('userName', userName);
+    formData.append('email', email);
+    formData.append('password', password);
+    formData.append('phone', phone);
+    formData.append('address', address);
+    formData.append('role', role);
+    if (image) {
+      formData.append('picture', image); // Gửi hình ảnh kèm theo
+    }
+
+    try {
+      const response = await  postStaffAPI(formData);
+      handleToast("success", "Nhân viên đã được sửa thành công!", "top-right");
+      navigate("/dashboard/staff");
+    } catch (error) {
+      handleToast("error", "Sửa nhân viên thất bại.", "top-right");
+    }
+  };
+  const handleImageChange = (e) => {
+    const file = e.target.files?.[0] || null;  // Lấy file đầu tiên nếu có
+    if (file) {
+      setImage(file);  // Gán file vào state
+      setImagePreview(URL.createObjectURL(file));  // Hiển thị ảnh xem trước
+    } else {
+      setImage(null);  // Đảm bảo null nếu không có file
+      setImagePreview(null);  // Xóa ảnh xem trước nếu không có file
+    }
   };
 
-  const handleDelete = () => {
-    formik.setFieldValue("avatar", "");
+ 
+const handleLocationSelect = async (location) => {
+  setSelectedLocation(location);
+
+  const address = await getAddressFromLatLng(location.lat, location.lng);
+  
+  if (address) {
+    setAddress(address); 
+  } else {
+    setAddress(`Vĩ độ: ${location.lat}, Kinh độ: ${location.lng}`); 
+  }
+
+  setShowMap(false); 
+};
+
+const getAddressFromLatLng = async (lat, lng) => {
+  const url = `https://nominatim.openstreetmap.org/reverse?lat=${lat}&lon=${lng}&format=json`;
+
+  try {
+    const response = await fetch(url);
+    const data = await response.json();
+    
+    if (data.address) {
+      const fullAddress = `${data.address.road || ''}, ${data.address.city || ''}, ${data.address.country || ''}`;
+      console.log('Địa chỉ: ', fullAddress);
+      return fullAddress;
+    } else {
+      console.error('Không tìm thấy địa chỉ');
+      return null;
+    }
+  } catch (error) {
+    console.error('Lỗi khi gọi API: ', error);
+    return null;
+  }
+};
+
+  const handleAddressChange = async (e) => {
+    setAddress(e.target.value);
+    const address = e.target.value;
+
+    // Nếu người dùng nhập địa chỉ, tìm kiếm vĩ độ và kinh độ qua Geocoding (Nominatim API)
+    if (address) {
+      const geocodeUrl = `https://nominatim.openstreetmap.org/search?q=${address}&format=json&addressdetails=1`;
+      try {
+        const response = await axios.get(geocodeUrl);
+        if (response.data && response.data[0]) {
+          const { lat, lon } = response.data[0];
+          setSelectedLocation({ lat, lng: lon });
+        }
+      } catch (error) {
+        console.error("Lỗi khi geocode địa chỉ:", error);
+      }
+    } else {
+      setSelectedLocation(null);  // Nếu không có địa chỉ, xóa tọa độ đã chọn
+    }
   };
-
-  const getErrorProps = (name) => ({
-    error: formik.touched[name] && Boolean(formik.errors[name]),
-    helperText: formik.touched[name] && formik.errors[name],
-  });
-
   return (
-    <form onSubmit={formik.handleSubmit}>
-      {" "}
-      {/* Sử dụng handleSubmit của Formik */}
-      <Box p={3}>
-        <Grid container spacing={3}>
-          {/* Profile Upload Section */}
-          <Grid item xs={12} md={4}>
-            <Paper elevation={3} sx={{ padding: 2 }}>
-              <Box textAlign="center" mb={2}>
-                <Typography variant="h6">Ảnh hồ sơ</Typography>
-                <Box>
-                  <ImageUploader
-                    onUploadComplete={handleUploadComplete}
-                    onDelete={handleDelete}
-                    avatarSize={100}
-                    {...getErrorProps("avatar")}
-                    onBlur={formik.handleBlur}
-                    fooder="staff" // thay đổi dynamic nếu cần
-                  />
-                </Box>
-              </Box>
-            </Paper>
-          </Grid>
+    <div className="container">
+      <form onSubmit={addnv}>
+        <div className="row">
+          <div className="col-md-4">
 
-          {/* User Information Section */}
-          <Grid item xs={12} md={8}>
-            <Paper elevation={3} sx={{ padding: 2 }}>
-              <Grid container spacing={2}>
-                <Grid item xs={12} md={6}>
-                  <CustomInputField
-                    label="Họ và tên"
-                    name="name"
-                    value={formik.values.name}
-                    onChange={formik.handleChange}
-                    {...getErrorProps("name")}
-                  />
-                </Grid>
-                <Grid item xs={12} md={6}>
-                  <CustomInputField
-                    label="Email"
-                    name="email"
-                    value={formik.values.email}
-                    onChange={formik.handleChange}
-                    {...getErrorProps("email")}
-                  />
-                </Grid>
-                <Grid item xs={12} md={6}>
-                  <CustomInputField
-                    label="Số điện thoại"
-                    name="phone"
-                    value={formik.values.phone}
-                    onChange={formik.handleChange}
-                    {...getErrorProps("phone")}
-                  />
-                </Grid>
-                <Grid item xs={12} md={6}>
-                  <CustomInputField
-                    label="Địa chỉ"
-                    name="address"
-                    value={formik.values.address}
-                    onChange={formik.handleChange}
-                    {...getErrorProps("address")}
-                  />
-                </Grid>
-                <Grid item xs={12} md={6}>
-                  <CustomDropdown
-                    label="Chức vụ"
-                    name="role"
-                    options={options.roles}
-                    value={formik.values.role}
-                    onChange={formik.handleChange}
-                    {...getErrorProps("role")}
-                  />
-                </Grid>
-                <Grid item xs={12} md={6}>
-                  <CustomDropdown
-                    label="Phòng ban"
-                    name="department"
-                    options={options.departments}
-                    value={formik.values.department}
-                    onChange={formik.handleChange}
-                    {...getErrorProps("department")}
-                  />
-                </Grid>
-                <Grid item xs={12} md={6}>
-                  <CustomDropdown
-                    label="Cơ sở làm việc"
-                    name="base"
-                    options={options.bases}
-                    value={formik.values.base}
-                    onChange={formik.handleChange}
-                    {...getErrorProps("base")}
-                  />
-                </Grid>
-                <Grid item xs={12} md={6}>
-                  <CustomInputField
-                    label="Lương cơ bản"
-                    name="fixedSalary"
-                    value={formik.values.fixedSalary}
-                    onChange={formik.handleChange}
-                    {...getErrorProps("fixedSalary")}
-                  />
-                </Grid>
-                <Grid item xs={12} md={6}>
-                  <CustomInputField
-                    label="Mật khẩu"
-                    name="password"
-                    value={formik.values.password}
-                    onChange={formik.handleChange}
-                    {...getErrorProps("password")}
-                  />
-                </Grid>
-                <Grid item xs={12} md={6}>
-                  <CustomInputField
-                    label="Xác nhận mật khẩu"
-                    name="confirmPassword"
-                    value={formik.values.confirmPassword}
-                    onChange={formik.handleChange}
-                    {...getErrorProps("confirmPassword")}
-                  />
-                </Grid>
-                <Grid item xs={12}>
-                  <Textarea
-                    label="Mô tả"
-                    name="description"
-                    value={formik.values.description}
-                    onChange={formik.handleChange}
-                    {...getErrorProps("description")}
-                    height={300}
-                  />
-                </Grid>
-              </Grid>
+            <div className="from-img image-up">
+              <label htmlFor="image" className="image-label">
+                {imagePreview ? (
+                  <img src={imagePreview} alt="Preview" className="img-fluid robot-image" />
+                ) : (
+                  <div className="image-placeholder">
+                    <i className="fas fa-camera"></i> {/* Biểu tượng camera */}
+                    <span className="image-tx">Chọn hình ảnh</span>
+                  </div>
+                )}
+              </label>
+              <input
+                type="file"
+                id="image"
+                onChange={handleImageChange}
+                accept="image/*"
+                required
+                style={{ display: 'none' }}
+              />
+            </div>
 
-              {/* Submit Button */}
-              <Box mt={3} textAlign="right">
-                <Button
-                  variant="contained"
-                  type="submit"
-                  color="success"
-                  aria-label="Add Staff"
-                >
-                  Thêm nhân viên
-                </Button>
-                <Button
-                  variant="contained"
-                  color="error"
-                  onClick={() => navigate("/dashboard/staff")}
-                  style={{ marginLeft: 10 }}
-                  aria-label="Cancel"
-                >
-                  Hủy
-                </Button>
-              </Box>
-            </Paper>
-          </Grid>
-        </Grid>
-      </Box>
-    </form>
+
+          </div>
+          <div className="col-md-8">
+            <Card>
+              <div className="bor_create">
+                <div className="row">
+                  <div className="col-md-6">
+                    <div className="form-floating">
+                      <input
+                        type="text"
+                        className="form-control"
+                        id="fullName"
+                        placeholder="Họ và Tên"
+                        value={fullName}
+                        onChange={(e) => setFullName(e.target.value)}
+                      />
+                      <label htmlFor="fullName">Họ và Tên</label>
+                    </div>
+                  </div>
+                  <div className="col-md-6">
+                    <div className="form-floating">
+                      <input
+                        type="email"
+                        className="form-control"
+                        id="email"
+                        placeholder="Email"
+                        value={email}
+                        onChange={(e) => setEmail(e.target.value)}
+                        required
+                      />
+                      <label htmlFor="email">Email</label>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="row">
+                  <div className="col-md-6">
+                    <div className="form-floating">
+                      <input
+                        type="text"
+                        className="form-control"
+                        id="userName"
+                        placeholder="Tên Người Dùng"
+                        value={userName}
+                        onChange={(e) => setUserName(e.target.value)}
+                        required
+                      />
+                      <label htmlFor="userName">Tên Người Dùng</label>
+                    </div>
+                  </div>
+                  <div className="col-md-6">
+                    <div className="form-floating">
+                      <input
+                        type="password"
+                        className="form-control"
+                        id="password"
+                        placeholder="Mật Khẩu"
+                        value={password}
+                        onChange={(e) => setPassword(e.target.value)}
+                        required
+                      />
+                      <label htmlFor="password">Mật Khẩu</label>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="row">
+                  <div className="col-md-6">
+                    <div className="form-floating">
+                      <input
+                        type="text"
+                        className="form-control"
+                        id="phone"
+                        placeholder="Số Điện Thoại"
+                        value={phone}
+                        onChange={(e) => setPhone(e.target.value)}
+                        required
+                      />
+                      <label htmlFor="phone">Số Điện Thoại</label>
+                    </div>
+                  </div>
+                  <div className="col-md-6">
+                    <div className="form-floating custom-floating-label">
+                      <select
+                        className="form-select"
+                        id="chucVu"
+                        value={role}
+                        onChange={(e) => setRole(e.target.value)}
+                        required
+                      >
+                        <option value="" disabled hidden></option>
+                        <option value="1">Quản lý</option>
+                        <option value="2">Nhân viên</option>
+                        <option value="0">Khách Hàng</option>
+                      </select>
+                      <label htmlFor="chucVu">Chức vụ</label>
+                    </div>
+                  </div>
+
+                </div>
+                
+                <div className="form-floating d-flex ">
+                    <input
+                      type="text"
+                      className="form-control"
+                        id="address"
+                      placeholder="Địa Chỉ"
+                      value={address}
+                      onChange={handleAddressChange} 
+                      required // Xử lý thay đổi địa chỉ từ người dùng
+                    />
+                  <label htmlFor="address">Địa Chỉ</label>
+                    <button
+                      type="button"
+                      className="btn btn-outline-secondary ms-2"
+                      onClick={() => setShowMap((prev) => !prev)}
+                    >
+                      <i className="fas fa-map-marker-alt"></i>
+                    </button>
+                </div>
+
+                {/* Hiển thị Bản Đồ khi click */}
+                {showMap && (
+                  <div className="map-container" style={{ height: '300px' }}>
+                    <MapPicker onLocationSelect={handleLocationSelect} selectedLocation={selectedLocation} />
+                  </div>
+                )}
+              </div>
+              <div className="text-center">
+          <button type="submit" className="create-luu" 
+          disabled={isLoading || !fullName || !email || !phone || !address || !role || !password}
+        >
+          {isLoading ? <span ><i className="loading-icon">⏳</i>Đang tải</span> : "Thêm nhân viên"}
+          </button>
+        </div>
+            </Card>
+
+
+
+          </div>
+        </div>
+
+        
+
+      </form>
+
+    </div>
   );
 }
 

@@ -8,9 +8,9 @@ import { handleToast } from "../../utils/toast";
 export default function BrandPage() {
   const [isUpdate, setIsUpdate] = useState(false);
   const [items, setItems] = useState([]);
-  const [maxPageSize, setMaxPageSize] = useState(50); // Giá trị tối đa cho trang
-  const [rowsPerPage, setRowsPerPage] = useState(5); // Kích thước mặc định mỗi trang
-  const [page, setPage] = useState(0); // Trang hiện tại
+  const [maxPageSize, setMaxPageSize] = useState(50); 
+  const [rowsPerPage, setRowsPerPage] = useState(5); 
+  const [page, setPage] = useState(0); 
 
 
   const [initialValues, setInitialValues] = useState({
