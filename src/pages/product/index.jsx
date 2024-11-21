@@ -1,19 +1,28 @@
 import React, { useEffect, useState } from "react";
-import { Row, Col, Card, Button } from "react-bootstrap";
-import { getProductAPI, getMediaAPI, getImageAPI, getBrandAPI } from "./js/product";
-import { useNavigate } from "react-router-dom";
-
+import { Row, Col, Card, Button, Modal } from "react-bootstrap";
+import { getProductAPI, getMediaAPI, getImageAPI, getBrandAPI, getDetailproductAPI } from "./js/product";
+import { useNavigate, Link } from "react-router-dom";
+import ControlPointIcon from "@mui/icons-material/ControlPoint";
+import RemoveRedEyeIcon from "@mui/icons-material/RemoveRedEye";
+import {IconButton} from "@mui/material";
+import "./css/product.css"
 export default function StaffPage() {
   const navigate = useNavigate();
   const [items, setItems] = useState([]);
   const [brands, setBrands] = useState([]);
   const [medias, setMedias] = useState([]);
   const [images, setImages] = useState([]);
-  const [selectedEmployee, setSelectedEmployee] = useState(null);
+  const [detailproducts, setDetailproduct] = useState([]);
+  const [selectedProduct, setSelectedProduct] = useState(null);
   const [searchTerm, setSearchTerm] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
   const [customersPerPage, setCustomersPerPage] = useState(5);
   const [showDetailModal, setShowDetailModal] = useState(false);
+  const [activeTab, setActiveTab] = useState("info");
+
+
+
+
   const handleShow = () => setShowDetailModal(true);
   const handleClose = () => setShowDetailModal(false);
 
@@ -21,6 +30,7 @@ export default function StaffPage() {
     const GetStall = async () => {
       try {
         const res = await getProductAPI(customersPerPage, currentPage);
+
         if (Array.isArray(res.data)) {
           setItems(res.data);
         } else {
@@ -37,7 +47,6 @@ export default function StaffPage() {
       try {
         const brandPromises = items.map((item) => getBrandAPI(item.brandId));
         const resolvedBrands = await Promise.all(brandPromises);
-        console.log("resolvedBrands: ", JSON.stringify(resolvedBrands, null, 2));
         setBrands(resolvedBrands);
       } catch (error) {
         console.error("Lỗi khi lấy media cho sản phẩm:", error);
@@ -53,6 +62,10 @@ export default function StaffPage() {
       try {
         const mediaPromises = items.map((item) => getMediaAPI(item.id));
         const resolvedMedias = await Promise.all(mediaPromises);
+
+        // console.log("imagePromises: ", resolvedMedias);
+
+        // console.log("resolvedImages: ", JSON.stringify(resolvedMedias, null, 2));
         setMedias(resolvedMedias);
       } catch (error) {
         console.error("Lỗi khi lấy media cho sản phẩm:", error);
@@ -74,13 +87,11 @@ export default function StaffPage() {
           }));
         });
 
-        // In ra console để kiểm tra các promises
-        console.log("imagePromises: ", imagePromises);
+        // console.log("imagePromises: ", imagePromises);
 
         const resolvedImages = await Promise.all(imagePromises);
 
-        // Sử dụng JSON.stringify để kiểm tra chi tiết đối tượng trong resolvedImages
-        console.log("resolvedImages: ", JSON.stringify(resolvedImages, null, 2));
+        // console.log("resolvedImages: ", JSON.stringify(resolvedImages, null, 2));
 
         setImages(resolvedImages);
       } catch (error) {
@@ -104,7 +115,20 @@ export default function StaffPage() {
       setCurrentPage(newPage);
     }
   };
-
+  const detaile = async (item) => {
+    try{
+    console.log("id ", item.productName)
+    const response = await getDetailproductAPI(item.id);
+    // const responsee = await getDeLoginAPI(id);
+    setDetailproduct(response);
+    setSelectedProduct(item);
+    //  setLogin(responsee);
+    console.log("de: " + response);
+    handleShow();
+    }catch (error) {
+      console.error("Lỗi khi tải thông tin chi tiết sản phẩm: ", error);
+    }
+  };
   return (
     <React.Fragment>
       <Row>
@@ -123,9 +147,19 @@ export default function StaffPage() {
                   />
                   <label htmlFor="search">Tìm kiếm</label>
                 </div>
-                <a href="/dashboard/staff/create" className="create-stall">
+                {/* <a href="/dashboard/staff/create" className="create-stall">
                   Thêm mới
-                </a>
+                </a> */}
+                <Link to={"/dashboard/staff/create"}>
+                  <Button
+                    variant="contained"
+                    className="custom-button"
+                    sx={{ mr: 2 }}
+                  >
+                    <ControlPointIcon sx={{ marginRight: 1 }} />
+                    Thêm mới
+                  </Button>
+                </Link>
               </div>
               <div className="table-responsive">
                 <table className="table">
@@ -148,14 +182,9 @@ export default function StaffPage() {
                           <th scope="row">{indexOfFirstCustomer + stt + 1}</th>
                           <td>
                             {productMedia.map((media, index) => {
-                              console.log("media: ", media);
-                              console.log("images: ", images);
 
                               const productImage = images.find((image) => image.mediaId === media.imageId);
-                              console.log("Found product image: ", productImage);
-                              console.log("media.imageId " + media.imageId);
-                              console.log("productMedia " + productMedia);
-                              console.log("productImage " + productImage);
+                              // console.log("productImage1 : ",productImage);
                               return (
                                 productImage && (
                                   <img
@@ -171,19 +200,136 @@ export default function StaffPage() {
                           <td>{item.productName}</td>
                           <td>{item.categoryId || "Chưa có địa chỉ"}</td>
                           <td>
-                          {productBrans.length > 0 && (
-  <p>{productBrans[0].brandName}</p>
-)}
+                            {productBrans.length > 0 && (
+                              <p>{productBrans[0].brandName}</p>
+                            )}
                           </td>
                           <td>
-                            <Button variant="primary" onClick={() => setSelectedEmployee(item)}>
-                              Xem
-                            </Button>
+                            <IconButton
+                              color="primary"
+                              onClick={() => detaile(item)}
+                              sx={{ padding: "4px" }}
+                            >
+                              <RemoveRedEyeIcon />
+                            </IconButton>
+                            
+
                           </td>
                         </tr>
                       );
                     })}
+                    <Modal show={showDetailModal} 
+                            onHide={handleClose} size="lg">
+                              <Modal.Header closeButton>
+                                <Modal.Title>
+                                  Thông Tin Chi Tiết Sản Phẩm: {selectedProduct?.productName || "N/A"}
+                                </Modal.Title>
+                              </Modal.Header>
+                              <Modal.Body>
+                                {detailproducts ? (
+                                  <div className="dialog">
+                                    <div className="dialog-tabs">
+              {/* Tab Buttons */}
+              <button
+                className={`tab-btn ${activeTab === "info" ? "active" : ""}`}
+                onClick={() => setActiveTab("info")}
+              >
+                Xem Thông Tin
+              </button>
+              <button
+                className={`tab-btn ${activeTab === "description" ? "active" : ""}`}
+                onClick={() => setActiveTab("description")}
+              >
+                Xem Mô Tả Sản Phẩm
+              </button>
+            </div>
+                                    <div className="dialog-content">
+                                    {activeTab === "info" && (
+                                      <div className="table-responsive">
+                                        <table className="table">
+                                          <thead>
+                                            <tr>
+                                              <th scope="col">#</th>
+                                              <th scope="col">Hình ảnh</th>
+                                              <th scope="col">Tên sản phẩm</th>
+                                              <th scope="col">Kích thước</th>
+                                              <th scope="col">Màu sắc</th>
+                                              <th scope="col">Số lượng</th>
+                                              <th scope="col">Giá</th>
+                                              <th scope="col">Giới tính</th>
+                                            </tr>
+                                          </thead>
+                                          <tbody>
+                                            {detailproducts.map((detail, index) => {
+                                              const productMedia = medias.filter((media) => media.productId === selectedProduct?.id);
+                                              const mediaForProduct = productMedia.filter(
+                                                (media) => media.productId === selectedProduct?.id
+                                              );
+
+                                              return (
+                                                <tr key={detail.id}>
+                                                  <th scope="row">{index + 1}</th>
+                                                  <td>
+                                                    {mediaForProduct.map((media, mediaIndex) => {
+                                                      const productImage = images.find(
+                                                        (image) => image.mediaId === media.imageId
+                                                      );
+                                                      console.log("productImage: ", productImage);
+                                                      return (
+                                                        productImage && (
+                                                          // <img
+                                                          //   key={mediaIndex}
+                                                          //   src={productImage.imageUrl}
+                                                          //   alt={`media-${detail.id}`}
+                                                          //   style={{
+                                                          //     width: "50px",
+                                                          //     height: "50px",
+                                                          //     objectFit: "cover",
+                                                          //   }}
+                                                          // />
+                                                          <img
+                                                            key={mediaIndex
+                                                            }
+                                                            src={productImage.imageUrl}
+                                                            alt={`media-${selectedProduct.id}`}
+                                                            style={{ width: "50px", height: "50px", objectFit: "cover" }}
+                                                          />
+                                                        )
+                                                      );
+                                                    })}
+                                                  </td>
+                                                  <td>{selectedProduct.productName}</td>
+                                                  <td>{detail.size}</td>
+                                                  <td>{detail.colorId}</td>
+                                                  <td>{detail.quantity}</td>
+                                                  <td>{detail.price}</td>
+                                                  <td>{detail.gender}</td>
+                                                </tr>
+                                              );
+                                            })}
+                                          </tbody>
+                                        </table>
+                                      </div>)}
+                                      {activeTab === "description" && (
+                <div className="description-container">
+                  <h5>Mô Tả Sản Phẩm</h5>
+                  <p>{selectedProduct?.description || "Không có mô tả."}</p>
+                </div>
+              )}
+                                      <div className="dialog-actions">
+                                        <button className="close-btn" onClick={handleClose}>
+                                          Đóng
+                                        </button>
+                                      </div>
+                                    </div>
+                                  </div>
+                                ) : (
+                                  <p>Đang tải thông tin...</p>
+                                )}
+                              </Modal.Body>
+                            </Modal>
                   </tbody>
+                  
                 </table>
 
                 <div

@@ -5,7 +5,7 @@ import axiosImage from "./axiosImage";
 import axiosBrand from "./axiosBrand";
 const END_POINT = {
     GetAllProduct : "get-all-product",
-    GetAllDetailproduct : "get-all-detailproduct",
+    GetDetailproduct : "get-detailproduct",
     GetMedia: "get-medias",
     GetImage: "get-Image",
     Getbrand: "get-brand-by-id",
@@ -14,8 +14,8 @@ const END_POINT = {
 export const getProductAPI = (customersPerPage,currentPage) => {
     return axiosS.get(`${END_POINT.GetAllProduct}?maxPageSize=${customersPerPage}&Pagesize=${customersPerPage}&PageNumber=${currentPage}`)
 }
-export const getDetailproductAPI = (customersPerPage,currentPage) => {
-    return axiosDE.get(`${END_POINT.GetAllDetailproduct}?maxPageSize=${customersPerPage}&Pagesize=${customersPerPage}&PageNumber=${currentPage}`)
+export const getDetailproductAPI = (idpruduct) => {
+    return axiosDE.get(`${END_POINT.GetDetailproduct}/${idpruduct}`)
 }
 export const getMediaAPI = (idpruduct) => {
     return axiosMedia.get(`${END_POINT.GetMedia}/${idpruduct}`)
