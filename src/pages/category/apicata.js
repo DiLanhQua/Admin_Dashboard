@@ -2,9 +2,9 @@ import axios from "axios";
 import { DeleteConfirmationModal, handleToast } from "../../utils/toast";
 
 const BASE_URL = "https://localhost:7048/api/Category";
-export const fetchCategories = async () => {
+export const fetchCategories = async (maxPageSize, rowsPerPage, page) => {
   try {
-    const response = await axios.get(`${BASE_URL}/get-all-category`);
+    const response = await axios.get(`${BASE_URL}/get-all-category?maxPageSize=${maxPageSize}&PageSize=${rowsPerPage}&PageNumber=${page + 1}`);
     if (response.data && Array.isArray(response.data.data)) {
       return response.data.data.map((item) => ({
         id: item.id,
