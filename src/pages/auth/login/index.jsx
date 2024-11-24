@@ -13,6 +13,7 @@ import MuiCard from "@mui/material/Card";
 import { styled } from "@mui/material/styles";
 import ForgotPassword from "../ForgotPassword/ForgotPassword";
 import { useNavigate } from "react-router-dom";
+import { toast } from "react-toastify";
 
 const Card = styled(MuiCard)(({ theme }) => ({
   display: "flex",
@@ -84,6 +85,7 @@ export default function SignIn() {
     try {
       const response = await axios.post("https://localhost:7048/api/Account/login", data);
       console.log("Đăng nhập thành công:", response.data);
+      toast.success("Đăng nhập thành công");
   
       // Lưu thông tin vào localStorage
       localStorage.setItem("userInfo", JSON.stringify(response.data.data));

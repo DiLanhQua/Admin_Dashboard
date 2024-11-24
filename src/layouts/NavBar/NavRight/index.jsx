@@ -6,6 +6,7 @@ import { useAuth } from "../../../contexts/AuthContext";
 import { handleToast } from "../../../utils/toast";
 import { getMe, logout as handleLogout } from "../../../redux/slices/staff";
 
+
 const NavRight = () => {
   const dispatch = useDispatch();
   const status = useSelector((state) => state.staff.getMeStatus);
@@ -24,16 +25,13 @@ const NavRight = () => {
     }
   }, [status, data]);
 
-  const logoutme = () => {
-    dispatch(handleLogout()).then((result) => {
-      if (result.type === "staff/logout/fulfilled") {
-        handleToast("success", "Logout successful", "top-right");
-        logout();
-        navigate("/");
-      } else {
-        handleToast("error", "Logout failed", "top-right");
-      }
-    });
+  const handleLogout = () => {
+    window.location.href = "/"; 
+    // Xóa toàn bộ thông tin trong localStorage
+    localStorage.clear();
+    // Điều hướng về trang đăng nhập
+    // Tùy chọn: Hiển thị thông báo (nếu bạn có tích hợp Toast)
+    handleToast("success", "Logged out successfully!", "top-right");
   };
 
   return (
@@ -60,7 +58,7 @@ const NavRight = () => {
                   to="#"
                   className="dud-logout"
                   title="Logout"
-                  onClick={logoutme}
+                  onClick={handleLogout}
                 >
                   <i className="feather icon-log-out" />
                 </Link>
@@ -87,7 +85,7 @@ const NavRight = () => {
                   </Link>
                 </ListGroup.Item>
                 <ListGroup.Item as="li">
-                  <Link className="dropdown-item" onClick={logoutme}>
+                  <Link className="dropdown-item" onClick={handleLogout}>
                     <i className="feather icon-log-out" /> Logout
                   </Link>
                 </ListGroup.Item>
