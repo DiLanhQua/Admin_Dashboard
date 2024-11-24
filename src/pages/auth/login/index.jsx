@@ -74,25 +74,28 @@ export default function SignIn() {
 
   const handleSubmit = async (event) => {
     event.preventDefault();
-    if (!validateInputs()) {
-      return;
-    }
-
-     const data = {
-        userName: document.getElementById("username").value,
-        password: document.getElementById("password").value,
+    if (!validateInputs()) return;
+  
+    const data = {
+      userName: document.getElementById("username").value,
+      password: document.getElementById("password").value,
     };
-    console.log(data);
+  
     try {
       const response = await axios.post("https://localhost:7048/api/Account/login", data);
       console.log("Đăng nhập thành công:", response.data);
-      alert("Đăng nhập thành công!");
+  
+      // Lưu thông tin vào localStorage
+      localStorage.setItem("userInfo", JSON.stringify(response.data.data));
+  
+      // Điều hướng đến trang profile
       navigate("/dashboard");
     } catch (error) {
       console.error("Lỗi đăng nhập:", error.response?.data || error.message);
-      alert("Đăng nhập thất bại! Vui lòng kiểm tra lại thông tin.");
+      alert("Đăng nhập thất bại!");
     }
   };
+  
 
   const validateInputs = () => {
     const username = document.getElementById("username");

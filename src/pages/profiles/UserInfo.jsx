@@ -1,22 +1,42 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import "./Userinfo.css";
 
 const UserProfileForm = () => {
   const [user, setUser] = useState({
-    userName: "nguyenvana",
-    email: "nguyenvana@example.com",
-    phone: "0123456789",
-    fullName: "Nguyễn Văn A",
-    address: "Số 12, Đường ABC, Quận 1, TP.HCM",
-    image: "https://via.placeholder.com/150", // Đường dẫn ảnh đại diện mặc định
+    userName: "",
+    email: "",
+    phone: "",
+    fullName: "",
+    address: "",
+    image: "https://via.placeholder.com/150", // Đường dẫn ảnh mặc định
   });
 
+  useEffect(() => {
+    // Lấy thông tin người dùng từ localStorage
+    const storedUserInfo = localStorage.getItem("userInfo");
+    if (storedUserInfo) {
+      try {
+        const userInfo = JSON.parse(storedUserInfo); // Chỉ parse khi dữ liệu không rỗng
+        setUser({
+          userName: userInfo.userName || "",
+          email: userInfo.email || "",
+          phone: userInfo.phone || "",
+          fullName: userInfo.fullName || "",
+          address: userInfo.address || "",
+          image: userInfo.image || "",
+        });
+      } catch (error) {
+        console.error("Lỗi khi parse dữ liệu userInfo:", error);
+      }
+    }
+  }, []);
+  
   const handleInputChange = (e) => {
     const { name, value } = e.target;
-    setUser({
-      ...user,
+    setUser((prev) => ({
+      ...prev,
       [name]: value,
-    });
+    }));
   };
 
   const handleImageChange = (e) => {
@@ -24,9 +44,9 @@ const UserProfileForm = () => {
     if (file) {
       const reader = new FileReader();
       reader.onloadend = () => {
-        setUser({ ...user, image: reader.result });
+        setUser((prev) => ({ ...prev, image: reader.result }));
       };
-      reader.readAsDataURL(file); // Đọc file ảnh và chuyển đổi sang base64
+      reader.readAsDataURL(file);
     }
   };
 
@@ -41,11 +61,7 @@ const UserProfileForm = () => {
         {/* Ảnh đại diện */}
         <div className="avatar-upload">
           <label htmlFor="image">
-            <img
-              src={user.image}
-              alt="Avatar"
-              className="avatar-img"
-            />
+            <img src={`https://localhost:7048/${user.image}`} alt="Avatar" className="avatar-img" />
           </label>
           <input
             type="file"
@@ -53,20 +69,14 @@ const UserProfileForm = () => {
             name="image"
             accept="image/*"
             onChange={handleImageChange}
-            style={{ display: "none" }} // Ẩn input file, chỉ hiển thị ảnh
+            style={{ display: "none" }}
           />
         </div>
 
-        {/* Tên người dùng không thể sửa */}
+        {/* Tên đăng nhập */}
         <div className="form-group">
           <label htmlFor="userName">Tên đăng nhập:</label>
-          <input
-            type="text"
-            id="userName"
-            name="userName"
-            value={user.userName}
-            readOnly
-          />
+          <input type="text" id="userName" name="userName" value={user.userName} readOnly />
         </div>
 
         {/* Họ tên */}
