@@ -1,134 +1,378 @@
-/* eslint-disable no-unused-vars */
-import { useCallback, useEffect, useState } from "react";
-import ReusableTable from "../../components/Table";
-import ProductDetailsDialog from "./details";
-import { useDispatch, useSelector } from "react-redux";
-import {
-  deleteProduct,
-  getProduct,
-  resetState,
-} from "../../redux/slices/product";
-import { DeleteConfirmationModal, handleToast } from "../../utils/toast";
-import { useNavigate } from "react-router-dom";
-
-export default function ProductPage() {
+import React, { useEffect, useState } from "react";
+import { Row, Col, Card, Button, Modal } from "react-bootstrap";
+import { getProductAPI, getMediaAPI, getImageAPI, getBrandAPI, getDetailproductAPI } from "./js/product";
+import { useNavigate, Link } from "react-router-dom";
+import ControlPointIcon from "@mui/icons-material/ControlPoint";
+import RemoveRedEyeIcon from "@mui/icons-material/RemoveRedEye";
+import {IconButton} from "@mui/material";
+import "./css/product.css"
+export default function StaffPage() {
   const navigate = useNavigate();
-  const [open, setOpen] = useState(false);
-  const dispatch = useDispatch();
-  const [data, setData] = useState([]);
+  const [items, setItems] = useState([]);
+  const [brands, setBrands] = useState([]);
+  const [medias, setMedias] = useState([]);
+  const [images, setImages] = useState([]);
+  const [detailproducts, setDetailproduct] = useState([]);
+  const [selectedProduct, setSelectedProduct] = useState(null);
+  const [searchTerm, setSearchTerm] = useState("");
+  const [currentPage, setCurrentPage] = useState(1);
+  const [customersPerPage, setCustomersPerPage] = useState(5);
+  const [showDetailModal, setShowDetailModal] = useState(false);
+  const [activeTab, setActiveTab] = useState("info");
 
-  const columns = [
-    { label: "mã", field: "SKU" },
-    { label: "Tên sản phẩm", field: "name" },
-    { label: "hình ảnh", field: "images" },
-    { label: "giá thị trường", field: "priceInMarket" },
-    { label: "giá cửa hàng", field: "priceInStore" },
-    { label: "giá trên website", field: "priceOnline" },
-    { label: "Số lượng", field: "onStock" },
-    { label: "Trạng thái", field: "status" },
-  ];
 
-  const [product, setProduct] = useState({});
-  const [openDialog, setOpenDialog] = useState(false);
-  const [quantity, setQuantity] = useState(1);
-  const [selectedColor, setSelectedColor] = useState("#FF6B6B");
-  const [selectedSize, setSelectedSize] = useState(42);
-  const [tabValue, setTabValue] = useState(0);
-  const handleAddToCart = () => {
-    console.log(`Added ${quantity} of ${product.name} to cart`);
-  };
-  const handleEdit = (index) => {
-    navigate(`/dashboard/product/update/${index._id}`);
-  };
 
-  const handleEye = (index) => {
-    console.log("Eye", index);
-    setProduct(index);
-    setOpenDialog(true);
-  };
 
-  const handleTabChange = (event, newValue) => {
-    setTabValue(newValue);
-  };
-
-  const handleColorChange = (color) => {
-    setSelectedColor(color);
-  };
-
-  const handleSizeChange = (size) => {
-    setSelectedSize(size);
-  };
-  const handleQuantity = () => {
-    console.log("Quantity");
-  };
-  const status = useSelector((state) => state.product.status);
-  const products = useSelector((state) => state.product.data.products);
-  const deleteStatus = useSelector((state) => state.product.statusDelete);
-  useEffect(() => {
-    dispatch(getProduct());
-  }, [dispatch]);
+  const handleShow = () => setShowDetailModal(true);
+  const handleClose = () => setShowDetailModal(false);
 
   useEffect(() => {
-    if (status === "success") {
-      setData(products);
+    const GetStall = async () => {
+      try {
+        const res = await getProductAPI(customersPerPage, currentPage);
+
+        if (Array.isArray(res.data)) {
+          setItems(res.data);
+        } else {
+          setItems([]);
+        }
+      } catch (er) {
+        console.error("Không thể xuất danh sách: ", er);
+      }
+    };
+    GetStall();
+  }, [customersPerPage, currentPage]);
+  useEffect(() => {
+    const fetchBrand = async () => {
+      try {
+        const brandPromises = items.map((item) => getBrandAPI(item.brandId));
+        const resolvedBrands = await Promise.all(brandPromises);
+        setBrands(resolvedBrands);
+      } catch (error) {
+        console.error("Lỗi khi lấy media cho sản phẩm:", error);
+      }
+    };
+
+    if (items.length > 0) {
+      fetchBrand();
     }
-    dispatch(resetState({ key: "status", value: "idle" }));
-  }, [status, products, dispatch]);
+  }, [items]);
+  useEffect(() => {
+    const fetchMediaForProducts = async () => {
+      try {
+        const mediaPromises = items.map((item) => getMediaAPI(item.id));
+        const resolvedMedias = await Promise.all(mediaPromises);
+
+        // console.log("imagePromises: ", resolvedMedias);
+
+        // console.log("resolvedImages: ", JSON.stringify(resolvedMedias, null, 2));
+        setMedias(resolvedMedias);
+      } catch (error) {
+        console.error("Lỗi khi lấy media cho sản phẩm:", error);
+      }
+    };
+
+    if (items.length > 0) {
+      fetchMediaForProducts();
+    }
+  }, [items]);
 
   useEffect(() => {
-    if (deleteStatus === "success") {
-      dispatch(getProduct());
-      handleToast("success", "Xóa sản phẩm thành công", "top-right");
+    const fetchImage = async () => {
+      try {
+        const imagePromises = medias.flat().map((media) => {
+          return getImageAPI(media.imageId).then((image) => ({
+            mediaId: media.imageId,
+            imageUrl: image.link,
+          }));
+        });
+
+        // console.log("imagePromises: ", imagePromises);
+
+        const resolvedImages = await Promise.all(imagePromises);
+
+        // console.log("resolvedImages: ", JSON.stringify(resolvedImages, null, 2));
+
+        setImages(resolvedImages);
+      } catch (error) {
+        console.error("Lỗi khi lấy media cho sản phẩm:", error);
+      }
+    };
+
+    if (medias.length > 0) {
+      fetchImage();
     }
-    if (deleteStatus === "failed")
-      handleToast("error", "Xóa sản phẩm thất bại", "top-right");
-    dispatch(resetState({ key: "statusDelete", value: "idle" }));
-  }, [deleteStatus, dispatch]);
-  const handleDelete = useCallback(
-    (index) => {
-      console.log("Delete", index);
-      DeleteConfirmationModal({
-        title: "Xác nhận xóa sản phẩm",
-        content: "Bạn có chắc chắn muốn xóa sản phẩm này?",
-        okText: "Xóa",
-        cancelText: "Hủy",
-        icon: "warning",
-        confirmButtonText: "Xóa",
-        onConfirm: () => dispatch(deleteProduct(index._id)),
-      });
-    },
-    [dispatch]
-  );
+  }, [medias]);
 
-  const handleSave = (data) => {
-    console.log("Save", data);
 
-    setOpen(false);
+  const indexOfLastCustomer = currentPage * customersPerPage;
+  const indexOfFirstCustomer = indexOfLastCustomer - customersPerPage;
+  const currentCustomers = items.slice(indexOfFirstCustomer, indexOfLastCustomer);
+  const totalPages = Math.ceil(items.length / customersPerPage);
+
+  const handlePageChange = (newPage) => {
+    if (newPage >= 1 && newPage <= totalPages) {
+      setCurrentPage(newPage);
+    }
+  };
+  const detaile = async (item) => {
+    try{
+    console.log("id ", item.productName)
+    const response = await getDetailproductAPI(item.id);
+    // const responsee = await getDeLoginAPI(id);
+    setDetailproduct(response);
+    setSelectedProduct(item);
+    //  setLogin(responsee);
+    console.log("de: " + response);
+    handleShow();
+    }catch (error) {
+      console.error("Lỗi khi tải thông tin chi tiết sản phẩm: ", error);
+    }
   };
   return (
-    <>
-      <ReusableTable
-        data={data}
-        columns={columns}
-        navigate={"/dashboard/product/create"}
-        handleEdit={handleEdit}
-        handleDelete={handleDelete}
-        handleEye={handleEye}
-      />
-      <ProductDetailsDialog
-        product={product}
-        open={openDialog}
-        onClose={() => setOpenDialog(false)}
-        handleAddToCart={handleAddToCart}
-        selectedColor={selectedColor}
-        setSelectedColor={handleColorChange}
-        quantity={1}
-        setQuantity={handleQuantity}
-        selectedSize={selectedSize}
-        setSelectedSize={handleSizeChange}
-        tabValue={tabValue}
-        handleTabChange={handleTabChange}
-      />
-    </>
+    <React.Fragment>
+      <Row>
+        <Col sm={12}>
+          <Card>
+            <div className="bg-light rounded text-center h-100 p-4">
+              <div className="d-flex align-items-center justify-content-between mb-4">
+                <div className="form-floating">
+                  <input
+                    type="text"
+                    className="form-control"
+                    id="search"
+                    value={searchTerm}
+                    onChange={(e) => setSearchTerm(e.target.value)}
+                    placeholder="Tìm kiếm"
+                  />
+                  <label htmlFor="search">Tìm kiếm</label>
+                </div>
+                {/* <a href="/dashboard/staff/create" className="create-stall">
+                  Thêm mới
+                </a> */}
+                <Link to={"/dashboard/staff/create"}>
+                  <Button
+                    variant="contained"
+                    className="custom-button"
+                    sx={{ mr: 2 }}
+                  >
+                    <ControlPointIcon sx={{ marginRight: 1 }} />
+                    Thêm mới
+                  </Button>
+                </Link>
+              </div>
+              <div className="table-responsive">
+                <table className="table">
+                  <thead>
+                    <tr>
+                      <th scope="col">#</th>
+                      <th scope="col">Hình ảnh</th>
+                      <th scope="col">Tên sản phẩm</th>
+                      <th scope="col">Thương hiệu</th>
+                      <th scope="col">Loại</th>
+                      <th scope="col">Thao tác</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {currentCustomers.map((item, stt) => {
+                      const productMedia = medias.filter((media) => media.productId === item.id);
+                      const productBrans = brands.filter((bran) => bran.id === item.brandId);
+                      return (
+                        <tr key={item.id}>
+                          <th scope="row">{indexOfFirstCustomer + stt + 1}</th>
+                          <td>
+                            {productMedia.map((media, index) => {
+
+                              const productImage = images.find((image) => image.mediaId === media.imageId);
+                              // console.log("productImage1 : ",productImage);
+                              return (
+                                productImage && (
+                                  <img
+                                    key={index}
+                                    src={productImage.imageUrl}
+                                    alt={`media-${item.id}`}
+                                    style={{ width: "50px", height: "50px", objectFit: "cover" }}
+                                  />
+                                )
+                              );
+                            })}
+                          </td>
+                          <td>{item.productName}</td>
+                          <td>{item.categoryId || "Chưa có địa chỉ"}</td>
+                          <td>
+                            {productBrans.length > 0 && (
+                              <p>{productBrans[0].brandName}</p>
+                            )}
+                          </td>
+                          <td>
+                            <IconButton
+                              color="primary"
+                              onClick={() => detaile(item)}
+                              sx={{ padding: "4px" }}
+                            >
+                              <RemoveRedEyeIcon />
+                            </IconButton>
+                            
+
+                          </td>
+                        </tr>
+                      );
+                    })}
+                    <Modal show={showDetailModal} 
+                            onHide={handleClose} size="lg">
+                              <Modal.Header closeButton>
+                                <Modal.Title>
+                                  Thông Tin Chi Tiết Sản Phẩm: {selectedProduct?.productName || "N/A"}
+                                </Modal.Title>
+                              </Modal.Header>
+                              <Modal.Body>
+                                {detailproducts ? (
+                                  <div className="dialog">
+                                    <div className="dialog-tabs">
+              {/* Tab Buttons */}
+              <button
+                className={`tab-btn ${activeTab === "info" ? "active" : ""}`}
+                onClick={() => setActiveTab("info")}
+              >
+                Xem Thông Tin
+              </button>
+              <button
+                className={`tab-btn ${activeTab === "description" ? "active" : ""}`}
+                onClick={() => setActiveTab("description")}
+              >
+                Xem Mô Tả Sản Phẩm
+              </button>
+            </div>
+                                    <div className="dialog-content">
+                                    {activeTab === "info" && (
+                                      <div className="table-responsive">
+                                        <table className="table">
+                                          <thead>
+                                            <tr>
+                                              <th scope="col">#</th>
+                                              <th scope="col">Hình ảnh</th>
+                                              <th scope="col">Tên sản phẩm</th>
+                                              <th scope="col">Kích thước</th>
+                                              <th scope="col">Màu sắc</th>
+                                              <th scope="col">Số lượng</th>
+                                              <th scope="col">Giá</th>
+                                              <th scope="col">Giới tính</th>
+                                            </tr>
+                                          </thead>
+                                          <tbody>
+                                            {detailproducts.map((detail, index) => {
+                                              const productMedia = medias.filter((media) => media.productId === selectedProduct?.id);
+                                              const mediaForProduct = productMedia.filter(
+                                                (media) => media.productId === selectedProduct?.id
+                                              );
+
+                                              return (
+                                                <tr key={detail.id}>
+                                                  <th scope="row">{index + 1}</th>
+                                                  <td>
+                                                    {mediaForProduct.map((media, mediaIndex) => {
+                                                      const productImage = images.find(
+                                                        (image) => image.mediaId === media.imageId
+                                                      );
+                                                      console.log("productImage: ", productImage);
+                                                      return (
+                                                        productImage && (
+                                                          // <img
+                                                          //   key={mediaIndex}
+                                                          //   src={productImage.imageUrl}
+                                                          //   alt={`media-${detail.id}`}
+                                                          //   style={{
+                                                          //     width: "50px",
+                                                          //     height: "50px",
+                                                          //     objectFit: "cover",
+                                                          //   }}
+                                                          // />
+                                                          <img
+                                                            key={mediaIndex
+                                                            }
+                                                            src={productImage.imageUrl}
+                                                            alt={`media-${selectedProduct.id}`}
+                                                            style={{ width: "50px", height: "50px", objectFit: "cover" }}
+                                                          />
+                                                        )
+                                                      );
+                                                    })}
+                                                  </td>
+                                                  <td>{selectedProduct.productName}</td>
+                                                  <td>{detail.size}</td>
+                                                  <td>{detail.colorId}</td>
+                                                  <td>{detail.quantity}</td>
+                                                  <td>{detail.price}</td>
+                                                  <td>{detail.gender}</td>
+                                                </tr>
+                                              );
+                                            })}
+                                          </tbody>
+                                        </table>
+                                      </div>)}
+                                      {activeTab === "description" && (
+                <div className="description-container">
+                  <h5>Mô Tả Sản Phẩm</h5>
+                  <p>{selectedProduct?.description || "Không có mô tả."}</p>
+                </div>
+              )}
+                                      <div className="dialog-actions">
+                                        <button className="close-btn" onClick={handleClose}>
+                                          Đóng
+                                        </button>
+                                      </div>
+                                    </div>
+                                  </div>
+                                ) : (
+                                  <p>Đang tải thông tin...</p>
+                                )}
+                              </Modal.Body>
+                            </Modal>
+                  </tbody>
+                  
+                </table>
+
+                <div
+                  style={{
+                    display: "flex",
+                    justifyContent: "space-between",
+                    alignItems: "center",
+                    marginTop: "10px",
+                  }}
+                >
+                  <span>Bản ghi trang:</span>
+                  <select
+                    style={{ padding: "5px" }}
+                    value={customersPerPage}
+                    onChange={(e) => setCustomersPerPage(Number(e.target.value))}
+                  >
+                    <option value="5">5</option>
+                    <option value="10">10</option>
+                    <option value="15">15</option>
+                  </select>
+                  <span>{`${indexOfFirstCustomer + 1}-${Math.min(indexOfLastCustomer, items.length)}`}</span>
+                  <div>
+                    <button
+                      style={{ padding: "5px", marginRight: "5px" }}
+                      onClick={() => handlePageChange(currentPage - 1)}
+                      disabled={currentPage === 1}
+                    >
+                      &lt;
+                    </button>
+                    <button
+                      style={{ padding: "5px" }}
+                      onClick={() => handlePageChange(currentPage + 1)}
+                      disabled={currentPage === totalPages}
+                    >
+                      &gt;
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </Card>
+        </Col>
+      </Row>
+    </React.Fragment>
   );
 }

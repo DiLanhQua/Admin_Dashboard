@@ -8,12 +8,15 @@ export default function UserPage() {
   const [items, setItems] = useState([]);
   const [pagination, setPagination] = useState({ pageSize: 3, pageNumber: 1, pageCount: 1 });
   const [loading, setLoading] = useState(false);
+  const [maxPageSize, setMaxPageSize] = useState(50); 
+  const [rowsPerPage, setRowsPerPage] = useState(100); 
+  const [page, setPage] = useState(0);
 
   // Fetch customers from API
   const fetchCustomers = useCallback(async (pageNumber = 1) => {
     setLoading(true);
     try {
-      const response = await axios.get("https://localhost:7048/api/Account/get-all-account", {
+      const response = await axios.get(`https://localhost:7048/api/Account/get-all-account?maxPageSize=${maxPageSize}&PageSize=${rowsPerPage}&PageNumber=${page + 1}`, {
         params: { pageNumber, pageSize: pagination.pageSize },
       });
 
@@ -41,7 +44,7 @@ export default function UserPage() {
 
   useEffect(() => {
     fetchCustomers();
-  }, [fetchCustomers]);
+  }, [fetchCustomers, maxPageSize, rowsPerPage, page]);
 
   // Approve action
 const handleApprove = useCallback(async (id) => {
@@ -69,11 +72,6 @@ const handleReject = useCallback(async (id) => {
 
 
   // Handle page change
-  const handlePageChange = (newPage) => {
-    if (newPage > 0 && newPage <= pagination.pageCount) {
-      fetchCustomers(newPage);
-    }
-  };
 
   const columns = [
     { label: "Tên tài khoản", field: "UserName" },
@@ -95,24 +93,6 @@ const handleReject = useCallback(async (id) => {
         handleReject={handleReject}
       />
 
-      {/* Pagination Controls */}
-      <div style={{ display: "flex", justifyContent: "center", marginTop: "20px" }}>
-        <button
-          onClick={() => handlePageChange(pagination.pageNumber - 1)}
-          disabled={pagination.pageNumber <= 1}
-        >
-          Trang trước
-        </button>
-        <span style={{ margin: "0 10px" }}>
-          Trang {pagination.pageNumber} / Dữ liệu {pagination.pageCount}
-        </span>
-        <button
-          onClick={() => handlePageChange(pagination.pageNumber + 1)}
-          disabled={pagination.pageNumber >= pagination.pageCount}
-        >
-          Trang sau
-        </button>
-      </div>
     </LoadingWrapper>
   );
 }

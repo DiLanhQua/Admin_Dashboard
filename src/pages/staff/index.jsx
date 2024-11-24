@@ -2,7 +2,7 @@ import { useDispatch, useSelector } from "react-redux";
 // import ReusableTable from "../../components/Table";
 // import EyeStaff from "./details";
 import React, { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate,Link } from "react-router-dom";
 import { deleteStaff, getStaff, resetState } from "../../redux/slices/staff";
 import { DeleteConfirmationModal, handleToast } from "../../utils/toast";
 import { Row, Col, Card ,Modal, Button} from 'react-bootstrap';
@@ -10,7 +10,12 @@ import { Row, Col, Card ,Modal, Button} from 'react-bootstrap';
 import { getStaffAPI, getDeStaffAPI, getDeLoginAPI } from "./js/AxiosStaff";
 import "../staff/css/staff.css";
 import EyeStaff from './details/index'; 
+import ControlPointIcon from "@mui/icons-material/ControlPoint";
+import RemoveRedEyeIcon from "@mui/icons-material/RemoveRedEye";
 
+import {
+  IconButton
+} from "@mui/material";
 export default function StaffPage() {
   const navigate = useNavigate();
   // const dispatch = useDispatch();
@@ -119,12 +124,22 @@ const roleNames = {
                   </div>
 
 
-                  <a href="/dashboard/staff/create"
+                  {/* <a href="/dashboard/staff/create"
                     className="create-stall"
 
                   >
                     Thêm mới
-                  </a>
+                  </a> */}
+                  <Link to={"/dashboard/staff/create"}>
+            <Button
+              variant="contained"
+              className="custom-button"
+              sx={{ mr: 2 }}
+            >
+              <ControlPointIcon sx={{ marginRight: 1 }} />
+              Thêm mới
+            </Button>
+          </Link>
                 </div>
                 <div className="table-responsive">
                   <table className="table">
@@ -149,9 +164,16 @@ const roleNames = {
                           <td>{item.phone || "Chưa có số điện thoại"}</td>
                           <td>{item.userName || "Chưa có tên đăng nhập"}</td>
                           <td>
-                          <Button variant="primary" onClick={() => detaile(item.id)}>
+                          <IconButton
+              color="primary"
+              onClick={() => detaile(item.id)}
+              sx={{ padding: "4px" }} // Reduced padding for action buttons
+            >
+              <RemoveRedEyeIcon />
+            </IconButton>
+                          {/* <Button variant="primary" onClick={() => detaile(item.id)}>
         Xem 
-      </Button>
+      </Button> */}
 
       {/* Modal hiển thị thông tin chi tiết nhân viên */}
       <Modal  show={showDetailModal} onHide={handleClose} size="lg">
