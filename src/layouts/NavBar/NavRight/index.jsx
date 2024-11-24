@@ -6,7 +6,6 @@ import { useAuth } from "../../../contexts/AuthContext";
 import { handleToast } from "../../../utils/toast";
 import { getMe, logout as handleLogout } from "../../../redux/slices/staff";
 
-
 const NavRight = () => {
   const dispatch = useDispatch();
   const status = useSelector((state) => state.staff.getMeStatus);
@@ -25,32 +24,45 @@ const NavRight = () => {
     }
   }, [status, data]);
 
+  // Lấy thông tin người dùng từ localStorage và parse nó
+  const storedUserInfo = JSON.parse(localStorage.getItem("userInfo"));
+  const avatar = storedUserInfo?.image;
+
   const handleLogout = () => {
     window.location.href = "/"; 
     // Xóa toàn bộ thông tin trong localStorage
     localStorage.clear();
     // Điều hướng về trang đăng nhập
-    // Tùy chọn: Hiển thị thông báo (nếu bạn có tích hợp Toast)
     handleToast("success", "Logged out successfully!", "top-right");
   };
 
   return (
     <React.Fragment>
+      <style>
+        {`
+          .avatar-img {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            object-fit: cover;
+          }
+        `}
+      </style>
       <ListGroup as="ul" bsPrefix="navbar-nav ml-auto">
         <ListGroup.Item as="li" bsPrefix="">
           <Dropdown align="end" className="drp-user">
             <Dropdown.Toggle as={Link} variant="link" to="#">
               <img
-                src={profileData?.avatar || "/default-avatar.png"}
-                className="img-radius wid-40"
+                src={`https://localhost:7048/${avatar}`}
+                className="img-radius wid-40 avatar-img"
                 alt="User Profile"
               />
             </Dropdown.Toggle>
             <Dropdown.Menu align="end" className="profile-notification">
               <div className="pro-head">
                 <img
-                  src={profileData?.avatar || "/default-avatar.png"}
-                  className="img-radius"
+                  src={`https://localhost:7048/${avatar}`}
+                  className="img-radius avatar-img"
                   alt="User Profile"
                 />
                 <span>{profileData?.name || "Guest"}</span>
