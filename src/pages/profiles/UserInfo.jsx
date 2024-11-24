@@ -39,17 +39,6 @@ const UserProfileForm = () => {
     }));
   };
 
-  const handleImageChange = (e) => {
-    const file = e.target.files[0];
-    if (file) {
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        setUser((prev) => ({ ...prev, image: reader.result }));
-      };
-      reader.readAsDataURL(file);
-    }
-  };
-
   const handleSubmit = (e) => {
     e.preventDefault();
     console.log("Thông tin đã được cập nhật:", user);
@@ -64,12 +53,11 @@ const UserProfileForm = () => {
             <img src={`https://localhost:7048/${user.image}`} alt="Avatar" className="avatar-img" />
           </label>
           <input
-            type="file"
             id="image"
             name="image"
             accept="image/*"
-            onChange={handleImageChange}
             style={{ display: "none" }}
+            readOnly
           />
         </div>
 
@@ -77,6 +65,7 @@ const UserProfileForm = () => {
         <div className="form-group">
           <label htmlFor="userName">Tên đăng nhập:</label>
           <input type="text" id="userName" name="userName" value={user.userName} readOnly />
+          
         </div>
 
         {/* Họ tên */}
@@ -88,6 +77,7 @@ const UserProfileForm = () => {
             name="fullName"
             value={user.fullName}
             onChange={handleInputChange}
+            readOnly
           />
         </div>
 
@@ -100,6 +90,7 @@ const UserProfileForm = () => {
             name="email"
             value={user.email}
             onChange={handleInputChange}
+            readOnly
           />
         </div>
 
@@ -112,6 +103,7 @@ const UserProfileForm = () => {
             name="phone"
             value={user.phone}
             onChange={handleInputChange}
+            readOnly
           />
         </div>
 
@@ -123,10 +115,9 @@ const UserProfileForm = () => {
             name="address"
             value={user.address}
             onChange={handleInputChange}
+            readOnly
           ></textarea>
         </div>
-
-        <button type="submit">Cập nhật thông tin</button>
       </form>
     </div>
   );

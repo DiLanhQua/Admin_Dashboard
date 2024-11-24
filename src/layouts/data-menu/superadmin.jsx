@@ -230,12 +230,6 @@ const menuItems = {
               type: "item",
               url: "/dashboard/login",
             },
-            {
-              id: "register",
-              title: "Đăng ký",
-              type: "item",
-              url: "/dashboard/register",
-            },
           ],
         },
       ],
