@@ -1,9 +1,10 @@
 import { useState, useEffect, useCallback } from "react";
 import { Box, Grid, Paper, styled } from "@mui/material";
 import { useNavigate } from "react-router-dom";
-import axios from "axios";
+import { fetchCategories, deleteCategory } from "./apicata"; // import the API functions
 import ReusableTable from "../../components/Table";
 import { DeleteConfirmationModal, handleToast } from "../../utils/toast";
+
 const Item = styled(Paper)(({ theme }) => ({
   backgroundColor: "#fff",
   ...theme.typography.body2,
@@ -19,43 +20,24 @@ function CategoryPage() {
   const [categories, setCategories] = useState([]);
 
   const columns = [
-    { label: "Tên danh mục", field: "CategoryName" }, 
+    { label: "Tên danh mục", field: "CategoryName" },
     { label: "Hình ảnh", field: "image" },
   ];
-  
 
-  const fetchCategories = useCallback(async () => {
-    try {
-      const response = await axios.get(
-        `https://localhost:7048/api/Category/get-all-category`
-      );
-      if (response.data && Array.isArray(response.data.data)) {
-        setCategories(
-          response.data.data.map((item) => ({
-            id: item.id,
-            CategoryName: item.categoryName, 
-            image: item.image,
-          }))
-        );
-      } else {
-        handleToast("error", "Dữ liệu không hợp lệ hoặc trống.");
-      }
-    } catch (error) {
-      handleToast("error", "Lỗi khi tải danh sách danh mục");
-      console.error("Error loading:", error);
+  const fetchCategoriesData = useCallback(async () => {
+    const data = await fetchCategories();
+    if (data) {
+      setCategories(data);
     }
   }, []);
-  
 
   useEffect(() => {
-    fetchCategories();
-  }, [fetchCategories]);
+    fetchCategoriesData();
+  }, [fetchCategoriesData]);
 
   const handleEdit = useCallback(
     (category) => {
-      navigate(`/dashboard/category/update/${category.id}`, {
-        state: { category }, 
-      });
+      navigate(`/dashboard/category/update/${category.id}`, { state: { category } });
     },
     [navigate]
   );
@@ -70,23 +52,17 @@ function CategoryPage() {
         icon: "warning",
         confirmButtonText: "Xóa",
         onConfirm: async () => {
-          try {
-            await axios.delete(`/api/categories/${category.id}`);
-            handleToast("success", "Xóa danh mục thành công", "top-right");
-            fetchCategories();
-          } catch (error) {
-            handleToast("error", "Không thể xóa danh mục", "top-right");
-          }
+          await deleteCategory(category.id);
+          fetchCategoriesData();
         },
       });
     },
-    [fetchCategories]
+    [fetchCategoriesData]
   );
 
   return (
     <Box sx={{ flexGrow: 1 }}>
       <Grid container spacing={2}>
-        {/* Bảng hiển thị danh mục */}
         <Grid item xs={12}>
           <Item>
             <ReusableTable

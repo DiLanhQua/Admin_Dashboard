@@ -1,8 +1,9 @@
+// src/pages/BrandPage.jsx
 import { useState, useEffect } from "react";
 import { Grid } from "@mui/material";
 import ReusableTable from "../../components/Table";
 import BrandForm from "./create/index";
-import axios from "axios";
+import { fetchBrands, addBrand, updateBrand, deleteBrand } from "../../pages/brand/apibrand";  // Import các hàm API
 import { handleToast } from "../../utils/toast";
 
 export default function BrandPage() {
@@ -11,7 +12,6 @@ export default function BrandPage() {
   const [maxPageSize, setMaxPageSize] = useState(50); 
   const [rowsPerPage, setRowsPerPage] = useState(100); 
   const [page, setPage] = useState(0); 
-
 
   const [initialValues, setInitialValues] = useState({
     BrandName: "",
@@ -25,32 +25,14 @@ export default function BrandPage() {
     { label: "Xuất xứ", field: "country" },
   ];
 
-  const fetchBrands = async () => {
-    try {
-      const response = await axios.get(
-        `https://localhost:7048/api/Brand/get-all-brand?maxPageSize=${maxPageSize}&PageSize=${rowsPerPage}&PageNumber=${page + 1}`);
-      if (response.data && Array.isArray(response.data.data)) {
-        setItems(
-          response.data.data.map((item) => ({
-            id: item.id,
-            BrandName: item.brandName,
-            image: item.image,
-            country: item.country,
-          }))
-        );
-      } else {
-        handleToast("error", "Dữ liệu không hợp lệ hoặc trống.");
-      }
-    } catch (error) {
-      handleToast("error", "Lỗi khi tải danh sách thương hiệu");
-      console.error("Error loading brands:", error);
-    }
+  const loadBrands = async () => {
+    const brandData = await fetchBrands(maxPageSize, rowsPerPage, page);
+    setItems(brandData);
   };
 
   useEffect(() => {
-    fetchBrands();
+    loadBrands();
   }, [maxPageSize, rowsPerPage, page]);
-
 
   const handleEdit = (brand) => {
     setInitialValues({
@@ -63,45 +45,22 @@ export default function BrandPage() {
   };
 
   const handleAdd = async (formData) => {
-
-    try {
-      console.log("FormData gửi lên:", formData);
-
-      await axios.post("https://localhost:7048/api/Brand/add-brand", formData, {
-        headers: {
-          'Content-Type': 'multipart/form-data',
-        },
-      });
-      fetchBrands();
-      setInitialValues({ BrandName: "", image: "", country: "" });
-      handleToast("success", "Thương hiệu đã được thêm thành công");
-    } catch (error) {
-      console.error("Error adding brand:", error);
-      handleToast("error", "Lỗi khi thêm thương hiệu");
-    }
+    await addBrand(formData);
+    loadBrands();
+    formik.resetForm()
+    setInitialValues({ BrandName: "", image: "", country: "" });
   };
 
   const handleUpdate = async (formData) => {
-    try {
-      await axios.put(`https://localhost:7048/api/Brand/update-brand-by-id/${initialValues.id}`, formData);
-      fetchBrands();
-      setIsUpdate(false);
-      setInitialValues({ BrandName: "", image: "", country: "" });
-      handleToast("success", "Thương hiệu đã được cập nhật thành công");
-    } catch (error) {
-      console.error("Error updating brand:", error);
-      handleToast("error", "Lỗi khi cập nhật thương hiệu");
-    }
+    await updateBrand(initialValues.id, formData);
+    loadBrands();
+    setIsUpdate(false);
+    setInitialValues({ BrandName: "", image: "", country: "" });
   };
 
   const handleDelete = async (id) => {
-    try {
-      await axios.delete(`https://localhost:7048/api/Brand/delete-brand-by-id/${id}`);
-      fetchBrands();
-    } catch (error) {
-      console.error("Error deleting brand:", error);
-      handleToast("error", "Lỗi khi xóa thương hiệu");
-    }
+    await deleteBrand(id);
+    loadBrands();
   };
 
   return (

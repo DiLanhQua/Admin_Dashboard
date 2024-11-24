@@ -34,6 +34,7 @@ import CreateProduct from "../pages/product/create";
 import EditProduct from "../pages/product/update";
 import TagPage from "../pages/tags";
 import ShippingPage from "../pages/shippingConfig";
+import UserInfo from "../pages/profiles/UserInfo"
 
 
 
@@ -43,7 +44,8 @@ const AdminRoute = () => {
       {/* Home Page route */}
       <Route index element={<HomePage />} />
       <Route path="history" element={<History />} />
-
+      {/* Profile route */}
+      <Route path="profile" element={<UserInfo />} />
       {/* Category Page route */}
       <Route path="category" element={<CategoryPage />} />
       <Route path="category/create" element={<CategoryCreate />} />

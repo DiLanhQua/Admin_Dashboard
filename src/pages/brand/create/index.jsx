@@ -66,8 +66,10 @@ export default function BrandForm({
     <Formik
       initialValues={initialValues}
       validationSchema={Yup.object().shape({
-        BrandName: Yup.string().required("Tên thương hiệu không được để trống"),
-        country: Yup.string().required("Xuất xứ không được để trống"),
+        BrandName: Yup.string().required("Tên thương hiệu không được để trống")
+        .test('no-number', 'Tên thương hiệu không được chứa số', value => !/[0-9]/.test(value)),
+        country: Yup.string().required("Xuất xứ không được để trống")
+        .test('no-number', 'Xuất xứ không được chứa số', value => !/[0-9]/.test(value)),
       })}
       onSubmit={handleSubmit}
       enableReinitialize={true}

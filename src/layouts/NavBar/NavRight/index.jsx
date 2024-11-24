@@ -72,7 +72,7 @@ const NavRight = () => {
                   </Link>
                 </ListGroup.Item>
                 <ListGroup.Item as="li">
-                  <Link to="#" className="dropdown-item">
+                  <Link to="/dashboard/profile" className="dropdown-item">
                     <i className="feather icon-user" /> Profile
                   </Link>
                 </ListGroup.Item>
