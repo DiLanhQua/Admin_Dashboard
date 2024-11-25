@@ -4,11 +4,13 @@ import { useFormik } from 'formik';
 import * as Yup from 'yup';
 import { addCategory } from '../apicata'; // Import your add category API
 import { handleToast } from '../../../utils/toast'; // Assuming you have a handleToast utility
+import { useNavigate } from 'react-router-dom';
 
 const AddCategory = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [preview, setPreview] = useState(null);
   const [file, setFile] = useState(null);
+  const navigate = useNavigate();
 
   // Form validation with Formik and Yup
   const formik = useFormik({
@@ -45,8 +47,8 @@ const AddCategory = () => {
 
   const handleAddCategory = async (formData) => {
     await addCategory(formData);
+    navigate('/dashboard/category');
     fetchCategoriesData();
-    navigate("/dashboard/category");
     setInitialValues({ CategoryName: "", image: ""});
   };
 

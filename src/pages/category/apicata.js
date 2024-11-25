@@ -1,5 +1,6 @@
 import axios from "axios";
 import { DeleteConfirmationModal, handleToast } from "../../utils/toast";
+import { Navigate, useNavigate } from "react-router-dom";
 
 const BASE_URL = "https://localhost:7048/api/Category";
 export const fetchCategories = async (maxPageSize, rowsPerPage, page) => {
@@ -51,13 +52,12 @@ export const addCategory = async (formData) => {
       headers: { "Content-Type": "multipart/form-data" },
     });
     handleToast("success", "Thêm danh mục thành công");
-    navigate("/dashboard/category");
+    Navigate(`/dashboard/category`)
   } catch (error) {
     console.error("Error adding category:", error);
     if (error.response && error.response.status === 400 && error.response.data === "Tên danh mục đã tồn tại.") {
       handleToast("error", "Tên danh mục đã tồn tại.");
     } else {
-      handleToast("error", "Lỗi khi thêm danh mục");
     }
   }
 };
