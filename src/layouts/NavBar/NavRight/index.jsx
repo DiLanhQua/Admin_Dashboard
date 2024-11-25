@@ -24,35 +24,45 @@ const NavRight = () => {
     }
   }, [status, data]);
 
-  const logoutme = () => {
-    dispatch(handleLogout()).then((result) => {
-      if (result.type === "staff/logout/fulfilled") {
-        handleToast("success", "Logout successful", "top-right");
-        logout();
-        navigate("/");
-      } else {
-        handleToast("error", "Logout failed", "top-right");
-      }
-    });
+  // Lấy thông tin người dùng từ localStorage và parse nó
+  const storedUserInfo = JSON.parse(localStorage.getItem("userInfo"));
+  const avatar = storedUserInfo?.image;
+
+  const handleLogout = () => {
+    window.location.href = "/"; 
+    // Xóa toàn bộ thông tin trong localStorage
+    localStorage.clear();
+    // Điều hướng về trang đăng nhập
+    handleToast("success", "Logged out successfully!", "top-right");
   };
 
   return (
     <React.Fragment>
+      <style>
+        {`
+          .avatar-img {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            object-fit: cover;
+          }
+        `}
+      </style>
       <ListGroup as="ul" bsPrefix="navbar-nav ml-auto">
         <ListGroup.Item as="li" bsPrefix="">
           <Dropdown align="end" className="drp-user">
             <Dropdown.Toggle as={Link} variant="link" to="#">
               <img
-                src={profileData?.avatar || "/default-avatar.png"}
-                className="img-radius wid-40"
+                src={`https://localhost:7048/${avatar}`}
+                className="img-radius wid-40 avatar-img"
                 alt="User Profile"
               />
             </Dropdown.Toggle>
             <Dropdown.Menu align="end" className="profile-notification">
               <div className="pro-head">
                 <img
-                  src={profileData?.avatar || "/default-avatar.png"}
-                  className="img-radius"
+                  src={`https://localhost:7048/${avatar}`}
+                  className="img-radius avatar-img"
                   alt="User Profile"
                 />
                 <span>{profileData?.name || "Guest"}</span>
@@ -60,7 +70,7 @@ const NavRight = () => {
                   to="#"
                   className="dud-logout"
                   title="Logout"
-                  onClick={logoutme}
+                  onClick={handleLogout}
                 >
                   <i className="feather icon-log-out" />
                 </Link>
@@ -87,7 +97,7 @@ const NavRight = () => {
                   </Link>
                 </ListGroup.Item>
                 <ListGroup.Item as="li">
-                  <Link className="dropdown-item" onClick={logoutme}>
+                  <Link className="dropdown-item" onClick={handleLogout}>
                     <i className="feather icon-log-out" /> Logout
                   </Link>
                 </ListGroup.Item>

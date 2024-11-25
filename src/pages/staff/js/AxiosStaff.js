@@ -6,8 +6,8 @@ const END_POINT = {
     GetDELogin: "getDe-login",
     UpStaff: "up-account",
 }
-export const getStaffAPI = (customersPerPage,currentPage) => {
-    return axiosS.get(`${END_POINT.GetAllStaff}?maxPageSize=${customersPerPage}&Pagesize=${customersPerPage}&PageNumber=${currentPage}`)
+export const getStaffAPI = (currentMax,customersPerPage,currentPage) => {
+    return axiosS.get(`${END_POINT.GetAllStaff}?maxPageSize=${currentMax}&Pagesize=${customersPerPage}&PageNumber=${currentPage}`)
 }
 export const getDeStaffAPI = (id) => {
     return axiosS.get(`${END_POINT.GetDEStall}/${id}`);
