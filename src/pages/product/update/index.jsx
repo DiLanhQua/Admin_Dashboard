@@ -1,328 +1,673 @@
-import { Box, Button, Card, Grid, Tab, Tabs } from "@mui/material";
-import { useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
-import { useFormik } from "formik";
-import TabPanel, { a11yProps } from "../tags";
-import InformationEdit from "./information";
-import { useDispatch, useSelector } from "react-redux";
-import { getProductById, updateProduct } from "../../../redux/slices/product";
-import { getAllWarehouses } from "../../../redux/slices/warehouse";
-import OtherProductEdit from "./other";
-import { getCategory } from "../../../redux/slices/category";
-import { getBrand } from "../../../redux/slices/brand";
-import { getAllCollections } from "../../../redux/slices/collection";
-import { getAllTags } from "../../../redux/slices/tags";
-import SEOInformation from "./SEOInformation";
-import AttributesSection from "./attributes/AttributesSection";
-import { getAttribute } from "../../../redux/slices/attribute";
-import Specifications from "./Specifications";
-import Gifts from "./Gifts";
-import ThumbnailProduct from "./image/thumbnai";
-import ImageProduct from "./image/images";
-import VideosProduct from "./image/video";
-import { handleToast } from "./../../../utils/toast";
-import { validationProductSchema } from "./validate";
-
-export default function EditProduct() {
-  const dispatch = useDispatch();
-  const [mainTabValue, setMainTabValue] = useState(0);
-
-  const [dataProduct, setDataProduct] = useState([]);
-  const [warehouseSelect, setWarehouseSelect] = useState([]);
-  const [categorySelect, setCategorySelect] = useState([]);
-  const [brandSelect, setBrandSelect] = useState([]);
-  const [seriesSelect, setSeriesSelect] = useState([]);
-  const [tagsSelect, setTagsSelect] = useState([]);
-  const [attributesSelect, setAttributesSelect] = useState([]);
-  const handleMainTabChange = (event, newValue) => setMainTabValue(newValue);
+import React, { useState, useEffect } from "react";
+import { Card } from "react-bootstrap";
+import Textarea from "../../../components/textarea";
+import { handleToast } from "../../../utils/toast";
+import { useParams,useNavigate } from "react-router-dom";
+import {
+  getAllBrandAPI, getMediaAPI, getImageAPI, getBrandAPI,
+  getDetailproductAPI, postProductAPI, postDEProductAPI, postImageAPI, getProduct
+} from "../js/product";
+function ProductPage() {
+  const [productInfo, setProductInfo] = useState({
+    productName: "",
+    description: "",
+    categoryId: "",
+    brandId: "",
+    productDetais: [{
+      price: "",
+      quantity: "",
+      colorId: "",
+      size: "",
+      gender: "",
+      status: ""
+    }],
+    medias: [{
+      isPrimary: "",
+      link: "",
+    }]
+  });
+  const [isLoading, setIsLoading] = useState(false);
+  const [activeTab, setActiveTab] = useState("info");
+  const [brand, setBrand] = useState([]);
+  const [productImages, setProductImages] = useState([]);
+  const navigate = useNavigate();
+  const [currentPage, setCurrentPage] = useState(1);
+  const [customersPerPage, setCustomersPerPage] = useState(5);
+  const [medias, setMedias] = useState([]);
 
   const { id } = useParams();
-
-  const statusGetById = useSelector((state) => state.product.statusGetById);
-  const productData = useSelector((state) => state.product.data?.products);
-  const statusWarehouse = useSelector((state) => state.warehouse.status);
-  const dataWarehouse = useSelector((state) => state.warehouse.data.wareHouses);
-  const statusGetCategory = useSelector((state) => state.category.status);
-  const dataCategory = useSelector((state) => state.category.data);
-  const statusBrand = useSelector((state) => state.brand.status);
-  const dataBrand = useSelector((state) => state.brand.data);
-  const statusSeries = useSelector((state) => state.collection.status);
-  const dataSeries = useSelector((state) => state.collection.data);
-  const statusTag = useSelector((state) => state.tag.status);
-  const dataTag = useSelector((state) => state.tag.data.tags);
-  const statusGetAttribute = useSelector((state) => state.attribute.status);
-  const dataAttribute = useSelector((state) => state.attribute.data);
-  useEffect(() => {
-    dispatch(getProductById(id));
-  }, [dispatch, id]);
-  useEffect(() => {
-    dispatch(getAllWarehouses());
-  }, [dispatch]);
-  useEffect(() => {
-    dispatch(getCategory());
-  }, [dispatch]);
+  const [brands, setBrands] = useState([]);
+  // const [medias, setMedias] = useState([]);
+  const [images, setImages] = useState([]);
 
   useEffect(() => {
-    dispatch(getBrand());
-  }, [dispatch]);
-
-  useEffect(() => {
-    dispatch(getAllCollections());
-  }, [dispatch]);
-  useEffect(() => {
-    dispatch(getAllTags());
-  }, [dispatch]);
-  useEffect(() => {
-    dispatch(getAttribute());
-  }, [dispatch]);
-  useEffect(() => {
-    if (statusGetAttribute === "success") {
-      const attributes = dataAttribute.map((item) => ({
-        id: item._id,
-        name: item.name,
-        values: item.values.map((value) => ({
-          name: value,
-          value: value,
-        })),
-      }));
-      setAttributesSelect(attributes);
+    if (!id) {
+      console.error("ID không hợp lệ");
+      return;
     }
-  }, [statusGetAttribute, dataAttribute]);
-  useEffect(() => {
-    if (statusGetById === "success" && productData) {
-      setDataProduct(productData);
-    }
-  }, [statusGetById, productData]);
-
-  useEffect(() => {
-    if (statusWarehouse === "success") {
-      const warehouses = dataWarehouse.map((item) => ({
-        value: item._id,
-        label: item.name,
-      }));
-      setWarehouseSelect(warehouses);
-    }
-  }, [statusWarehouse, dataWarehouse]);
-  useEffect(() => {
-    if (statusGetCategory === "success") {
-      const categories = dataCategory.map((item) => ({
-        value: item._id,
-        label: item.name,
-      }));
-      setCategorySelect(categories);
-    }
-  }, [statusGetCategory, dataCategory]);
-  useEffect(() => {
-    if (statusBrand === "success") {
-      const brands = dataBrand.map((item) => ({
-        value: item._id,
-        label: item.name,
-      }));
-      setBrandSelect(brands);
-    }
-  }, [statusBrand, dataBrand]);
-
-  useEffect(() => {
-    if (statusSeries === "succeeded") {
-      const series = dataSeries.map((item) => ({
-        value: item._id,
-        label: item.name,
-      }));
-      setSeriesSelect(series);
-    }
-  }, [statusSeries, dataSeries]);
-
-  useEffect(() => {
-    if (statusTag === "succeeded") {
-      const tags = dataTag.map((item) => ({
-        value: item._id,
-        label: item.name,
-      }));
-      setTagsSelect(tags);
-    }
-  }, [statusTag, dataTag]);
-  useEffect(() => {
-    if (statusGetById === "success" && productData) setDataProduct(productData);
-  }, [statusGetById, productData]);
-  const formik = useFormik({
-    initialValues: {
-      name: dataProduct[0]?.name || "",
-      slug: dataProduct[0]?.slug || "",
-      SKU: dataProduct[0]?.SKU || "",
-      historicalPrice: dataProduct[0]?.historicalPrice || 0,
-      priceInMarket: dataProduct[0]?.priceInMarket || 0,
-      price: dataProduct[0]?.price || 0,
-      discount: dataProduct[0]?.discount || 0,
-      onStock: dataProduct[0]?.onStock || 0,
-      inStock: dataProduct[0]?.inStock || 0,
-      inComing: dataProduct[0]?.inComing || 0,
-      unit: dataProduct[0]?.unit || "",
-      minInventory: dataProduct[0]?.minInventory || 0,
-      maxInventory: dataProduct[0]?.maxInventory || 0,
-      weight: dataProduct[0]?.weight || 0,
-      isBattery: dataProduct[0]?.isBattery || false,
-      isStopSelling: dataProduct[0]?.isStopSelling || false,
-      description: dataProduct[0]?.description || "",
-      shortDescription: dataProduct[0]?.shortDescription || "",
-      keywords: dataProduct[0]?.keywords || "",
-      titleSEO: dataProduct[0]?.titleSEO || "",
-      descriptionSEO: dataProduct[0]?.descriptionSEO || "",
-      thumbnail: dataProduct[0]?.thumbnail || "",
-      images: dataProduct[0]?.images || [],
-      videos: dataProduct[0]?.videos || "",
-      status: dataProduct[0]?.status || "",
-      series: dataProduct[0]?.series || "",
-      brand: dataProduct[0]?.brand || "",
-      category: dataProduct[0]?.category || "",
-      warehouse: dataProduct[0]?.warehouse || "",
-      tagsProduct: dataProduct[0]?.tagsProduct || [],
-      attributes: Array.isArray(dataProduct[0]?.attributes)
-        ? dataProduct[0].attributes.map((attr) => ({
-            aid: attr.aid || "",
-            value: attr.value || "",
-            SKU: attr.SKU || "",
-            historicalPrice: attr.historicalPrice || 0,
-            priceInMarket: attr.priceInMarket || 0,
-            price: attr.price || 0,
-            discount: attr.discount || 0,
-            onStock: attr.onStock || 0,
-            inStock: attr.inStock || 0,
-            inComing: attr.inComing || 0,
-            unit: attr.unit || "",
-            minInventory: attr.minInventory || 0,
-            maxInventory: attr.maxInventory || 0,
-            images: attr.images || [],
-          }))
-        : [],
-      specifications: [],
-      gifts: [],
-      views: 0,
-    },
-    validationSchema: validationProductSchema,
-    enableReinitialize: true,
-    onSubmit: (values) => {
-      dispatch(updateProduct({ productId: id, data: { values } })).then(
-        (res) => {
-          if (res.type === "product/updateProduct/fulfilled") {
-            handleToast("success", "Cập nhật sản phẩm thành công");
-          } else {
-            handleToast("error", "Cập nhật sản phẩm thất bại");
-          }
+  
+    const fetchProductData = async () => {
+      try {
+        const product = await getProduct(id);
+        if (!product) {
+          console.error("Không tìm thấy sản phẩm");
+          return;
         }
-      );
-    },
-  });
+    
+        const detailResponse = await getDetailproductAPI(id);
+        console.log("detailResponse:", detailResponse);
+        if (!detailResponse || detailResponse.length === 0) {
+          console.warn("Không tìm thấy thông tin chi tiết sản phẩm.");
+          return;
+        }
+    
+        const mediaData = await getMediaAPI(id);
 
+// Chuyển đổi thành mảng nếu cần
+const mediaArray = Array.isArray(mediaData)
+  ? mediaData
+  : [mediaData]; // Nếu mediaData là đối tượng, đưa nó vào mảng
+
+const imagePromises = mediaArray.map((media) =>
+  getImageAPI(media.imageId).then((image) => ({
+    ...media,
+    link: image.link || "",
+  }))
+);
+const resolvedImages = await Promise.all(imagePromises);
+    
+        setProductInfo((prev) => ({
+          ...prev,
+          productName: product.name || prev.productName,
+          description: product.description || prev.description,
+          categoryId: product.categoryId || prev.categoryId,
+          brandId: product.brandId || prev.brandId,
+          productDetais: detailResponse || prev.productDetais,
+          medias: resolvedImages || prev.medias,
+        }));
+      } catch (error) {
+        console.error("Lỗi khi lấy dữ liệu sản phẩm:", error);
+      }
+    };
+    
+  
+    fetchProductData();
+  }, [id]);
+  
+
+  const handleAddVariant = () => {
+    setProductInfo((prev) => ({
+      ...prev,
+      productDetais: [
+        ...prev.productDetais,
+        { size: "", price: 0, quantity: 0, color: "", gender: "" },
+      ],
+    }));
+  };
+
+  // Xóa biến thể
+  const handleDeleteVariant = (index) => {
+    setProductInfo((prev) => ({
+      ...prev,
+      productDetais: prev.productDetais.filter((_, i) => i !== index),
+    }));
+  };
+
+  // Xử lý thay đổi trong biến thể
+  const handleVariantChange = (index, key, value) => {
+    const updatedVariants = [...productInfo.productDetais];
+    updatedVariants[index][key] = value;
+    setProductInfo((prev) => ({ ...prev, productDetais: updatedVariants }));
+  };
+
+  const handleImageChange = (e) => {
+    const files = Array.from(e.target.files);
+    const fileArray = files.map((file) => URL.createObjectURL(file));
+  
+    const uniqueFiles = fileArray.filter((file) => 
+      !productImages.includes(file) 
+    );
+  
+    if (uniqueFiles.length > 0) {
+      setProductImages((prev) => [...prev, ...uniqueFiles]);
+  
+      const newMedia = files.map((file, index) => ({
+        link: file.name,
+        isPrimary: index === 0,
+      }));
+  
+      setProductInfo((prev) => ({
+        ...prev,
+        medias: [
+          ...prev.medias,
+          ...newMedia,
+        ],
+      }));
+    }
+  };
+  
+
+
+  // const handleCheckGrammar = async () => {
+  //   setIsChecking(true);
+  //   try {
+  //     const response = await fetch("https://api.openai.com/v1/completions", {
+  //       method: "POST",
+  //       headers: {
+  //         "Content-Type": "application/json",
+  //         Authorization: `Bearer YOUR_API_KEY`,
+  //       },
+  //       body: JSON.stringify({
+  //         model: "text-davinci-003",
+  //         prompt: `Hãy kiểm tra lỗi chính tả và ngữ pháp trong đoạn văn sau:\n\n${productInfo.description}`,
+  //         max_tokens: 500,
+  //       }),
+  //     });
+  //     const data = await response.json();
+  //     const correctedText = data.choices[0].text.trim();
+  //     setProductInfo({ ...productInfo, description: correctedText });
+  //   } catch (error) {
+  //     console.error("Lỗi khi kiểm tra ngữ pháp:", error);
+  //   } finally {
+  //     setIsChecking(false);
+  //   }
+  // };
+
+  const handleDeleteProductDetail = (index) => {
+    const updatedDetails = productInfo.productDetais.filter(
+      (_, detailIndex) => detailIndex !== index
+    );
+    setProductInfo({ ...productInfo, productDetais: updatedDetails });
+  };
+
+  const handleProductDetailChange = (index, key, value) => {
+    const newDetails = [...productInfo.productDetais];
+    newDetails[index][key] = value;
+    setProductInfo((prev) => ({ ...prev, productDetais: newDetails }));
+  };
+
+  const handleSave = () => {
+    console.log("Saved Data:", productInfo);
+  };
+
+
+  const handleDeleteImage = (index) => {
+    const updatedImages = productImages.filter((_, imageIndex) => imageIndex !== index);
+    setProductImages(updatedImages);
+  };
+
+
+  useEffect(() => {
+    const fetchBrand = async () => {
+      try {
+        const brandPromises = await getAllBrandAPI(customersPerPage, currentPage);
+        console.log("brandPromises ", brandPromises);
+        if (Array.isArray(brandPromises.data)) {
+          setBrand(brandPromises.data);
+        } else {
+          setBrand([]);
+        }
+      } catch (error) {
+        console.error("Lỗi khi lấy media cho sản phẩm:", error);
+      }
+    };
+
+    fetchBrand();
+  }, [customersPerPage, currentPage]);
+
+
+  const handleAdd = async (e) => {
+    e.preventDefault();
+    console.log("productInfo ", productInfo);
+    console.log("productInfo.productDetais ",);
+
+    const mainProduct = {
+      main: {
+        productName: productInfo.productName,
+        description: productInfo.description,
+        categoryId: productInfo.categoryId,
+        brandId: productInfo.brandId,
+      },
+      productDetails: [
+        {
+          price: productInfo.price,
+          quantity: productInfo.quantity,
+          colorId: productInfo.colorId,
+          size: productInfo.size,
+          gender: productInfo.gender,
+          status: "1",
+        }
+      ]
+    };
+
+    const variants = productInfo.productDetais.map((variant) => ({
+      colorId: variant.colorId,
+      size: variant.size,
+      gender: variant.gender,
+      quantity: variant.quantity,
+      price: variant.price,
+      status: "0",
+    }));
+    const mediaMain = productInfo.medias.filter(media => media.isPrimary);
+    const mediaSub = productInfo.medias.filter(media => !media.isPrimary);
+    const productData = {
+      ...mainProduct.main,
+      productDetais: [
+        ...mainProduct.productDetails,
+        ...variants,
+      ],
+      medias: [
+        {
+          ...mediaMain,
+          ...mediaSub,
+        }
+      ]
+    };
+
+    console.log("productData ", productData);
+    setIsLoading(true);
+    try {
+      const response = await postProductAPI(productData);
+      handleToast("success", "Sản phẩm đã được lưu thành công!", "top-right");
+    } catch (error) {
+      console.error("Error saving product:", error);
+      handleToast("error", "Có lỗi khi lưu sản phẩm.", "top-right");
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+
+  const handleInputChange = (field, value) => {
+    setProductInfo(prevState => ({
+      ...prevState,
+      [field]: value
+    }));
+  };
+  const renderInput = (label, value, field) => (
+    <div className="col-md-6">
+      <div className="form-floating">
+        <input
+          type="text"
+          className="form-control"
+          id={field}
+          placeholder={label}
+          value={value}
+          onChange={(e) => handleInputChange(field, e.target.value)}
+        />
+        <label htmlFor={field}>{label}</label>
+      </div>
+    </div>
+  );
+  
   return (
-    <>
-      <Card sx={{ mt: 1, p: 1 }}>
-        <Tabs value={mainTabValue} onChange={handleMainTabChange}>
-          <Tab label="Thông tin sản phẩm" {...a11yProps(0)} />
-          <Tab label="Thông tin SEO" {...a11yProps(1)} />
-          <Tab label="Biến thể" {...a11yProps(2)} />
-        </Tabs>
-      </Card>
-      <form onSubmit={formik.handleSubmit}>
-        <TabPanel value={mainTabValue} index={0}>
-          <Grid container spacing={3}>
-            <Grid item xs={12}>
-              <InformationEdit
-                formik={formik}
-                warehouseSelect={warehouseSelect}
-              />
-            </Grid>
-            <Grid item xs={12}>
-              <OtherProductEdit
-                formik={formik}
-                brandSelect={brandSelect}
-                seriesSelect={seriesSelect}
-                categorySelect={categorySelect}
-                tagsProduct={tagsSelect}
-              />
-            </Grid>
-          </Grid>
-          <Card sx={{ mt: 2, p: 3 }}>
-            <Grid container spacing={3}>
-              <Grid item xs={4}>
-                <ThumbnailProduct
-                  formik={formik}
-                  dataImage={formik.values.thumbnail}
-                />
-              </Grid>
-              <Grid item xs={4}>
-                <ImageProduct
-                  formik={formik}
-                  dataImage={formik.values.images}
-                />
-              </Grid>
-              <Grid item xs={4}>
-                <VideosProduct
-                  formik={formik}
-                  dataImage={formik.values.videos}
-                />
-              </Grid>
-            </Grid>
-          </Card>
+    <Card>
 
-          <Card sx={{ mt: 2, p: 3 }}>
-            <Grid container spacing={3}>
-              <Grid item xs={12}>
-                <Specifications formik={formik} />
-              </Grid>
-            </Grid>
-          </Card>
-          <Card sx={{ mt: 2, p: 3 }}>
-            <Grid container spacing={3}>
-              <Grid item xs={12}>
-                <Gifts formik={formik} />
-              </Grid>
-            </Grid>
-          </Card>
-        </TabPanel>
 
-        <TabPanel value={mainTabValue} index={1}>
-          <Card sx={{ mt: 2, p: 3 }}>
-            <Grid container spacing={3}>
-              <Grid item xs={12}>
-                <SEOInformation formik={formik} />
-              </Grid>
-            </Grid>
-          </Card>
-        </TabPanel>
-
-        <TabPanel value={mainTabValue} index={2}>
-          <Card sx={{ mt: 2, p: 3 }}>
-            <Grid container spacing={3}>
-              <Grid item xs={12}>
-                <AttributesSection
-                  formik={formik}
-                  attributesSelect={attributesSelect}
-                />
-              </Grid>
-            </Grid>
-          </Card>
-        </TabPanel>
-        <Box
-          sx={{
-            display: "flex",
-            justifyContent: "flex-end",
-            mt: 2,
-            p: 2,
-          }}
+      <div className="dialog-tabs">
+        <button
+          className={`tab-btn ${activeTab === "info" ? "active" : ""}`}
+          onClick={() => setActiveTab("info")}
         >
-          <Button
-            variant="contained"
-            color="primary"
-            type="submit"
-            sx={{ mr: 2 }}
+          Thông Tin Sản Phẩm
+        </button>
+        <button
+          className={`tab-btn ${activeTab === "description" ? "active" : ""}`}
+          onClick={() => setActiveTab("description")}
+        >
+          Mô Tả Sản Phẩm
+        </button>
+        <button
+          className={`tab-btn ${activeTab === "deimgae" ? "active" : ""}`}
+          onClick={() => setActiveTab("deimgae")}
+        >
+          Hình ảnh chi tiết
+        </button>
+        <button
+          className={`tab-btn ${activeTab === "debienthe" ? "active" : ""}`}
+          onClick={() => setActiveTab("debienthe")}
+        >
+          Chi tiết biến thể
+        </button>
+      </div>
+      <form onSubmit={handleAdd}>
+        {activeTab === "info" && (
+          <div className="container">
+            {/* <h1>Thông tin sản phẩm</h1> */}
+            <div className="row">
+            <div className="col-md-4">
+  <div className="from-img image-up">
+    <label htmlFor="image" className="image-label">
+      {productImages.length > 0 ? (
+        <div className="image-previews">
+          <img
+            src={productImages[0]}  
+            alt="Product Main"
+            className="img-fluid robot-image"style={{ width: "100%", height: "100%", objectFit: "cover" }}
+
+          />
+        </div>
+      ) : (
+        <div className="image-placeholder">
+          <i className="fas fa-camera"></i>
+          <span className="image-tx">Chọn hình ảnh chính</span>
+        </div>
+      )}
+    </label>
+    <input
+      type="file"
+      id="image"
+      onChange={handleImageChange}
+      accept="image/*"
+      // multiple
+      style={{ display: "none" }}
+    />
+  </div>
+</div>
+
+              <div className="col-md-8">
+                <Card>
+                  <div className="bor_create">
+                    <div className="row">
+                      {renderInput("Tên Sản Phẩm", productInfo.productName, "productName")}
+                      {/* <div className="col-md-6">
+                        <div className="form-floating">
+                          
+                          <input
+                            type="text"
+                            className="form-control"
+                            id="productName"
+                            name="productName"
+                            placeholder="Tên Sản Phẩm"
+                            value={productInfo.productName}
+                onChange={(e) => handleInputChange("productName", e.target.value)}
+                            // onChange={(e) => setProductName(e.target.value)}
+                          />
+                          <label htmlFor="productName">Tên Sản Phẩm</label>
+                        </div>
+                      </div> */}
+                      <div className="col-md-6">
+                        <div className="form-floating">
+                          <input
+                            type="text"
+                            className="form-control"
+                            id="quantity"
+                            placeholder="Số Lượng"
+                            // value={quantity}
+                            value={productInfo.quantity}
+                            onChange={(e) => handleInputChange("quantity", e.target.value)}
+                          // onChange={(e) => setQuantity(e.target.value)}
+
+                          />
+                          <label htmlFor="quantity">Số lượng</label>
+                        </div>
+                      </div>
+                    </div>
+                    <div className="row">
+                      <div className="col-md-6">
+                        <div className="form-floating">
+                          <input
+                            type="text"
+                            className="form-control"
+                            id="price"
+                            placeholder="Giá"
+                            // value={price}
+                            // onChange={(e) => setPrice(e.target.value)}
+                            value={productInfo.price}
+                            onChange={(e) => handleInputChange("price", e.target.value)}
+                          />
+                          <label htmlFor="price">Giá</label>
+                        </div>
+                      </div>
+                      <div className="col-md-6">
+                        <div className="form-floating custom-floating-label">
+                          <select
+                            className="form-select"
+                            id="size"
+                            // value={size}
+                            // onChange={(e) => setSize(e.target.value)}
+
+                            value={productInfo.size}
+                            onChange={(e) => handleInputChange("size", e.target.value)}
+                          >
+                            <option value="" disabled hidden></option>
+                            <option value="M">M</option>
+                            <option value="X">X</option>
+                            <option value="XL">XL</option>
+                          </select>
+                          <label htmlFor="size">Kích Thước</label>
+                        </div>
+                      </div>
+                    </div>
+                    <div className="row">
+                      <div className="col-md-6">
+                        <div className="form-floating custom-floating-label">
+                          <select
+                            className="form-select"
+                            id="colorId"
+                            // value={color}
+                            // onChange={(e) => setColor(e.target.value)}
+
+                            value={productInfo.colorId}
+                            onChange={(e) => handleInputChange("colorId", e.target.value)}
+                          >
+                            <option value="" disabled hidden>Chọn màu sắc</option>
+                            <option value="1">1</option>
+                            <option value="2">2</option>
+                          </select>
+                          <label htmlFor="colorId">Màu sắc</label>
+                        </div>
+                      </div>
+                      <div className="col-md-6">
+                        <div className="form-floating custom-floating-label">
+                          <select
+                            className="form-select"
+                            id="gender"
+                            // value={gender}
+                            // onChange={(e) => setGender(e.target.value)}
+
+                            value={productInfo.gender}
+                            onChange={(e) => handleInputChange("gender", e.target.value)}
+                          >
+                            <option value="" disabled hidden>Chọn giới tính</option>
+                            <option value="male">Nam</option>
+                            <option value="female">Nữ</option>
+                            <option value="other">Khác</option>
+                          </select>
+                          <label htmlFor="gender">Giới tính</label>
+                        </div>
+                      </div>
+                    </div>
+                    <div className="row">
+                      <div className="col-md-6">
+                        <div className="form-floating">
+                          <input
+                            type="text"
+                            className="form-control"
+                            id="categoryId"
+                            placeholder="Loại sản phẩm"
+                            // value={category}
+                            // onChange={(e) => setCategory(e.target.value)}
+
+                            value={productInfo.categoryId}
+                            onChange={(e) => handleInputChange("categoryId", e.target.value)}
+                          />
+                          <label htmlFor="category">Loại sản phẩm</label>
+                        </div>
+                      </div>
+                      <div className="col-md-6">
+                        <div className="form-floating custom-floating-label">
+                          <select
+                            className="form-select"
+                            id="brandId"
+                            // value={selectedBrand}
+                            // onChange={(e) => setSelectedBrand(e.target.value)} // Cập nhật thương hiệu được chọn
+
+                            value={productInfo.brandId}
+                            onChange={(e) => handleInputChange("brandId", e.target.value)}
+                          >
+                            <option value="" disabled hidden>Chọn thương hiệu</option>
+                            {brand.map((item) => (
+                              <option key={item.id} value={item.id}>
+                                {item.brandName}
+                              </option>
+                            ))}
+                          </select>
+                          <label htmlFor="brand">Thương hiệu</label>
+                        </div>
+                      </div>
+
+                    </div>
+                  </div>
+                </Card>
+              </div>
+            </div>
+
+          </div>
+        )}
+
+        {activeTab === "description" && (
+          <div className="container">
+            <h3>Thông tin mô tả</h3>
+            <div className="form-floating">
+              <input
+                type="text"
+                className="form-control"
+                id="description"
+                placeholder="Loại sản phẩm"
+                // value={description}
+                // onChange={(e) => setdescription(e.target.value)}
+
+                value={productInfo.description}
+                onChange={(e) => handleInputChange("description", e.target.value)}
+              />
+              <label htmlFor="description">Mô tả</label>
+            </div>
+            {/* <button onClick={handleCheckGrammar} disabled={isChecking}>
+              {isChecking ? "Đang kiểm tra..." : "Kiểm tra ngữ pháp"}
+            </button>
+            <div
+              className={`product-description-preview ${expandDescription ? "expanded" : ""}`}
+            >
+              {productInfo.description}
+            </div>
+            <button onClick={() => setExpandDescription(!expandDescription)}>
+              {expandDescription ? "Thu gọn" : "Xem thêm"}
+            </button> */}
+          </div>
+        )}
+
+{activeTab === "deimgae" && (
+  <div className="container">
+    <div className="from-img image-up">
+      <label htmlFor="image" className="image-label">
+        
+          <div className="image-placeholder">
+            <i className="fas fa-camera"></i>
+            <span className="image-tx">Chọn hình ảnh bìa</span>
+          </div>
+      </label>
+      <input
+        type="file"
+        id="image"
+        onChange={handleImageChange}
+        accept="image/*"
+        multiple
+        style={{ display: "none" }}
+      />
+    </div>
+    
+    {/* Các hình ảnh sẽ hiển thị trong dạng lưới 4 cột */}
+    <div className="image-previews">
+      {productImages.map((image, index) => (
+        <div key={index} className="image-preview">
+          <img src={image} alt={`Product Image ${index}`} className="img-fluid" />
+          <a className="ima" onClick={() => handleDeleteImage(index)}>Xóa</a>
+        </div>
+      ))}
+    </div>
+  </div>
+)}
+
+
+
+{activeTab === "debienthe" && (
+  <div className="container">
+    <a className="addpro" onClick={handleAddVariant}>Thêm Biến thể</a>
+    <div className="variant-list">
+      {productInfo.productDetais.map((detail, index) => (
+        <div key={index} className="variant-card">
+          <div className="variant-header">
+            <h4>Biến thể {index + 1}</h4>
+            <a className="delete-btn" onClick={() => handleDeleteProductDetail(index)}>Xóa</a>
+          </div>
+          <div className="variant-body">
+            <input
+              type="text"
+              placeholder="Size"
+              value={detail.size}
+              onChange={(e) =>
+                handleProductDetailChange(index, "size", e.target.value)
+              }
+            />
+            <input
+              type="number"
+              placeholder="Số lượng"
+              value={detail.quantity}
+              onChange={(e) =>
+                handleProductDetailChange(index, "quantity", e.target.value)
+              }
+            />
+            <input
+              type="number"
+              placeholder="Giá"
+              value={detail.price}
+              onChange={(e) =>
+                handleProductDetailChange(index, "price", e.target.value)
+              }
+            />
+            <select
+              value={detail.colorId}
+              onChange={(e) =>
+                handleProductDetailChange(index, "colorId", e.target.value)
+              }
+            >
+              <option value="">Chọn màu</option>
+              <option value="red">Đỏ</option>
+              <option value="blue">Xanh dương</option>
+              <option value="green">Xanh lá</option>
+              {/* Các màu sắc khác nếu cần */}
+            </select>
+            <select
+              value={detail.gender}
+              onChange={(e) =>
+                handleProductDetailChange(index, "gender", e.target.value)
+              }
+            >
+              <option value="">Chọn giới tính</option>
+              <option value="male">Nam</option>
+              <option value="female">Nữ</option>
+              <option value="unisex">Unisex</option>
+            </select>
+          </div>
+        </div>
+      ))}
+    </div>
+  </div>
+)}
+
+
+        <div className="text-center">
+          <button type="submit" className="create-luu"
+          // onClick={handleSave}
+          // disabled={isLoading || !productName}
           >
             Lưu sản phẩm
-          </Button>
-          <Button variant="contained" color="error">
-            Hủy
-          </Button>
-        </Box>
+          </button>
+        </div>
       </form>
-    </>
+    </Card>
   );
 }
+
+export default ProductPage;
