@@ -94,11 +94,11 @@ function AddStaff() {
       return false;
     }
   
-    const phoneRegex = /^0389\d{6,8}$/; 
-    if (!phoneRegex.test(phone)) {
-      handleToast("error", "Số điện thoại không hợp lệ. Phải bắt đầu bằng 0389 và dài từ 10 đến 12 chữ số.", "top-right");
-      return false;
-    }
+    // const phoneRegex = /^0389\d{6,8}$/; 
+    // if (!phoneRegex.test(phone)) {
+    //   handleToast("error", "Số điện thoại không hợp lệ. Phải bắt đầu bằng 0389 và dài từ 10 đến 12 chữ số.", "top-right");
+    //   return false;
+    // }
   
     if (password.length < 5) {
       handleToast("error", "Mật khẩu phải ít nhất 5 ký tự.", "top-right");

@@ -50,7 +50,7 @@ export default function UserPage() {
 const handleApprove = useCallback(async (id) => {
   console.log("Approved User ID:", id);  
   try {
-    await axios.put(`https://localhost:7048/api/Account/un-block-account/${id}`);
+    await axios.post(`https://localhost:7048/api/Account/un-block-account/${id}`);
     handleToast("success", "Người dùng đã được cho phép hoạt động!", "top-right");
     fetchCustomers(pagination.pageNumber);
   } catch {
@@ -62,7 +62,7 @@ const handleApprove = useCallback(async (id) => {
 const handleReject = useCallback(async (id) => {
   console.log("Approved User ID:", id);  
   try {
-    await axios.put(`https://localhost:7048/api/Account/block-account/${id}`);
+    await axios.post(`https://localhost:7048/api/Account/block-account/${id}`);
     handleToast("error", "Người dùng đã bị cấm đăng nhập!", "top-right");
     fetchCustomers(pagination.pageNumber);
   } catch {
