@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { Row, Col, Card, Button, Modal } from "react-bootstrap";
-import { getProductAPI, getMediaAPI, getImageAPI, getBrandAPI, getDetailproductAPI, getProduct } from "./js/product";
+import { getProductAPI, getMediaAPI, getImageAPI, getBrandAPI, getDetailproductAPI,getAllCategoryAPI,getCategoryAPI, getProduct } from "./js/product";
 import { useNavigate, Link } from "react-router-dom";
 import ControlPointIcon from "@mui/icons-material/ControlPoint";
 import RemoveRedEyeIcon from "@mui/icons-material/RemoveRedEye";
@@ -20,6 +20,7 @@ export default function StaffPage() {
   const [customersPerPage, setCustomersPerPage] = useState(5);
   const [showDetailModal, setShowDetailModal] = useState(false);
   const [activeTab, setActiveTab] = useState("info");
+  const [Categorys, setCategorys] = useState([]); 
 
 
 
@@ -59,6 +60,21 @@ export default function StaffPage() {
     }
   }, [items]);
   useEffect(() => {
+    const fetchCategory = async () => {
+      try {
+        const CategoryPromises = items.map((item) => getCategoryAPI(item.categoryId));
+        const resolvedBrands = await Promise.all(CategoryPromises);
+        setCategorys(resolvedBrands);
+      } catch (error) {
+        console.error("Lỗi khi lấy media cho sản phẩm:", error);
+      }
+    };
+
+    if (items.length > 0) {
+      fetchCategory();
+    }
+  }, [items]);
+  useEffect(() => {
     const fetchMediaForProducts = async () => {
       try {
         const mediaPromises = items.map((item) => getMediaAPI(item.id));
@@ -82,8 +98,8 @@ export default function StaffPage() {
     const fetchImage = async () => {
       try {
         const imagePromises = medias.flat().map((media) => {
-          return getImageAPI(media.imageId).then((image) => ({
-            mediaId: media.imageId,
+          return getImageAPI(media.imagesId).then((image) => ({
+            mediaId: media.imagesId,
             imageUrl: image.link,
           }));
         });
@@ -185,16 +201,20 @@ export default function StaffPage() {
                   </thead>
                   <tbody>
                     {currentCustomers.map((item, stt) => {
+                      
+                      console.log("medias ", medias);
                       const productMedia = medias.filter((media) => media.productId === item.id);
+                      console.log("productMedia ", productMedia);
                       const productBrans = brands.filter((bran) => bran.id === item.brandId);
+                      const productCategorys = Categorys.filter((catego) => catego.id === item.categoryId);
                       return (
                         <tr key={item.id}>
                           <th scope="row">{indexOfFirstCustomer + stt + 1}</th>
                           <td>
                             {productMedia.map((media, index) => {
 
-                              const productImage = images.find((image) => image.mediaId === media.imageId);
-                              // console.log("productImage1 : ",productImage);
+                              const productImage = images.find((image) => image.mediaId === media.imagesId);
+                               console.log("productImage1 : ",productImage);
                               return (
                                 productImage && (
                                   <img
@@ -208,7 +228,12 @@ export default function StaffPage() {
                             })}
                           </td>
                           <td>{item.productName}</td>
-                          <td>{item.categoryId || "Chưa có địa chỉ"}</td>
+                          <td>
+                          {productCategorys.length > 0 && (
+                              <p>{productCategorys[0].categoryName}</p>
+                            )}
+                            {/* {Categorys.categoryName} */}
+                            </td>
                           <td>
                             {productBrans.length > 0 && (
                               <p>{productBrans[0].brandName}</p>
@@ -287,7 +312,7 @@ export default function StaffPage() {
                                             <td>
                                               {mediaForProduct.map((media, mediaIndex) => {
                                                 const productImage = images.find(
-                                                  (image) => image.mediaId === media.imageId
+                                                  (image) => image.mediaId === media.imagesId
                                                 );
                                                 console.log("productImage: ", productImage);
                                                 return (
@@ -343,6 +368,11 @@ export default function StaffPage() {
                         )}
                       </Modal.Body>
                     </Modal>
+
+
+
+
+                    
                   </tbody>
 
                 </table>

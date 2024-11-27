@@ -5,8 +5,8 @@ import { handleToast } from "../../../utils/toast";
 
 import { useNavigate } from "react-router-dom";
 import {
-  getAllBrandAPI, getMediaAPI, getImageAPI, getBrandAPI,
-  getDetailproductAPI, postProductAPI, postDEProductAPI, postImageAPI
+  getAllBrandAPI, getMediaAPI, getImageAPI, getBrandAPI,getAllCategoryAPI,
+  getDetailproductAPI, postProductAPI, postDEProductAPI, postImageAPI, getAllColorAPI
 } from "../js/product";
 function ProductPage() {
   const [productInfo, setProductInfo] = useState({
@@ -22,10 +22,7 @@ function ProductPage() {
       gender: "",
       status: ""
     }],
-    medias: [{
-      isPrimary: "",
-      link: "",
-    }]
+    medias: []
   });
   const [expandDescription, setExpandDescription] = useState(false);
   const [productImage, setProductImage] = useState(null);
@@ -46,10 +43,11 @@ function ProductPage() {
   const [selectedBrand, setSelectedBrand] = useState('');
   const navigate = useNavigate();
   const [currentPage, setCurrentPage] = useState(1);
-  const [customersPerPage, setCustomersPerPage] = useState(5);
+  const [customersPerPage, setCustomersPerPage] = useState(8);
   const [productDetais, setproductDetais] = useState([]);
   const [medias, setMedias] = useState([]);
-
+  const [colors, setColors] = useState([]); 
+  const [Categorys, setCategorys] = useState([]); 
 
   const handleAddVariant = () => {
     setProductInfo((prev) => ({
@@ -76,31 +74,34 @@ function ProductPage() {
     setProductInfo((prev) => ({ ...prev, productDetais: updatedVariants }));
   };
 
-  const handleImageChange = (e) => {
-    const files = Array.from(e.target.files);
-    const fileArray = files.map((file) => URL.createObjectURL(file));
+  // const handleImageChange = (e) => {
+  //   const files = Array.from(e.target.files);
   
-    const uniqueFiles = fileArray.filter((file) => 
-      !productImages.includes(file) 
-    );
+  //   const newFiles = files.map((file) => ({
+  //     url: URL.createObjectURL(file),
+  //     name: file.name,
+  //   }));
   
-    if (uniqueFiles.length > 0) {
-      setProductImages((prev) => [...prev, ...uniqueFiles]);
+  //   const uniqueFiles = newFiles.filter(
+  //     (file) => !productInfo.medias.some((media) => media.link === file.name)
+  //   );
   
-      const newMedia = files.map((file, index) => ({
-        link: file.name,
-        isPrimary: index === 0,
-      }));
+  //   if (uniqueFiles.length > 0) {
+  //     // Cập nhật mảng hình ảnh
+  //     setProductImages((prev) => [...prev, ...uniqueFiles.map(file => file.url)]);
   
-      setProductInfo((prev) => ({
-        ...prev,
-        medias: [
-          ...prev.medias,
-          ...newMedia,
-        ],
-      }));
-    }
-  };
+  //     // Tạo các phần tử mới trong medias
+  //     const newMedia = uniqueFiles.map((file, index) => ({
+  //       link: file.name,
+  //       isPrimary: productInfo.medias.length === 0 && index === 0, // Đặt isPrimary nếu chưa có
+  //     }));
+  
+  //     setProductInfo((prev) => ({
+  //       ...prev,
+  //       medias: [...prev.medias, ...newMedia], // Thêm vào mảng medias
+  //     }));
+  //   }
+  // };
   
 
 
@@ -147,12 +148,84 @@ function ProductPage() {
   };
 
 
-  const handleDeleteImage = (index) => {
-    const updatedImages = productImages.filter((_, imageIndex) => imageIndex !== index);
-    setProductImages(updatedImages);
+  // const handleDeleteImage = (index) => {
+  //   const updatedImages = productImages.filter((_, imageIndex) => imageIndex !== index);
+  //   setProductImages(updatedImages);
+  // };
+
+  // const handleDeleteImage = (index) => {
+  //   const updatedImages = productImages.filter((_, i) => i !== index);
+
+  //   setProductImages(updatedImages);
+
+  //   setProductInfo((prev) => ({
+  //     ...prev,
+  //     medias: prev.medias.filter((_, i) => i !== index),
+  //   }));
+  // };
+
+  // // Đặt hình ảnh làm hình chính
+  // const handleSetPrimaryImage = (index) => {
+  //   setProductInfo((prev) => ({
+  //     ...prev,
+  //     medias: prev.medias.map((media, i) => ({
+  //       ...media,
+  //       isPrimary: i === index,
+  //     })),
+  //   }));
+  // };
+
+
+  const handleImageChange = (e) => {
+    const files = Array.from(e.target.files);
+  
+    const newFiles = files.map((file) => ({
+      url: URL.createObjectURL(file),
+      name: file.name,
+    }));
+  
+    const uniqueFiles = newFiles.filter(
+      (file) => !productInfo.medias.some((media) => media.link === file.name)
+    );
+  
+    if (uniqueFiles.length > 0) {
+      setProductImages((prev) => [
+        ...prev,
+        ...uniqueFiles.map((file) => file.url),
+      ]);
+  
+      const newMedia = uniqueFiles.map((file, index) => ({
+        link: file.name,
+        isPrimary: productInfo.medias.length === 0 && index === 0,
+      }));
+  
+      setProductInfo((prev) => ({
+        ...prev,
+        medias: [...prev.medias, ...newMedia],
+      }));
+    }
   };
-
-
+  
+  const handleDeleteImage = (index) => {
+    setProductImages((prev) => prev.filter((_, i) => i !== index));
+    setProductInfo((prev) => ({
+      ...prev,
+      medias: prev.medias.filter((_, i) => i !== index),
+    }));
+  };
+  
+  const handleSetPrimaryImage = (index) => {
+    if (index >= 0 && index < productInfo.medias.length) {
+      setProductInfo((prev) => ({
+        ...prev,
+        medias: prev.medias.map((media, i) => ({
+          ...media,
+          isPrimary: i === index,
+        })),
+      }));
+    }
+  };
+  
   useEffect(() => {
     const fetchBrand = async () => {
       try {
@@ -171,7 +244,41 @@ function ProductPage() {
     fetchBrand();
   }, [customersPerPage, currentPage]);
 
+  const fetchColors = async () => {
+    try {
+      const response = await getAllColorAPI(customersPerPage, currentPage);
+      if (Array.isArray(response.data)) {
+        setColors(response.data); 
+      } else {
+        setColors([]);
+      } // Cập nhật state colors với dữ liệu màu sắc
+    } catch (error) {
+      console.error("Lỗi khi lấy dữ liệu màu:", error);
+    }
+  };
 
+  // Gọi API khi component được render
+  useEffect(() => {
+    fetchColors();
+  }, []);
+
+  const fetchCategory = async () => {
+    try {
+      const response = await getAllCategoryAPI(customersPerPage, currentPage);
+      if (Array.isArray(response.data)) {
+        setCategorys(response.data); 
+      } else {
+        setCategorys([]);
+      } // Cập nhật state colors với dữ liệu màu sắc
+    } catch (error) {
+      console.error("Lỗi khi lấy dữ liệu màu:", error);
+    }
+  };
+
+  // Gọi API khi component được render
+  useEffect(() => {
+    fetchCategory();
+  }, []);
   const handleAdd = async (e) => {
     e.preventDefault();
     console.log("productInfo ", productInfo);
@@ -204,20 +311,20 @@ function ProductPage() {
       price: variant.price,
       status: "0",
     }));
-    const mediaMain = productInfo.medias.filter(media => media.isPrimary);
-    const mediaSub = productInfo.medias.filter(media => !media.isPrimary);
+    let mediaMain = productInfo.medias.find((media) => media.isPrimary);
+  const mediaSub = productInfo.medias.filter((media) => !media.isPrimary);
+
+  // Nếu không có ảnh chính, đặt ảnh đầu tiên làm ảnh chính
+  if (!mediaMain && productInfo.medias.length > 0) {
+    mediaMain = { ...productInfo.medias[0], isPrimary: true };
+  }
     const productData = {
       ...mainProduct.main,
       productDetais: [
         ...mainProduct.productDetails,
         ...variants,
       ],
-      medias: [
-        {
-          ...mediaMain,
-          ...mediaSub,
-        }
-      ]
+      medias: [mediaMain, ...mediaSub].filter(Boolean),
     };
 
     console.log("productData ", productData);
@@ -225,6 +332,8 @@ function ProductPage() {
     try {
       const response = await postProductAPI(productData);
       handleToast("success", "Sản phẩm đã được lưu thành công!", "top-right");
+      // navigate("/dashboard/product")
+      navigate("/dashboard/product");
     } catch (error) {
       console.error("Error saving product:", error);
       handleToast("error", "Có lỗi khi lưu sản phẩm.", "top-right");
@@ -295,12 +404,48 @@ function ProductPage() {
     <label htmlFor="image" className="image-label">
       {productImages.length > 0 ? (
         <div className="image-previews">
-          <img
-            src={productImages[0]}  
-            alt="Product Main"
-            className="img-fluid robot-image"style={{ width: "100%", height: "100%", objectFit: "cover" }}
-
-          />
+          {productImages.map((image, index) => (
+            <div
+              key={index}
+              className={`image-item ${
+                productInfo.medias[index]?.isPrimary ? "primary" : ""
+              }`}
+              style={{ position: "relative", margin: "5px" }}
+            >
+              <img
+                src={image}
+                alt={`Product ${index}`}
+                className="img-fluid"
+                style={{ width: "100%", height: "100%", objectFit: "cover" }}
+              />
+              <button
+                className="btn btn-sm btn-primary"
+                style={{
+                  position: "absolute",
+                  top: "5px",
+                  right: "5px",
+                  zIndex: 10,
+                }}
+                onClick={() => handleSetPrimaryImage(index)}
+              >
+                {productInfo.medias[index]?.isPrimary
+                  ? "Hình chính"
+                  : "Đặt làm chính"}
+              </button>
+              <button
+                className="btn btn-sm btn-danger"
+                style={{
+                  position: "absolute",
+                  bottom: "5px",
+                  right: "5px",
+                  zIndex: 10,
+                }}
+                onClick={() => handleDeleteImage(index)}
+              >
+                Xóa
+              </button>
+            </div>
+          ))}
         </div>
       ) : (
         <div className="image-placeholder">
@@ -314,11 +459,12 @@ function ProductPage() {
       id="image"
       onChange={handleImageChange}
       accept="image/*"
-      // multiple
+      multiple
       style={{ display: "none" }}
     />
   </div>
 </div>
+
 
               <div className="col-md-8">
                 <Card>
@@ -396,22 +542,23 @@ function ProductPage() {
                     </div>
                     <div className="row">
                       <div className="col-md-6">
-                        <div className="form-floating custom-floating-label">
-                          <select
-                            className="form-select"
-                            id="colorId"
-                            // value={color}
-                            // onChange={(e) => setColor(e.target.value)}
+                      <div className="form-floating custom-floating-label">
+  <select
+    className="form-select"
+    id="colorId"
+    value={productInfo.colorId}  // giá trị hiện tại của colorId
+    onChange={(e) => handleInputChange("colorId", e.target.value)}  // khi thay đổi colorId
+  >
+    <option value="" disabled hidden>Chọn màu sắc</option>
+    {colors.map((item) => (
+      <option key={item.id} value={item.id}> 
+        {item.nameColor}  {/* Hiển thị tên màu */}
+      </option>
+    ))}
+  </select>
+  <label htmlFor="colorId">Màu sắc</label>
+</div>
 
-                            value={productInfo.colorId}
-                            onChange={(e) => handleInputChange("colorId", e.target.value)}
-                          >
-                            <option value="" disabled hidden>Chọn màu sắc</option>
-                            <option value="1">1</option>
-                            <option value="2">2</option>
-                          </select>
-                          <label htmlFor="colorId">Màu sắc</label>
-                        </div>
                       </div>
                       <div className="col-md-6">
                         <div className="form-floating custom-floating-label">
@@ -434,7 +581,7 @@ function ProductPage() {
                       </div>
                     </div>
                     <div className="row">
-                      <div className="col-md-6">
+                      {/* <div className="col-md-6">
                         <div className="form-floating">
                           <input
                             type="text"
@@ -448,6 +595,27 @@ function ProductPage() {
                             onChange={(e) => handleInputChange("categoryId", e.target.value)}
                           />
                           <label htmlFor="category">Loại sản phẩm</label>
+                        </div>
+                      </div> */}
+                      <div className="col-md-6">
+                        <div className="form-floating custom-floating-label">
+                          <select
+                            className="form-select"
+                            id="categoryId"
+                            // value={selectedBrand}
+                            // onChange={(e) => setSelectedBrand(e.target.value)} // Cập nhật thương hiệu được chọn
+
+                            value={productInfo.categoryId}
+                            onChange={(e) => handleInputChange("categoryId", e.target.value)}
+                          >
+                            <option value="" disabled hidden>Loại sản phẩm</option>
+                            {Categorys.map((item) => (
+                              <option key={item.id} value={item.id}>
+                                {item.categoryName}
+                              </option>
+                            ))}
+                          </select>
+                          <label htmlFor="categoryId">Thương hiệu</label>
                         </div>
                       </div>
                       <div className="col-md-6">
@@ -535,13 +703,25 @@ function ProductPage() {
     
     {/* Các hình ảnh sẽ hiển thị trong dạng lưới 4 cột */}
     <div className="image-previews">
-      {productImages.map((image, index) => (
-        <div key={index} className="image-preview">
-          <img src={image} alt={`Product Image ${index}`} className="img-fluid" />
-          <a className="ima" onClick={() => handleDeleteImage(index)}>Xóa</a>
-        </div>
-      ))}
-    </div>
+        {productImages.map((image, index) => (
+          <div key={index} className="image-preview">
+            <img
+              src={image.url}
+              alt={`Product Image ${index}`}
+              className="img-fluid"
+              style={{ objectFit: "cover", width: "100px", height: "100px" }}
+            />
+            <div>
+              <button onClick={() => handleSetPrimaryImage(index)}>
+                {productInfo.medias[index]?.isPrimary ? "Hình chính" : "Đặt làm chính"}
+              </button>
+              <a className="ima" onClick={() => handleDeleteImage(index)}>
+                Xóa
+              </a>
+            </div>
+          </div>
+        ))}
+      </div>
   </div>
 )}
 
@@ -589,9 +769,9 @@ function ProductPage() {
               }
             >
               <option value="">Chọn màu</option>
-              <option value="red">Đỏ</option>
-              <option value="blue">Xanh dương</option>
-              <option value="green">Xanh lá</option>
+              <option value="1">1</option>
+              <option value="2">2</option>
+              <option value="3">3</option>
               {/* Các màu sắc khác nếu cần */}
             </select>
             <select
