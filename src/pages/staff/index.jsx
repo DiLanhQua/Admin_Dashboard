@@ -65,8 +65,6 @@ export default function StaffPage() {
   };
 
 
-  // const DetailStall = 
-  // Tính tổng số trang dựa trên `currentMax` và `customersPerPage`
   const totalPages = Math.ceil(currentMax / customersPerPage); 
   console.log("totalPages ",totalPages) ;// Tính tổng số trang
   const indexOfLastCustomer = currentPage * customersPerPage;

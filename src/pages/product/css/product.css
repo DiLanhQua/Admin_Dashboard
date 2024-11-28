@@ -376,7 +376,7 @@ button:disabled {
 
 .image-preview {
   flex: 1 1 22%; /* Chia đều 4 cột, mỗi cột chiếm khoảng 22% */
-  max-width: 22%; /* Đảm bảo mỗi cột không vượt quá 22% */
+  /* max-width: 22%; Đảm bảo mỗi cột không vượt quá 22% */
   position: relative;
 }
 
@@ -474,4 +474,67 @@ button:disabled {
 .variant-body input[type="number"]::-webkit-inner-spin-button {
   -webkit-appearance: none;
   margin: 0;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+/* Giới hạn kích thước khung hiển thị */
+.image-up {
+  border: 2px dashed #ccc;
+  border-radius: 8px;
+  padding: 15px;
+  text-align: center;
+  background-color: #f9f9f9;
+  transition: border-color 0.3s ease;
+  max-height: 300px; /* Giới hạn chiều cao */
+  overflow-y: auto; /* Thêm cuộn dọc nếu vượt quá chiều cao */
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.image-up:hover {
+  border-color: #007bff;
+}
+
+/* Căn giữa hình ảnh chính */
+.image-previews {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center; /* Căn giữa các hình ảnh */
+  gap: 15px;
+  width: 100%; /* Đảm bảo chiếm toàn bộ chiều rộng */
+}
+
+/* Nổi bật hình ảnh chính */
+.image-previews img {
+  border-radius: 5px;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+  transition: transform 0.2s ease, border-color 0.3s ease;
+}
+
+.image-previews img:hover {
+  transform: scale(1.1);
+}
+
+.image-previews img[style*="green"] {
+  order: -1; /* Đưa hình chính lên đầu danh sách */
+}
+
+/* Điều chỉnh bố cục hình chính */
+.image-previews div {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
 }

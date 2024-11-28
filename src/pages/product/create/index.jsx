@@ -176,36 +176,46 @@ function ProductPage() {
   // };
 
 
+  const fileToBase64 = (file) => {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.readAsDataURL(file);
+      reader.onload = () => resolve(reader.result);
+      reader.onerror = (error) => reject(error);
+    });
+  };
+
+  // Xử lý khi thêm hình ảnh
   const handleImageChange = (e) => {
     const files = Array.from(e.target.files);
-  
+
     const newFiles = files.map((file) => ({
+      file,
       url: URL.createObjectURL(file),
       name: file.name,
     }));
-  
+
     const uniqueFiles = newFiles.filter(
-      (file) => !productInfo.medias.some((media) => media.link === file.name)
+      (file) => !productInfo.medias.some((media) => media.name === file.name)
     );
-  
+
     if (uniqueFiles.length > 0) {
-      setProductImages((prev) => [
-        ...prev,
-        ...uniqueFiles.map((file) => file.url),
-      ]);
-  
+      setProductImages((prev) => [...prev, ...uniqueFiles.map((file) => file.url)]);
+
       const newMedia = uniqueFiles.map((file, index) => ({
-        link: file.name,
-        isPrimary: productInfo.medias.length === 0 && index === 0,
+        file: file.file,
+        link: "", // Link sẽ được chuyển đổi sang base64 sau
+        isPrimary: productInfo.medias.length === 0 && index === 0, // Ảnh đầu tiên sẽ là ảnh chính nếu chưa có ảnh nào
       }));
-  
+
       setProductInfo((prev) => ({
         ...prev,
         medias: [...prev.medias, ...newMedia],
       }));
     }
   };
-  
+
+  // Xử lý khi xóa hình ảnh
   const handleDeleteImage = (index) => {
     setProductImages((prev) => prev.filter((_, i) => i !== index));
     setProductInfo((prev) => ({
@@ -213,24 +223,22 @@ function ProductPage() {
       medias: prev.medias.filter((_, i) => i !== index),
     }));
   };
-  
+
+  // Xử lý khi đặt ảnh chính
   const handleSetPrimaryImage = (index) => {
-    if (index >= 0 && index < productInfo.medias.length) {
-      setProductInfo((prev) => ({
-        ...prev,
-        medias: prev.medias.map((media, i) => ({
-          ...media,
-          isPrimary: i === index,
-        })),
-      }));
-    }
+    setProductInfo((prev) => ({
+      ...prev,
+      medias: prev.medias.map((media, i) => ({
+        ...media,
+        isPrimary: i === index,
+      })),
+    }));
   };
-  
   useEffect(() => {
     const fetchBrand = async () => {
       try {
         const brandPromises = await getAllBrandAPI(customersPerPage, currentPage);
-        console.log("brandPromises ", brandPromises);
+        // console.log("brandPromises ", brandPromises);
         if (Array.isArray(brandPromises.data)) {
           setBrand(brandPromises.data);
         } else {
@@ -248,6 +256,7 @@ function ProductPage() {
     try {
       const response = await getAllColorAPI(customersPerPage, currentPage);
       if (Array.isArray(response.data)) {
+        console.log("fetchColors ", response.data);
         setColors(response.data); 
       } else {
         setColors([]);
@@ -279,6 +288,7 @@ function ProductPage() {
   useEffect(() => {
     fetchCategory();
   }, []);
+
   const handleAdd = async (e) => {
     e.preventDefault();
     console.log("productInfo ", productInfo);
@@ -311,27 +321,28 @@ function ProductPage() {
       price: variant.price,
       status: "0",
     }));
-    let mediaMain = productInfo.medias.find((media) => media.isPrimary);
-  const mediaSub = productInfo.medias.filter((media) => !media.isPrimary);
-
-  // Nếu không có ảnh chính, đặt ảnh đầu tiên làm ảnh chính
-  if (!mediaMain && productInfo.medias.length > 0) {
-    mediaMain = { ...productInfo.medias[0], isPrimary: true };
-  }
+    const mediasWithBase64 = await Promise.all(
+      productInfo.medias.map(async (media) => ({
+        link: await fileToBase64(media.file),
+        isPrimary: media.isPrimary,
+      }))
+    );
     const productData = {
       ...mainProduct.main,
       productDetais: [
         ...mainProduct.productDetails,
         ...variants,
       ],
-      medias: [mediaMain, ...mediaSub].filter(Boolean),
+      medias: mediasWithBase64,
     };
 
     console.log("productData ", productData);
     setIsLoading(true);
     try {
       const response = await postProductAPI(productData);
-      handleToast("success", "Sản phẩm đã được lưu thành công!", "top-right");
+     
+        handleToast("success", "Sản phẩm đã được lưu thành công!", "top-right");
+      
       // navigate("/dashboard/product")
       navigate("/dashboard/product");
     } catch (error) {
@@ -400,50 +411,54 @@ function ProductPage() {
             {/* <h1>Thông tin sản phẩm</h1> */}
             <div className="row">
             <div className="col-md-4">
-  <div className="from-img image-up">
+  <div className="form-img image-up">
     <label htmlFor="image" className="image-label">
       {productImages.length > 0 ? (
         <div className="image-previews">
           {productImages.map((image, index) => (
             <div
               key={index}
-              className={`image-item ${
-                productInfo.medias[index]?.isPrimary ? "primary" : ""
-              }`}
-              style={{ position: "relative", margin: "5px" }}
+              style={{
+                margin: "10px",
+                position: "relative",
+                display: "inline-block",
+                textAlign: "center",
+              }}
             >
               <img
                 src={image}
-                alt={`Product ${index}`}
-                className="img-fluid"
-                style={{ width: "100%", height: "100%", objectFit: "cover" }}
+                alt={`Hình ${index}`}
+                style={{
+                  width: "100px",
+                  height: "100px",
+                  objectFit: "cover",
+                  border: productInfo.medias[index]?.isPrimary
+                    ? "3px solid green"
+                    : "1px solid gray",
+                }}
               />
-              <button
-                className="btn btn-sm btn-primary"
-                style={{
-                  position: "absolute",
-                  top: "5px",
-                  right: "5px",
-                  zIndex: 10,
-                }}
-                onClick={() => handleSetPrimaryImage(index)}
-              >
-                {productInfo.medias[index]?.isPrimary
-                  ? "Hình chính"
-                  : "Đặt làm chính"}
-              </button>
-              <button
-                className="btn btn-sm btn-danger"
-                style={{
-                  position: "absolute",
-                  bottom: "5px",
-                  right: "5px",
-                  zIndex: 10,
-                }}
-                onClick={() => handleDeleteImage(index)}
-              >
-                Xóa
-              </button>
+              <div style={{ marginTop: "5px" }}>
+                <button
+                  type="button"
+                  className="btn btn-sm btn-primary"
+                  onClick={() => handleSetPrimaryImage(index)}
+                  style={{
+                    marginRight: "5px",
+                    backgroundColor: productInfo.medias[index]?.isPrimary
+                      ? "green"
+                      : "blue",
+                  }}
+                >
+                  {productInfo.medias[index]?.isPrimary ? "Hình chính" : "Đặt làm chính"}
+                </button>
+                <button
+                  type="button"
+                  className="btn btn-sm btn-danger"
+                  onClick={() => handleDeleteImage(index)}
+                >
+                  Xóa
+                </button>
+              </div>
             </div>
           ))}
         </div>
@@ -464,6 +479,7 @@ function ProductPage() {
     />
   </div>
 </div>
+
 
 
               <div className="col-md-8">
@@ -531,7 +547,7 @@ function ProductPage() {
                             value={productInfo.size}
                             onChange={(e) => handleInputChange("size", e.target.value)}
                           >
-                            <option value="" disabled hidden></option>
+                            <option value="">Chọn kích thước</option>
                             <option value="M">M</option>
                             <option value="X">X</option>
                             <option value="XL">XL</option>
@@ -549,7 +565,7 @@ function ProductPage() {
     value={productInfo.colorId}  // giá trị hiện tại của colorId
     onChange={(e) => handleInputChange("colorId", e.target.value)}  // khi thay đổi colorId
   >
-    <option value="" disabled hidden>Chọn màu sắc</option>
+    <option value="">Chọn màu sắc</option>
     {colors.map((item) => (
       <option key={item.id} value={item.id}> 
         {item.nameColor}  {/* Hiển thị tên màu */}
@@ -571,7 +587,7 @@ function ProductPage() {
                             value={productInfo.gender}
                             onChange={(e) => handleInputChange("gender", e.target.value)}
                           >
-                            <option value="" disabled hidden>Chọn giới tính</option>
+                            <option value="" >Chọn giới tính</option>
                             <option value="male">Nam</option>
                             <option value="female">Nữ</option>
                             <option value="other">Khác</option>
@@ -677,6 +693,42 @@ function ProductPage() {
             <button onClick={() => setExpandDescription(!expandDescription)}>
               {expandDescription ? "Thu gọn" : "Xem thêm"}
             </button> */}
+
+
+            {/* <div className="sec">
+              <div className="row">
+                <div className="ccol">
+                    <div className="fis boxx">
+                      <input type="number"
+                      id="font-size" min="1" max="100" value="16" onChange="f1(this)"/>
+                        
+                        
+                    </div>
+                    <div className="sec boxx">
+                      <a type="button" className="bon" onclick="f2(this)">
+                        <i className="fas fa-solid fa-bold"></i>
+                      </a>
+                      <a type="button" className="bon" onclick="f3(this)">
+                        <i className="fas fa-solid fa-italic"></i>
+                      </a>
+                      <a type="button" className="bon" onclick="f4(this)">
+                        <i className="fas fa-solid fa-underline"></i>
+                      </a>
+                    </div>
+                    <div className="thi boxx">
+                      <a type="button" className="bon" onclick="f2(this)">
+                        <i className="fas fa-solid fa-align-left"></i>
+                      </a>
+                      <a type="button" className="bon" onclick="f3(this)">
+                        <i className="fa-solid fa-italic"></i>
+                      </a>
+                      <a type="button" className="bon" onclick="f4(this)">
+                        <i className="fa-solid fa-underline"></i>
+                      </a>
+                    </div>
+                </div>
+              </div>
+            </div> */}
           </div>
         )}
 
@@ -738,14 +790,18 @@ function ProductPage() {
             <a className="delete-btn" onClick={() => handleDeleteProductDetail(index)}>Xóa</a>
           </div>
           <div className="variant-body">
-            <input
-              type="text"
-              placeholder="Size"
-              value={detail.size}
-              onChange={(e) =>
-                handleProductDetailChange(index, "size", e.target.value)
-              }
-            />
+          <select
+                            className="form-select"
+                            id="size"
+
+                            value={detail.size}
+                            onChange={(e) =>  handleProductDetailChange(index,"size", e.target.value)}
+                          >
+                            <option value="" disabled hidden>Chọn kích thước</option>
+                            <option value="M">M</option>
+                            <option value="X">X</option>
+                            <option value="XL">XL</option>
+                          </select>
             <input
               type="number"
               placeholder="Số lượng"
@@ -763,17 +819,18 @@ function ProductPage() {
               }
             />
             <select
-              value={detail.colorId}
-              onChange={(e) =>
-                handleProductDetailChange(index, "colorId", e.target.value)
-              }
-            >
-              <option value="">Chọn màu</option>
-              <option value="1">1</option>
-              <option value="2">2</option>
-              <option value="3">3</option>
-              {/* Các màu sắc khác nếu cần */}
-            </select>
+    className="form-select"
+    id="colorId"
+    value={detail.colorId}  // giá trị hiện tại của colorId
+    onChange={(e) =>  handleProductDetailChange(index,"colorId", e.target.value)}  // khi thay đổi colorId
+  >
+    <option value="" disabled hidden>Chọn màu sắc</option>
+    {colors.map((item) => (
+      <option key={item.id} value={item.id}> 
+        {item.nameColor}  {/* Hiển thị tên màu */}
+      </option>
+    ))}
+  </select>
             <select
               value={detail.gender}
               onChange={(e) =>
