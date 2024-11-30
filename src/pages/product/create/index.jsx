@@ -5,7 +5,7 @@ import { handleToast } from "../../../utils/toast";
 
 import { useNavigate } from "react-router-dom";
 import {
-  getAllBrandAPI, getMediaAPI, getImageAPI, getBrandAPI,getAllCategoryAPI,
+  getAllBrandAPI, getMediaAPI, getImageAPI, getBrandAPI, getAllCategoryAPI,
   getDetailproductAPI, postProductAPI, postDEProductAPI, postImageAPI, getAllColorAPI
 } from "../js/product";
 function ProductPage() {
@@ -29,7 +29,6 @@ function ProductPage() {
   const [isChecking, setIsChecking] = useState(false);
   const [imagePreview, setImagePreview] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
-  const [activeTab, setActiveTab] = useState("info");
   const [productName, setProductName] = useState("");
   const [description, setdescription] = useState("");
   const [price, setPrice] = useState("");
@@ -46,8 +45,8 @@ function ProductPage() {
   const [customersPerPage, setCustomersPerPage] = useState(8);
   const [productDetais, setproductDetais] = useState([]);
   const [medias, setMedias] = useState([]);
-  const [colors, setColors] = useState([]); 
-  const [Categorys, setCategorys] = useState([]); 
+  const [colors, setColors] = useState([]);
+  const [Categorys, setCategorys] = useState([]);
 
   const handleAddVariant = () => {
     setProductInfo((prev) => ({
@@ -76,33 +75,33 @@ function ProductPage() {
 
   // const handleImageChange = (e) => {
   //   const files = Array.from(e.target.files);
-  
+
   //   const newFiles = files.map((file) => ({
   //     url: URL.createObjectURL(file),
   //     name: file.name,
   //   }));
-  
+
   //   const uniqueFiles = newFiles.filter(
   //     (file) => !productInfo.medias.some((media) => media.link === file.name)
   //   );
-  
+
   //   if (uniqueFiles.length > 0) {
   //     // Cập nhật mảng hình ảnh
   //     setProductImages((prev) => [...prev, ...uniqueFiles.map(file => file.url)]);
-  
+
   //     // Tạo các phần tử mới trong medias
   //     const newMedia = uniqueFiles.map((file, index) => ({
   //       link: file.name,
   //       isPrimary: productInfo.medias.length === 0 && index === 0, // Đặt isPrimary nếu chưa có
   //     }));
-  
+
   //     setProductInfo((prev) => ({
   //       ...prev,
   //       medias: [...prev.medias, ...newMedia], // Thêm vào mảng medias
   //     }));
   //   }
   // };
-  
+
 
 
   // const handleCheckGrammar = async () => {
@@ -143,9 +142,9 @@ function ProductPage() {
     setProductInfo((prev) => ({ ...prev, productDetais: newDetails }));
   };
 
-  const handleSave = () => {
-    console.log("Saved Data:", productInfo);
-  };
+  // const handleSave = () => {
+  //   console.log("Saved Data:", productInfo);
+  // };
 
 
   // const handleDeleteImage = (index) => {
@@ -188,24 +187,21 @@ function ProductPage() {
   // Xử lý khi thêm hình ảnh
   const handleImageChange = (e) => {
     const files = Array.from(e.target.files);
-
     const newFiles = files.map((file) => ({
       file,
-      url: URL.createObjectURL(file),
+      url: URL.createObjectURL(file), // Tạo URL preview
       name: file.name,
     }));
-
     const uniqueFiles = newFiles.filter(
       (file) => !productInfo.medias.some((media) => media.name === file.name)
     );
 
     if (uniqueFiles.length > 0) {
       setProductImages((prev) => [...prev, ...uniqueFiles.map((file) => file.url)]);
-
       const newMedia = uniqueFiles.map((file, index) => ({
         file: file.file,
-        link: "", // Link sẽ được chuyển đổi sang base64 sau
-        isPrimary: productInfo.medias.length === 0 && index === 0, // Ảnh đầu tiên sẽ là ảnh chính nếu chưa có ảnh nào
+        url: file.url, // Lưu URL vào `medias` để tiện sử dụng
+        isPrimary: productInfo.medias.length === 0 && index === 0, // Ảnh đầu tiên là ảnh chính
       }));
 
       setProductInfo((prev) => ({
@@ -256,8 +252,7 @@ function ProductPage() {
     try {
       const response = await getAllColorAPI(customersPerPage, currentPage);
       if (Array.isArray(response.data)) {
-        console.log("fetchColors ", response.data);
-        setColors(response.data); 
+        setColors(response.data);
       } else {
         setColors([]);
       } // Cập nhật state colors với dữ liệu màu sắc
@@ -275,7 +270,7 @@ function ProductPage() {
     try {
       const response = await getAllCategoryAPI(customersPerPage, currentPage);
       if (Array.isArray(response.data)) {
-        setCategorys(response.data); 
+        setCategorys(response.data);
       } else {
         setCategorys([]);
       } // Cập nhật state colors với dữ liệu màu sắc
@@ -291,9 +286,7 @@ function ProductPage() {
 
   const handleAdd = async (e) => {
     e.preventDefault();
-    console.log("productInfo ", productInfo);
-    console.log("productInfo.productDetais ",);
-
+    // console.log("productInfo ", productInfo);
     const mainProduct = {
       main: {
         productName: productInfo.productName,
@@ -337,20 +330,18 @@ function ProductPage() {
     };
 
     console.log("productData ", productData);
-    setIsLoading(true);
-    try {
-      const response = await postProductAPI(productData);
-     
-        handleToast("success", "Sản phẩm đã được lưu thành công!", "top-right");
-      
-      // navigate("/dashboard/product")
-      navigate("/dashboard/product");
-    } catch (error) {
-      console.error("Error saving product:", error);
-      handleToast("error", "Có lỗi khi lưu sản phẩm.", "top-right");
-    } finally {
-      setIsLoading(false);
-    }
+    // setIsLoading(true);
+    // try {
+    //   // const response = await postProductAPI(productData);
+    //   handleToast("success", "Sản phẩm đã được lưu thành công!", "top-right");
+    //   // navigate("/dashboard/product")
+    //   navigate("/dashboard/product");
+    // } catch (error) {
+    //   console.error("Error saving product:", error);
+    //   handleToast("error", "Có lỗi khi lưu sản phẩm.", "top-right");
+    // } finally {
+    //   setIsLoading(false);
+    // }
   };
 
 
@@ -376,228 +367,129 @@ function ProductPage() {
     </div>
   );
   return (
-    <Card>
-
-
+    <div className="card-form">
       <div className="dialog-tabs">
         <button
-          className={`tab-btn ${activeTab === "info" ? "active" : ""}`}
-          onClick={() => setActiveTab("info")}
+          className={`tab-btn active`}
         >
-          Thông Tin Sản Phẩm
-        </button>
-        <button
-          className={`tab-btn ${activeTab === "description" ? "active" : ""}`}
-          onClick={() => setActiveTab("description")}
-        >
-          Mô Tả Sản Phẩm
-        </button>
-        <button
-          className={`tab-btn ${activeTab === "deimgae" ? "active" : ""}`}
-          onClick={() => setActiveTab("deimgae")}
-        >
-          Hình ảnh chi tiết
-        </button>
-        <button
-          className={`tab-btn ${activeTab === "debienthe" ? "active" : ""}`}
-          onClick={() => setActiveTab("debienthe")}
-        >
-          Chi tiết biến thể
+          THÔNG TIN SẢN PHẨM
         </button>
       </div>
-      <form onSubmit={handleAdd}>
-        {activeTab === "info" && (
-          <div className="container">
-            {/* <h1>Thông tin sản phẩm</h1> */}
-            <div className="row">
-            <div className="col-md-4">
-  <div className="form-img image-up">
-    <label htmlFor="image" className="image-label">
-      {productImages.length > 0 ? (
-        <div className="image-previews">
-          {productImages.map((image, index) => (
-            <div
-              key={index}
-              style={{
-                margin: "10px",
-                position: "relative",
-                display: "inline-block",
-                textAlign: "center",
-              }}
-            >
-              <img
-                src={image}
-                alt={`Hình ${index}`}
-                style={{
-                  width: "100px",
-                  height: "100px",
-                  objectFit: "cover",
-                  border: productInfo.medias[index]?.isPrimary
-                    ? "3px solid green"
-                    : "1px solid gray",
-                }}
-              />
-              <div style={{ marginTop: "5px" }}>
-                <button
-                  type="button"
-                  className="btn btn-sm btn-primary"
-                  onClick={() => handleSetPrimaryImage(index)}
-                  style={{
-                    marginRight: "5px",
-                    backgroundColor: productInfo.medias[index]?.isPrimary
-                      ? "green"
-                      : "blue",
-                  }}
-                >
-                  {productInfo.medias[index]?.isPrimary ? "Hình chính" : "Đặt làm chính"}
-                </button>
-                <button
-                  type="button"
-                  className="btn btn-sm btn-danger"
-                  onClick={() => handleDeleteImage(index)}
-                >
-                  Xóa
-                </button>
-              </div>
-            </div>
-          ))}
-        </div>
-      ) : (
-        <div className="image-placeholder">
-          <i className="fas fa-camera"></i>
-          <span className="image-tx">Chọn hình ảnh chính</span>
-        </div>
-      )}
-    </label>
-    <input
-      type="file"
-      id="image"
-      onChange={handleImageChange}
-      accept="image/*"
-      multiple
-      style={{ display: "none" }}
-    />
-  </div>
-</div>
-
-
-
-              <div className="col-md-8">
-                <Card>
-                  <div className="bor_create">
-                    <div className="row">
-                      {renderInput("Tên Sản Phẩm", productInfo.productName, "productName")}
-                      {/* <div className="col-md-6">
+      <form >
+        <div>
+          {/* ============== Thông tin sản phẩm ============== */}
+          <div className="col-md-12" style={{ marginTop: "20px" }}>
+            <div className="">
+              <div className="row">
+                {renderInput("Tên Sản Phẩm", productInfo.productName, "productName")}
+                {/* <div className="col-md-6">
                         <div className="form-floating">
-                          
                           <input
                             type="text"
                             className="form-control"
                             id="productName"
                             name="productName"
                             placeholder="Tên Sản Phẩm"
-                            value={productInfo.productName}
+                            value={productInfo.productName} 
                 onChange={(e) => handleInputChange("productName", e.target.value)}
                             // onChange={(e) => setProductName(e.target.value)}
                           />
                           <label htmlFor="productName">Tên Sản Phẩm</label>
                         </div>
                       </div> */}
-                      <div className="col-md-6">
-                        <div className="form-floating">
-                          <input
-                            type="text"
-                            className="form-control"
-                            id="quantity"
-                            placeholder="Số Lượng"
-                            // value={quantity}
-                            value={productInfo.quantity}
-                            onChange={(e) => handleInputChange("quantity", e.target.value)}
-                          // onChange={(e) => setQuantity(e.target.value)}
+                <div className="col-md-6">
+                  <div className="form-floating">
+                    <input
+                      type="text"
+                      className="form-control"
+                      id="quantity"
+                      placeholder="Số Lượng"
+                      // value={quantity}
+                      value={productInfo.quantity}
+                      onChange={(e) => handleInputChange("quantity", e.target.value)}
+                    // onChange={(e) => setQuantity(e.target.value)}
 
-                          />
-                          <label htmlFor="quantity">Số lượng</label>
-                        </div>
-                      </div>
-                    </div>
-                    <div className="row">
-                      <div className="col-md-6">
-                        <div className="form-floating">
-                          <input
-                            type="text"
-                            className="form-control"
-                            id="price"
-                            placeholder="Giá"
-                            // value={price}
-                            // onChange={(e) => setPrice(e.target.value)}
-                            value={productInfo.price}
-                            onChange={(e) => handleInputChange("price", e.target.value)}
-                          />
-                          <label htmlFor="price">Giá</label>
-                        </div>
-                      </div>
-                      <div className="col-md-6">
-                        <div className="form-floating custom-floating-label">
-                          <select
-                            className="form-select"
-                            id="size"
-                            // value={size}
-                            // onChange={(e) => setSize(e.target.value)}
+                    />
+                    <label htmlFor="quantity">Số lượng</label>
+                  </div>
+                </div>
+              </div>
+              <div className="row">
+                <div className="col-md-6">
+                  <div className="form-floating">
+                    <input
+                      type="text"
+                      className="form-control"
+                      id="price"
+                      placeholder="Giá"
+                      // value={price}
+                      // onChange={(e) => setPrice(e.target.value)}
+                      value={productInfo.price}
+                      onChange={(e) => handleInputChange("price", e.target.value)}
+                    />
+                    <label htmlFor="price">Giá</label>
+                  </div>
+                </div>
+                <div className="col-md-6">
+                  <div className="form-floating custom-floating-label">
+                    <select
+                      className="form-select"
+                      id="size"
+                      // value={size}
+                      // onChange={(e) => setSize(e.target.value)}
+                      value={productInfo.size}
+                      onChange={(e) => handleInputChange("size", e.target.value)}
+                    >
+                      <option value="">Chọn kích thước</option>
+                      <option value="M">M</option>
+                      <option value="X">X</option>
+                      <option value="XL">XL</option>
+                    </select>
+                    <label htmlFor="size">Kích Thước</label>
+                  </div>
+                </div>
+              </div>
+              <div className="row">
+                <div className="col-md-6">
+                  <div className="form-floating custom-floating-label">
+                    <select
+                      className="form-select"
+                      id="colorId"
+                      value={productInfo.colorId}  // giá trị hiện tại của colorId
+                      onChange={(e) => handleInputChange("colorId", e.target.value)}  // khi thay đổi colorId
+                    >
+                      <option value="">Chọn màu sắc</option>
+                      {colors.map((item) => (
+                        <option key={item.id} value={item.id}>
+                          {item.nameColor}  {/* Hiển thị tên màu */}
+                        </option>
+                      ))}
+                    </select>
+                    <label htmlFor="colorId">Màu sắc</label>
+                  </div>
 
-                            value={productInfo.size}
-                            onChange={(e) => handleInputChange("size", e.target.value)}
-                          >
-                            <option value="">Chọn kích thước</option>
-                            <option value="M">M</option>
-                            <option value="X">X</option>
-                            <option value="XL">XL</option>
-                          </select>
-                          <label htmlFor="size">Kích Thước</label>
-                        </div>
-                      </div>
-                    </div>
-                    <div className="row">
-                      <div className="col-md-6">
-                      <div className="form-floating custom-floating-label">
-  <select
-    className="form-select"
-    id="colorId"
-    value={productInfo.colorId}  // giá trị hiện tại của colorId
-    onChange={(e) => handleInputChange("colorId", e.target.value)}  // khi thay đổi colorId
-  >
-    <option value="">Chọn màu sắc</option>
-    {colors.map((item) => (
-      <option key={item.id} value={item.id}> 
-        {item.nameColor}  {/* Hiển thị tên màu */}
-      </option>
-    ))}
-  </select>
-  <label htmlFor="colorId">Màu sắc</label>
-</div>
-
-                      </div>
-                      <div className="col-md-6">
-                        <div className="form-floating custom-floating-label">
-                          <select
-                            className="form-select"
-                            id="gender"
-                            // value={gender}
-                            // onChange={(e) => setGender(e.target.value)}
-
-                            value={productInfo.gender}
-                            onChange={(e) => handleInputChange("gender", e.target.value)}
-                          >
-                            <option value="" >Chọn giới tính</option>
-                            <option value="male">Nam</option>
-                            <option value="female">Nữ</option>
-                            <option value="other">Khác</option>
-                          </select>
-                          <label htmlFor="gender">Giới tính</label>
-                        </div>
-                      </div>
-                    </div>
-                    <div className="row">
-                      {/* <div className="col-md-6">
+                </div>
+                <div className="col-md-6">
+                  <div className="form-floating custom-floating-label">
+                    <select
+                      className="form-select"
+                      id="gender"
+                      // value={gender}
+                      // onChange={(e) => setGender(e.target.value)}
+                      value={productInfo.gender}
+                      onChange={(e) => handleInputChange("gender", e.target.value)}
+                    >
+                      <option value="" >Chọn giới tính</option>
+                      <option value="male">Nam</option>
+                      <option value="female">Nữ</option>
+                      <option value="other">Khác</option>
+                    </select>
+                    <label htmlFor="gender">Giới tính</label>
+                  </div>
+                </div>
+              </div>
+              <div className="row">
+                {/* <div className="col-md-6">
                         <div className="form-floating">
                           <input
                             type="text"
@@ -613,253 +505,218 @@ function ProductPage() {
                           <label htmlFor="category">Loại sản phẩm</label>
                         </div>
                       </div> */}
-                      <div className="col-md-6">
-                        <div className="form-floating custom-floating-label">
-                          <select
-                            className="form-select"
-                            id="categoryId"
-                            // value={selectedBrand}
-                            // onChange={(e) => setSelectedBrand(e.target.value)} // Cập nhật thương hiệu được chọn
-
-                            value={productInfo.categoryId}
-                            onChange={(e) => handleInputChange("categoryId", e.target.value)}
-                          >
-                            <option value="" disabled hidden>Loại sản phẩm</option>
-                            {Categorys.map((item) => (
-                              <option key={item.id} value={item.id}>
-                                {item.categoryName}
-                              </option>
-                            ))}
-                          </select>
-                          <label htmlFor="categoryId">Thương hiệu</label>
-                        </div>
-                      </div>
-                      <div className="col-md-6">
-                        <div className="form-floating custom-floating-label">
-                          <select
-                            className="form-select"
-                            id="brandId"
-                            // value={selectedBrand}
-                            // onChange={(e) => setSelectedBrand(e.target.value)} // Cập nhật thương hiệu được chọn
-
-                            value={productInfo.brandId}
-                            onChange={(e) => handleInputChange("brandId", e.target.value)}
-                          >
-                            <option value="" disabled hidden>Chọn thương hiệu</option>
-                            {brand.map((item) => (
-                              <option key={item.id} value={item.id}>
-                                {item.brandName}
-                              </option>
-                            ))}
-                          </select>
-                          <label htmlFor="brand">Thương hiệu</label>
-                        </div>
-                      </div>
-
-                    </div>
+                <div className="col-md-6">
+                  <div className="form-floating custom-floating-label">
+                    <select
+                      className="form-select"
+                      id="categoryId"
+                      // value={selectedBrand}
+                      // onChange={(e) => setSelectedBrand(e.target.value)} // Cập nhật thương hiệu được chọn
+                      value={productInfo.categoryId}
+                      onChange={(e) => handleInputChange("categoryId", e.target.value)}
+                    >
+                      <option value="" disabled hidden>Loại sản phẩm</option>
+                      {Categorys.map((item) => (
+                        <option key={item.id} value={item.id}>
+                          {item.categoryName}
+                        </option>
+                      ))}
+                    </select>
+                    <label htmlFor="categoryId">Thương hiệu</label>
                   </div>
-                </Card>
+                </div>
+                <div className="col-md-6">
+                  <div className="form-floating custom-floating-label">
+                    <select
+                      className="form-select"
+                      id="brandId"
+                      // value={selectedBrand}
+                      // onChange={(e) => setSelectedBrand(e.target.value)} // Cập nhật thương hiệu được chọn
+
+                      value={productInfo.brandId}
+                      onChange={(e) => handleInputChange("brandId", e.target.value)}
+                    >
+                      <option value="" disabled hidden>Chọn thương hiệu</option>
+                      {brand.map((item) => (
+                        <option key={item.id} value={item.id}>
+                          {item.brandName}
+                        </option>
+                      ))}
+                    </select>
+                    <label htmlFor="brand">Thương hiệu</label>
+                  </div>
+                </div>
+
               </div>
-            </div>
-
-          </div>
-        )}
-
-        {activeTab === "description" && (
-          <div className="container">
-            <h3>Thông tin mô tả</h3>
-            <div className="form-floating">
-              <input
-                type="text"
-                className="form-control"
-                id="description"
-                placeholder="Loại sản phẩm"
-                // value={description}
-                // onChange={(e) => setdescription(e.target.value)}
-
-                value={productInfo.description}
-                onChange={(e) => handleInputChange("description", e.target.value)}
-              />
-              <label htmlFor="description">Mô tả</label>
-            </div>
-            {/* <button onClick={handleCheckGrammar} disabled={isChecking}>
-              {isChecking ? "Đang kiểm tra..." : "Kiểm tra ngữ pháp"}
-            </button>
-            <div
-              className={`product-description-preview ${expandDescription ? "expanded" : ""}`}
-            >
-              {productInfo.description}
-            </div>
-            <button onClick={() => setExpandDescription(!expandDescription)}>
-              {expandDescription ? "Thu gọn" : "Xem thêm"}
-            </button> */}
-
-
-            {/* <div className="sec">
               <div className="row">
-                <div className="ccol">
-                    <div className="fis boxx">
-                      <input type="number"
-                      id="font-size" min="1" max="100" value="16" onChange="f1(this)"/>
-                        
-                        
-                    </div>
-                    <div className="sec boxx">
-                      <a type="button" className="bon" onclick="f2(this)">
-                        <i className="fas fa-solid fa-bold"></i>
-                      </a>
-                      <a type="button" className="bon" onclick="f3(this)">
-                        <i className="fas fa-solid fa-italic"></i>
-                      </a>
-                      <a type="button" className="bon" onclick="f4(this)">
-                        <i className="fas fa-solid fa-underline"></i>
-                      </a>
-                    </div>
-                    <div className="thi boxx">
-                      <a type="button" className="bon" onclick="f2(this)">
-                        <i className="fas fa-solid fa-align-left"></i>
-                      </a>
-                      <a type="button" className="bon" onclick="f3(this)">
-                        <i className="fa-solid fa-italic"></i>
-                      </a>
-                      <a type="button" className="bon" onclick="f4(this)">
-                        <i className="fa-solid fa-underline"></i>
-                      </a>
-                    </div>
+                <div className="form-floating">
+                  <input
+                    type="text"
+                    className="form-control"
+                    id="description"
+                    placeholder="Loại sản phẩm"
+                    // value={description}
+                    // onChange={(e) => setdescription(e.target.value)}
+
+                    value={productInfo.description}
+                    onChange={(e) => handleInputChange("description", e.target.value)}
+                  />
+                  <label htmlFor="description">Mô tả</label>
                 </div>
               </div>
-            </div> */}
-          </div>
-        )}
-
-{activeTab === "deimgae" && (
-  <div className="container">
-    {/* <h3>Hình ảnh sản phẩm</h3> */}
-    <div className="from-img image-up">
-      <label htmlFor="image" className="image-label">
-        
-          <div className="image-placeholder">
-            <i className="fas fa-camera"></i>
-            <span className="image-tx">Chọn hình ảnh bìa</span>
-          </div>
-      </label>
-      <input
-        type="file"
-        id="image"
-        onChange={handleImageChange}
-        accept="image/*"
-        multiple
-        style={{ display: "none" }}
-      />
-    </div>
-    
-    {/* Các hình ảnh sẽ hiển thị trong dạng lưới 4 cột */}
-    <div className="image-previews">
-        {productImages.map((image, index) => (
-          <div key={index} className="image-preview">
-            <img
-              src={image.url}
-              alt={`Product Image ${index}`}
-              className="img-fluid"
-              style={{ objectFit: "cover", width: "100px", height: "100px" }}
-            />
-            <div>
-              <button onClick={() => handleSetPrimaryImage(index)}>
-                {productInfo.medias[index]?.isPrimary ? "Hình chính" : "Đặt làm chính"}
-              </button>
-              <a className="ima" onClick={() => handleDeleteImage(index)}>
-                Xóa
-              </a>
             </div>
           </div>
-        ))}
-      </div>
-  </div>
-)}
+          {/* ============== Thông tin sản phẩm ============== */}
 
 
+          {/* =========== biển thể sản phẩm ============= */}
+          <div className="">
+            <div className="dialog-tabs mb-4">
+              <button
+                className={`tab-btn active`}
+              >
+                CHI TIẾT BIẾN THỂ
+              </button>
+            </div>
+            <a className="addpro" onClick={handleAddVariant}>Thêm Biến thể</a>
+            <div className="variant-list">
+              {productInfo.productDetais.map((detail, index) => (
+                <div key={index} className="variant-card">
+                  <div className="variant-header">
+                    <h4>Biến thể {index + 1}</h4>
+                    <a className="delete-btn" onClick={() => handleDeleteProductDetail(index)}>Xóa</a>
+                  </div>
+                  <div className="variant-body">
+                    <select
+                      className="form-select"
+                      id="size"
 
-{activeTab === "debienthe" && (
-  <div className="container">
-    <a className="addpro" onClick={handleAddVariant}>Thêm Biến thể</a>
-    <div className="variant-list">
-      {productInfo.productDetais.map((detail, index) => (
-        <div key={index} className="variant-card">
-          <div className="variant-header">
-            <h4>Biến thể {index + 1}</h4>
-            <a className="delete-btn" onClick={() => handleDeleteProductDetail(index)}>Xóa</a>
+                      value={detail.size}
+                      onChange={(e) => handleProductDetailChange(index, "size", e.target.value)}
+                    >
+                      <option value="" disabled hidden>Chọn kích thước</option>
+                      <option value="M">M</option>
+                      <option value="X">X</option>
+                      <option value="XL">XL</option>
+                    </select>
+                    <input
+                      type="number"
+                      placeholder="Số lượng"
+                      value={detail.quantity}
+                      onChange={(e) =>
+                        handleProductDetailChange(index, "quantity", e.target.value)
+                      }
+                    />
+                    <input
+                      type="number"
+                      placeholder="Giá"
+                      value={detail.price}
+                      onChange={(e) =>
+                        handleProductDetailChange(index, "price", e.target.value)
+                      }
+                    />
+                    <select
+                      className="form-select"
+                      id="colorId"
+                      value={detail.colorId}  // giá trị hiện tại của colorId
+                      onChange={(e) => handleProductDetailChange(index, "colorId", e.target.value)}  // khi thay đổi colorId
+                    >
+                      <option value="" disabled hidden>Chọn màu sắc</option>
+                      {colors.map((item) => (
+                        <option key={item.id} value={item.id}>
+                          {item.nameColor}  {/* Hiển thị tên màu */}
+                        </option>
+                      ))}
+                    </select>
+                    <select
+                      value={detail.gender}
+                      onChange={(e) =>
+                        handleProductDetailChange(index, "gender", e.target.value)
+                      }
+                    >
+                      <option value="">Chọn giới tính</option>
+                      <option value="male">Nam</option>
+                      <option value="female">Nữ</option>
+                      <option value="unisex">Unisex</option>
+                    </select>
+                  </div>
+                </div>
+              ))}
+            </div>
           </div>
-          <div className="variant-body">
-          <select
-                            className="form-select"
-                            id="size"
+          {/* =========== biển thể sản phẩm ============= */}
 
-                            value={detail.size}
-                            onChange={(e) =>  handleProductDetailChange(index,"size", e.target.value)}
-                          >
-                            <option value="" disabled hidden>Chọn kích thước</option>
-                            <option value="M">M</option>
-                            <option value="X">X</option>
-                            <option value="XL">XL</option>
-                          </select>
-            <input
-              type="number"
-              placeholder="Số lượng"
-              value={detail.quantity}
-              onChange={(e) =>
-                handleProductDetailChange(index, "quantity", e.target.value)
-              }
-            />
-            <input
-              type="number"
-              placeholder="Giá"
-              value={detail.price}
-              onChange={(e) =>
-                handleProductDetailChange(index, "price", e.target.value)
-              }
-            />
-            <select
-    className="form-select"
-    id="colorId"
-    value={detail.colorId}  // giá trị hiện tại của colorId
-    onChange={(e) =>  handleProductDetailChange(index,"colorId", e.target.value)}  // khi thay đổi colorId
-  >
-    <option value="" disabled hidden>Chọn màu sắc</option>
-    {colors.map((item) => (
-      <option key={item.id} value={item.id}> 
-        {item.nameColor}  {/* Hiển thị tên màu */}
-      </option>
-    ))}
-  </select>
-            <select
-              value={detail.gender}
-              onChange={(e) =>
-                handleProductDetailChange(index, "gender", e.target.value)
-              }
-            >
-              <option value="">Chọn giới tính</option>
-              <option value="male">Nam</option>
-              <option value="female">Nữ</option>
-              <option value="unisex">Unisex</option>
-            </select>
+          {/* ============== Hình ảnh sản phẩm ============== */}
+          <div className="mt-5">
+            <div className="dialog-tabs mb-4">
+              <button
+                className={`tab-btn active`}
+              >
+                HÌNH ẢNH SẨN PHẨM
+              </button>
+            </div>
+            {/* Các hình ảnh sẽ hiển thị trong dạng lưới 4 cột */}
+            <div className="image-previews">
+              <div className="image-preview">
+                <label htmlFor="image" className="image-label">
+                  <div className="image-placeholder">
+                    <i className="fas fa-camera"></i>
+                    <span className="image-tx">Chọn hình ảnh bìa</span>
+                  </div>
+                </label>
+                <input
+                  type="file"
+                  id="image"
+                  onChange={handleImageChange}
+                  accept="image/*"
+                  multiple
+                  style={{ display: "none" }}
+                />
+              </div>
+
+              {productImages.map((image, index) => (
+                <div key={index} className="image-preview">
+                  <img
+                    src={image} // URL của ảnh
+                    alt={`Product Image ${index}`}
+                    className="img-fluid"
+                  />
+                  <div>
+                    {!productInfo.medias[index]?.isPrimary && (
+                      <div className="btn-set-primary" onClick={() => handleSetPrimaryImage(index)}>
+                        Đặt làm chính
+                      </div>
+                    )}
+                    {!productInfo.medias[index]?.isPrimary && (
+                      <a className="ima" onClick={() => handleDeleteImage(index)}>
+                        X
+                      </a>
+                    )}
+                    {productInfo.medias[index]?.isPrimary && (
+                      <div className="primary-image">
+                        Hình chính
+                      </div>
+                    )}
+                  </div>
+                </div>
+              ))}
+            </div>
           </div>
+          {/* ============== Hình ảnh sản phẩm ============== */}
+
+
         </div>
-      ))}
-    </div>
-  </div>
-)}
 
-
-        <div className="text-center">
-          <button type="submit" className="create-luu"
-          // onClick={handleSave}
+        <div className="border-t pt-4 mt-5 d-flex justify-content-end">
+          <button className="create-luu"
+            onClick={handleAdd}
           // disabled={isLoading || !productName}
           >
-            Lưu sản phẩm
+            Thêm sản phẩm mới
           </button>
         </div>
       </form>
-    </Card>
+    </div >
   );
 }
 

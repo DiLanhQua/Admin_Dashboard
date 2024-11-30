@@ -1,6 +1,8 @@
 .description-container {
-  max-height: 300px; /* Chiều cao tối đa cho khung mô tả */
-  overflow-y: auto;  /* Thêm thanh cuộn dọc khi nội dung vượt quá chiều cao */
+  max-height: 300px;
+  /* Chiều cao tối đa cho khung mô tả */
+  overflow-y: auto;
+  /* Thêm thanh cuộn dọc khi nội dung vượt quá chiều cao */
   padding: 10px;
   border: 1px solid #ddd;
   border-radius: 5px;
@@ -54,6 +56,7 @@
   max-height: 200px;
   margin-top: 10px;
 }
+
 /* Toàn bộ trang */
 body {
   font-family: Arial, sans-serif;
@@ -69,9 +72,11 @@ body {
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
   border-radius: 8px;
 }
+
 .dialog-tabs {
   display: flex;
-  border-bottom: 2px solid #ddd; /* Tạo thanh gạch ngang dưới các tab */
+  border-bottom: 2px solid #ddd;
+  /* Tạo thanh gạch ngang dưới các tab */
 }
 
 .tab-btn {
@@ -82,11 +87,13 @@ body {
   cursor: pointer;
   font-weight: bold;
   position: relative;
-  color: #555; /* Màu chữ khi chưa được chọn */
+  color: #555;
+  /* Màu chữ khi chưa được chọn */
 }
 
 .tab-btn.active {
-  color: #007bff; /* Màu chữ khi tab được chọn */
+  color: #007bff;
+  /* Màu chữ khi tab được chọn */
 }
 
 .tab-btn::after {
@@ -95,14 +102,17 @@ body {
   bottom: 0;
   left: 0;
   width: 100%;
-  height: 3px; /* Độ dày của thanh gạch ngang */
-  background-color: #007bff; /* Màu thanh gạch ngang khi tab được chọn */
+  height: 3px;
+  /* Độ dày của thanh gạch ngang */
+  background-color: #007bff;
+  /* Màu thanh gạch ngang khi tab được chọn */
   transform: scaleX(0);
   transition: transform 0.3s ease-in-out;
 }
 
 .tab-btn.active::after {
-  transform: scaleX(1); /* Hiển thị thanh gạch ngang khi tab được chọn */
+  transform: scaleX(1);
+  /* Hiển thị thanh gạch ngang khi tab được chọn */
 }
 
 .image-up {
@@ -119,12 +129,15 @@ body {
   border: 2px dashed #007bff;
   padding: 20px;
   width: 100%;
-  height: 150px;
+  height: 93%;
   cursor: pointer;
+  margin: 0px;
+  border-radius: 4px;
 }
 
 .image-placeholder {
   text-align: center;
+  width: 100%;
 }
 
 .image-tx {
@@ -134,7 +147,7 @@ body {
 
 .image-previews img {
   width: 100%;
-  max-height: 150px;
+  /* max-height: 150px; */
   object-fit: cover;
   margin: 5px;
 }
@@ -245,23 +258,26 @@ textarea.form-control {
 
 /* Responsive */
 @media (max-width: 768px) {
+
   .col-md-4,
   .col-md-6 {
     padding-left: 0;
     padding-right: 0;
   }
-  
+
   .image-up {
     flex-direction: column;
   }
-  
+
   .image-label {
     height: auto;
   }
 }
+
 .image-grid {
   display: grid;
-  grid-template-columns: repeat(4, 1fr); /* Chia thành 4 cột */
+  grid-template-columns: repeat(4, 1fr);
+  /* Chia thành 4 cột */
   gap: 10px;
 }
 
@@ -271,12 +287,10 @@ textarea.form-control {
 }
 
 .img-fluid {
-  max-width: 100%;
-  height: auto;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
 }
-
-
-
 
 .container {
   padding: 20px;
@@ -371,11 +385,13 @@ button:disabled {
 .image-previews {
   display: flex;
   flex-wrap: wrap;
-  gap: 10px; /* Khoảng cách giữa các hình ảnh */
+  gap: 10px;
+  /* Khoảng cách giữa các hình ảnh */
 }
 
 .image-preview {
-  flex: 1 1 22%; /* Chia đều 4 cột, mỗi cột chiếm khoảng 22% */
+  flex: 1 1 22%;
+  /* Chia đều 4 cột, mỗi cột chiếm khoảng 22% */
   /* max-width: 22%; Đảm bảo mỗi cột không vượt quá 22% */
   position: relative;
 }
@@ -383,21 +399,54 @@ button:disabled {
 
 .image-preview img {
   width: 100%;
-  height: 100%; /* Chiếm toàn bộ chiều cao của container */
-  object-fit: cover; 
+  height: 100%;
+  /* Chiếm toàn bộ chiều cao của container */
+  object-fit: cover;
 }
 
 .ima {
   position: absolute;
   top: 5px;
-  right: 5px;
+  right: 0px;
   background-color: red;
   color: white;
   border: none;
-  padding: 5px 10px;
+  padding: 2px 15px;
   cursor: pointer;
+  border-radius: 0px 4px 0px 4px;
+  font-size: 14px;
+  font-weight: 700;
 }
 
+.btn-set-primary {
+  position: absolute;
+  bottom: 5px;
+  border-radius: 0px 0px 4px 4px;
+  left: 0px;
+  background: rgba(255, 255, 255, 0.807);
+  width: 100%;
+  height: 20%;
+  padding: 5px 17px;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 700;
+}
+
+.btn-set-primary:hover {
+  background: white;
+}
+
+.primary-image {
+  position: absolute;
+  top: 5px;
+  left: 0px;
+  width: 100%;
+  height: 95%;
+  font-size: 20px;
+  border-radius: 4px;
+  background: #1515153f;
+  color: white;
+}
 
 .container {
   display: flex;
@@ -415,7 +464,8 @@ button:disabled {
   background-color: #fff;
   border: 1px solid #ddd;
   border-radius: 8px;
-  width: calc(33.33% - 20px); /* Chia đều 3 cột */
+  width: calc(33.33% - 20px);
+  /* Chia đều 3 cột */
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
   padding: 20px;
   display: flex;
@@ -460,10 +510,23 @@ button:disabled {
 }
 
 .addpro {
+  display: block;
   cursor: pointer;
-  color: green;
-  font-weight: bold;
-  margin-bottom: 10px;
+  font-weight: 500;
+  margin-bottom: 20px;
+  color: white;
+  background: green;
+  width: 10rem;
+  text-align: center;
+  padding: 5px;
+  border-radius: 4px;
+  font-size: 16px;
+  text-transform: uppercase;
+}
+
+.addpro:hover {
+  color: white;
+  background: rgb(3, 106, 3);
 }
 
 .variant-body input[type="number"] {
@@ -476,17 +539,6 @@ button:disabled {
   margin: 0;
 }
 
-
-
-
-
-
-
-
-
-
-
-
 /* Giới hạn kích thước khung hiển thị */
 .image-up {
   border: 2px dashed #ccc;
@@ -495,8 +547,10 @@ button:disabled {
   text-align: center;
   background-color: #f9f9f9;
   transition: border-color 0.3s ease;
-  max-height: 300px; /* Giới hạn chiều cao */
-  overflow-y: auto; /* Thêm cuộn dọc nếu vượt quá chiều cao */
+  max-height: 300px;
+  /* Giới hạn chiều cao */
+  overflow-y: auto;
+  /* Thêm cuộn dọc nếu vượt quá chiều cao */
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -511,9 +565,11 @@ button:disabled {
 .image-previews {
   display: flex;
   flex-wrap: wrap;
-  justify-content: center; /* Căn giữa các hình ảnh */
+  justify-content: center;
+  /* Căn giữa các hình ảnh */
   gap: 15px;
-  width: 100%; /* Đảm bảo chiếm toàn bộ chiều rộng */
+  width: 100%;
+  /* Đảm bảo chiếm toàn bộ chiều rộng */
 }
 
 /* Nổi bật hình ảnh chính */
@@ -521,14 +577,14 @@ button:disabled {
   border-radius: 5px;
   box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
   transition: transform 0.2s ease, border-color 0.3s ease;
-}
-
-.image-previews img:hover {
-  transform: scale(1.1);
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
 }
 
 .image-previews img[style*="green"] {
-  order: -1; /* Đưa hình chính lên đầu danh sách */
+  order: -1;
+  /* Đưa hình chính lên đầu danh sách */
 }
 
 /* Điều chỉnh bố cục hình chính */
@@ -537,4 +593,19 @@ button:disabled {
   flex-direction: column;
   align-items: center;
   justify-content: center;
+}
+
+.border-t {
+  border-top: 1px solid #ccc;
+}
+
+.pt-4 {
+  padding-top: 4px;
+}
+
+.card-form {
+  background: white;
+  padding: 20px 25px;
+  box-shadow: 0 1px 2.94px 0.06px rgba(4, 26, 55, 0.16);
+  border-radius: 5px;
 }

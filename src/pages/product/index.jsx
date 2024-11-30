@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import { Row, Col, Card, Button, Modal } from "react-bootstrap";
 import {
   getProductAPI, getMediaAPI, getImageAPI, getBrandAPI, deleteMesiaAPI, updateProductAPI, postMesiaAPI,
-  getDetailproductAPI, getAllMediaAPI, getAllCategoryAPI, postIsMediaAPI, postMediaAPI, getdetailAPI, getAllColorAPI,
+  getDetailproductAPI, getAllMediaAPI, postIsMediaAPI, postMediaAPI, getdetailAPI, getAllColorAPI,
   getCategoryAPI, getProduct,UPDE
 } from "./js/product";
 import { useNavigate, Link } from "react-router-dom";
@@ -19,8 +19,8 @@ export default function StaffPage() {
   const [images, setImages] = useState([]);
   const [allimages, setallImages] = useState([]);
   const [allmedias, setallMedias] = useState([]);
-  const [newImage, setNewImage] = useState(null);
-  const [isPrimary, setIsPrimary] = useState(false);
+  // const [newImage, setNewImage] = useState(null);
+  // const [isPrimary, setIsPrimary] = useState(false);
   const [detailproducts, setDetailproduct] = useState([]);
   const [selectedProduct, setSelectedProduct] = useState(null);
   const [searchTerm, setSearchTerm] = useState("");
@@ -36,7 +36,6 @@ export default function StaffPage() {
     description: ''
   });
   const [productInfo, setProductInfo] = useState({
-
     medias: []
   });
 
@@ -50,9 +49,9 @@ export default function StaffPage() {
     status: '',
   });
   const [showModal, setShowModal] = useState(false);
-  const [addedImages, setAddedImages] = useState([]);
-  const [removedImages, setRemovedImages] = useState([]);
-  const [productImages, setProductImages] = useState([]);
+  // const [addedImages, setAddedImages] = useState([]);
+  // const [removedImages, setRemovedImages] = useState([]);
+  // const [productImages, setProductImages] = useState([]);
   const [showDEModal, setDEShowModal] = useState(false);
   const [colors, setColors] = useState([]);
 
@@ -81,7 +80,6 @@ export default function StaffPage() {
     const GetStall = async () => {
       try {
         const res = await getProductAPI(customersPerPage, currentPage);
-
         if (Array.isArray(res.data)) {
           setItems(res.data);
         } else {
@@ -93,12 +91,12 @@ export default function StaffPage() {
     };
     GetStall();
   }, [customersPerPage, currentPage]);
+
   useEffect(() => {
     const fetchBrand = async () => {
       try {
         const brandPromises = items.map((item) => getBrandAPI(item.brandId));
         const resolvedBrands = await Promise.all(brandPromises);
-
         setBrands(resolvedBrands);
       } catch (error) {
         console.error("Lỗi khi lấy media cho sản phẩm:", error);
@@ -124,18 +122,17 @@ export default function StaffPage() {
       fetchCategory();
     }
   }, [items]);
+
   useEffect(() => {
     const fetchMediaForProducts = async () => {
       try {
         const mediaPromises = items.map((item) => getMediaAPI(item.id));
         const resolvedMedias = await Promise.all(mediaPromises);
-
         setMedias(resolvedMedias);
       } catch (error) {
         console.error("Lỗi khi lấy media cho sản phẩm:", error);
       }
     };
-
     if (items.length > 0) {
       fetchMediaForProducts();
     }
@@ -303,6 +300,7 @@ export default function StaffPage() {
   //     console.error('Error when changing image:', error);
   //   }
   // };
+ 
   const fileToBase64 = (file) => {
     return new Promise((resolve, reject) => {
       const reader = new FileReader();
@@ -352,10 +350,6 @@ export default function StaffPage() {
       console.error("Error when changing image:", error);
     }
   };
-
-
-
-
   // Hàm xử lý chọn ảnh chính
   const handleSetPrimaryImage = async (imageId) => {
     try {
@@ -832,7 +826,6 @@ export default function StaffPage() {
                                         const mediaForProduct = productMedia.filter(
                                           (media) => media.productId === selectedProduct?.id
                                         );
-
                                         return (
                                           <tr key={detail.id}>
                                             <th scope="row">{index + 1}</th>

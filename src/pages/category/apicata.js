@@ -34,7 +34,7 @@ export const updateCategory = async (id, formData) => {
   try {
     await axios.put(`${BASE_URL}/update-category-by-id/${id}`, formData, {
       headers: { "Content-Type": "multipart/form-data" },
-    });
+    }); 
     handleToast("success", "Cập nhật danh mục thành công");
   } catch (error) {
     console.error("Lỗi khi cập nhật danh mục:", error);
