@@ -24,22 +24,22 @@ function ProductPage() {
     }],
     medias: []
   });
-  const [expandDescription, setExpandDescription] = useState(false);
-  const [productImage, setProductImage] = useState(null);
-  const [isChecking, setIsChecking] = useState(false);
-  const [imagePreview, setImagePreview] = useState(null);
+  // const [expandDescription, setExpandDescription] = useState(false);
+  // const [productImage, setProductImage] = useState(null);
+  // const [isChecking, setIsChecking] = useState(false);
+  // const [imagePreview, setImagePreview] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
-  const [productName, setProductName] = useState("");
-  const [description, setdescription] = useState("");
-  const [price, setPrice] = useState("");
-  const [quantity, setQuantity] = useState("");
-  const [color, setColor] = useState("");
-  const [size, setSize] = useState("");
-  const [gender, setGender] = useState("");
-  const [category, setCategory] = useState("");
+  // const [productName, setProductName] = useState("");
+  // const [description, setdescription] = useState("");
+  // const [price, setPrice] = useState("");
+  // const [quantity, setQuantity] = useState("");
+  // const [color, setColor] = useState("");
+  // const [size, setSize] = useState("");
+  // const [gender, setGender] = useState("");
+  // const [category, setCategory] = useState("");
   const [brand, setBrand] = useState([]);
   const [productImages, setProductImages] = useState([]);
-  const [selectedBrand, setSelectedBrand] = useState('');
+  // const [selectedBrand, setSelectedBrand] = useState('');
   const navigate = useNavigate();
   const [currentPage, setCurrentPage] = useState(1);
   const [customersPerPage, setCustomersPerPage] = useState(8);
@@ -139,7 +139,7 @@ function ProductPage() {
   const handleProductDetailChange = (index, key, value) => {
     const newDetails = [...productInfo.productDetais];
     newDetails[index][key] = value;
-    setProductInfo((prev) => ({ ...prev, productDetais: newDetails }));
+    setProductInfo((prev) => ({ ...prev, productDetais: [...newDetails] }));
   };
 
   // const handleSave = () => {
@@ -286,7 +286,6 @@ function ProductPage() {
 
   const handleAdd = async (e) => {
     e.preventDefault();
-    // console.log("productInfo ", productInfo);
     const mainProduct = {
       main: {
         productName: productInfo.productName,
@@ -314,6 +313,7 @@ function ProductPage() {
       price: variant.price,
       status: "0",
     }));
+
     const mediasWithBase64 = await Promise.all(
       productInfo.medias.map(async (media) => ({
         link: await fileToBase64(media.file),
@@ -323,25 +323,21 @@ function ProductPage() {
     const productData = {
       ...mainProduct.main,
       productDetais: [
-        ...mainProduct.productDetails,
         ...variants,
       ],
       medias: mediasWithBase64,
     };
-
-    console.log("productData ", productData);
-    // setIsLoading(true);
-    // try {
-    //   // const response = await postProductAPI(productData);
-    //   handleToast("success", "Sản phẩm đã được lưu thành công!", "top-right");
-    //   // navigate("/dashboard/product")
-    //   navigate("/dashboard/product");
-    // } catch (error) {
-    //   console.error("Error saving product:", error);
-    //   handleToast("error", "Có lỗi khi lưu sản phẩm.", "top-right");
-    // } finally {
-    //   setIsLoading(false);
-    // }
+    setIsLoading(true);
+    try {
+      const response = await postProductAPI(productData);
+      handleToast("success", "Sản phẩm đã được lưu thành công!", "top-right");
+      navigate("/dashboard/product");
+    } catch (error) {
+      console.error("Error saving product:", error);
+      handleToast("error", "Có lỗi khi lưu sản phẩm.", "top-right");
+    } finally {
+      setIsLoading(false);
+    }
   };
 
 
@@ -352,7 +348,7 @@ function ProductPage() {
     }));
   };
   const renderInput = (label, value, field) => (
-    <div className="col-md-6">
+    <div className="col-md-12">
       <div className="form-floating">
         <input
           type="text"
@@ -382,147 +378,24 @@ function ProductPage() {
             <div className="">
               <div className="row">
                 {renderInput("Tên Sản Phẩm", productInfo.productName, "productName")}
-                {/* <div className="col-md-6">
-                        <div className="form-floating">
-                          <input
-                            type="text"
-                            className="form-control"
-                            id="productName"
-                            name="productName"
-                            placeholder="Tên Sản Phẩm"
-                            value={productInfo.productName} 
-                onChange={(e) => handleInputChange("productName", e.target.value)}
-                            // onChange={(e) => setProductName(e.target.value)}
-                          />
-                          <label htmlFor="productName">Tên Sản Phẩm</label>
-                        </div>
-                      </div> */}
-                <div className="col-md-6">
-                  <div className="form-floating">
-                    <input
-                      type="text"
-                      className="form-control"
-                      id="quantity"
-                      placeholder="Số Lượng"
-                      // value={quantity}
-                      value={productInfo.quantity}
-                      onChange={(e) => handleInputChange("quantity", e.target.value)}
-                    // onChange={(e) => setQuantity(e.target.value)}
-
-                    />
-                    <label htmlFor="quantity">Số lượng</label>
-                  </div>
-                </div>
               </div>
               <div className="row">
-                <div className="col-md-6">
-                  <div className="form-floating">
-                    <input
-                      type="text"
-                      className="form-control"
-                      id="price"
-                      placeholder="Giá"
-                      // value={price}
-                      // onChange={(e) => setPrice(e.target.value)}
-                      value={productInfo.price}
-                      onChange={(e) => handleInputChange("price", e.target.value)}
-                    />
-                    <label htmlFor="price">Giá</label>
-                  </div>
-                </div>
-                <div className="col-md-6">
-                  <div className="form-floating custom-floating-label">
-                    <select
-                      className="form-select"
-                      id="size"
-                      // value={size}
-                      // onChange={(e) => setSize(e.target.value)}
-                      value={productInfo.size}
-                      onChange={(e) => handleInputChange("size", e.target.value)}
-                    >
-                      <option value="">Chọn kích thước</option>
-                      <option value="M">M</option>
-                      <option value="X">X</option>
-                      <option value="XL">XL</option>
-                    </select>
-                    <label htmlFor="size">Kích Thước</label>
-                  </div>
-                </div>
-              </div>
-              <div className="row">
-                <div className="col-md-6">
-                  <div className="form-floating custom-floating-label">
-                    <select
-                      className="form-select"
-                      id="colorId"
-                      value={productInfo.colorId}  // giá trị hiện tại của colorId
-                      onChange={(e) => handleInputChange("colorId", e.target.value)}  // khi thay đổi colorId
-                    >
-                      <option value="">Chọn màu sắc</option>
-                      {colors.map((item) => (
-                        <option key={item.id} value={item.id}>
-                          {item.nameColor}  {/* Hiển thị tên màu */}
-                        </option>
-                      ))}
-                    </select>
-                    <label htmlFor="colorId">Màu sắc</label>
-                  </div>
-
-                </div>
-                <div className="col-md-6">
-                  <div className="form-floating custom-floating-label">
-                    <select
-                      className="form-select"
-                      id="gender"
-                      // value={gender}
-                      // onChange={(e) => setGender(e.target.value)}
-                      value={productInfo.gender}
-                      onChange={(e) => handleInputChange("gender", e.target.value)}
-                    >
-                      <option value="" >Chọn giới tính</option>
-                      <option value="male">Nam</option>
-                      <option value="female">Nữ</option>
-                      <option value="other">Khác</option>
-                    </select>
-                    <label htmlFor="gender">Giới tính</label>
-                  </div>
-                </div>
-              </div>
-              <div className="row">
-                {/* <div className="col-md-6">
-                        <div className="form-floating">
-                          <input
-                            type="text"
-                            className="form-control"
-                            id="categoryId"
-                            placeholder="Loại sản phẩm"
-                            // value={category}
-                            // onChange={(e) => setCategory(e.target.value)}
-
-                            value={productInfo.categoryId}
-                            onChange={(e) => handleInputChange("categoryId", e.target.value)}
-                          />
-                          <label htmlFor="category">Loại sản phẩm</label>
-                        </div>
-                      </div> */}
                 <div className="col-md-6">
                   <div className="form-floating custom-floating-label">
                     <select
                       className="form-select"
                       id="categoryId"
-                      // value={selectedBrand}
-                      // onChange={(e) => setSelectedBrand(e.target.value)} // Cập nhật thương hiệu được chọn
                       value={productInfo.categoryId}
                       onChange={(e) => handleInputChange("categoryId", e.target.value)}
                     >
-                      <option value="" disabled hidden>Loại sản phẩm</option>
+                      <option value="" disabled hidden>Chọn loại sản phẩm.....</option>
                       {Categorys.map((item) => (
                         <option key={item.id} value={item.id}>
                           {item.categoryName}
                         </option>
                       ))}
                     </select>
-                    <label htmlFor="categoryId">Thương hiệu</label>
+                    <label htmlFor="categoryId">Loại sản phẩm</label>
                   </div>
                 </div>
                 <div className="col-md-6">
@@ -590,7 +463,6 @@ function ProductPage() {
                     <select
                       className="form-select"
                       id="size"
-
                       value={detail.size}
                       onChange={(e) => handleProductDetailChange(index, "size", e.target.value)}
                     >
@@ -673,7 +545,6 @@ function ProductPage() {
                   style={{ display: "none" }}
                 />
               </div>
-
               {productImages.map((image, index) => (
                 <div key={index} className="image-preview">
                   <img
@@ -710,9 +581,10 @@ function ProductPage() {
         <div className="border-t pt-4 mt-5 d-flex justify-content-end">
           <button className="create-luu"
             onClick={handleAdd}
-          // disabled={isLoading || !productName}
+            disabled={isLoading || productInfo.productDetais.length === 0 || productInfo.medias.length === 0}
           >
-            Thêm sản phẩm mới
+            {isLoading ? "Đang thêm sản phẩm mới..." : "Thêm sản phẩm mới"}
+
           </button>
         </div>
       </form>

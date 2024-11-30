@@ -41,10 +41,20 @@ function VoucherCreate() {
 
   const handleAdd = async (values) => {
     try {
-      console.log("Dữ liệu gửi lên:", values);
-
+      const data = {
+        voucherName: values.VoucherName,
+        timeStart: values.TimeStart,
+        timeEnd: values.TimeEnd,
+        discountType: values.DiscountType,
+        quantity: values.Quantity,
+        discount: values.Discount,
+        min_Order_Value: values.Min_Order_Value,
+        max_Discount: values.Max_Discount,
+        status: values.Status
+      }
+      console.log("Dữ liệu gửi lên:", data);
       // Send the POST request to the API using axios
-      const response = await axios.post("https://localhost:7048/api/Voucher/add-voucher", values);
+      const response = await axios.post("https://localhost:7048/api/Voucher/add-voucher", data);
 
       console.log(response); // Log response for debugging
       handleToast("success", "Thêm voucher thành công");

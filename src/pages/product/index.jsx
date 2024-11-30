@@ -3,7 +3,7 @@ import { Row, Col, Card, Button, Modal } from "react-bootstrap";
 import {
   getProductAPI, getMediaAPI, getImageAPI, getBrandAPI, deleteMesiaAPI, updateProductAPI, postMesiaAPI,
   getDetailproductAPI, getAllMediaAPI, postIsMediaAPI, postMediaAPI, getdetailAPI, getAllColorAPI,
-  getCategoryAPI, getProduct,UPDE
+  getCategoryAPI, getProduct, UPDE
 } from "./js/product";
 import { useNavigate, Link } from "react-router-dom";
 import ControlPointIcon from "@mui/icons-material/ControlPoint";
@@ -49,9 +49,6 @@ export default function StaffPage() {
     status: '',
   });
   const [showModal, setShowModal] = useState(false);
-  // const [addedImages, setAddedImages] = useState([]);
-  // const [removedImages, setRemovedImages] = useState([]);
-  // const [productImages, setProductImages] = useState([]);
   const [showDEModal, setDEShowModal] = useState(false);
   const [colors, setColors] = useState([]);
 
@@ -70,12 +67,12 @@ export default function StaffPage() {
     setDEShowModal(true);  // This will open the modal
     handleClose();         // This should properly close the other modal (if needed)
   };
-  
+
   const handleDEClose = () => {
     setDEShowModal(false); // This will close the modal
     handleShow();          // This will open the other modal (if needed)
   };
-  
+
   useEffect(() => {
     const GetStall = async () => {
       try {
@@ -265,42 +262,7 @@ export default function StaffPage() {
       [field]: value // Cập nhật giá trị của trường được chọn
     }));
   };
-  
-  
 
-  // const handleChangeImage = (imageId, newImageFile) => {
-  //   if (!newImageFile) {
-  //     console.error("Không có file nào được chọn!");
-  //     return;
-  //   }
-  //   const updatedImages = allimages.map((img) => {
-  //     if (img.mediaIds === imageId) {
-  //       console.log("Đang thay đổi ảnh:", imageId);
-  //       return { ...img, imageUrl: URL.createObjectURL(newImageFile) };
-  //     }
-  //     return img;
-  //   });
-  //   setallImages(updatedImages);
-  // };
-  //   const handleChangeImage = async (imageId, newImageLink) => {
-  //     if (!newImageLink) {
-  //       console.error("Vui lòng nhập hoặc chọn đường dẫn ảnh mới!");
-  //       return;
-  //     }
-  //   try {
-  //     const response = await postMediaAPI(selectedProduct.id, imageId, newImageLink);
-  //     const data = await response.json();
-  //       setallImages((prevImages) =>
-  //         prevImages.map((img) =>
-  //           img.id === imageId ? { ...img, imageUrl: newImageLink } : img
-  //         )
-  //       );
-  //       console.log(data.message);
-  //   } catch (error) {
-  //     console.error('Error when changing image:', error);
-  //   }
-  // };
- 
   const fileToBase64 = (file) => {
     return new Promise((resolve, reject) => {
       const reader = new FileReader();
@@ -334,18 +296,6 @@ export default function StaffPage() {
       });
       setallImages(updatedImages);
       console.log("response ", response);
-      // if (response.status === 200) {
-      //   console.log("Cập nhật ảnh thành công!");
-
-      //   // Cập nhật state `allImages` với ảnh mới
-      //   setallImages((prevImages) =>
-      //     prevImages.map((img) =>
-      //       img.mediaIds === imageId
-      //         ? { ...img, imageUrl: base64Link }  // Cập nhật ảnh mới với base64Link
-      //         : img
-      //     )
-      //   );
-      // }
     } catch (error) {
       console.error("Error when changing image:", error);
     }
@@ -354,7 +304,6 @@ export default function StaffPage() {
   const handleSetPrimaryImage = async (imageId) => {
     try {
       const response = await postIsMediaAPI(selectedProduct.id, imageId);
-      // const data = await response.json();
       // Cập nhật giao diện người dùng với ảnh chính mới
       console.log(response);
       const updatedImages = allimages.map((img) => {
@@ -365,29 +314,10 @@ export default function StaffPage() {
       });
 
       setallImages(updatedImages);
-      // setallImages((prevImages) =>
-      //   prevImages.map((img) =>
-      //     img.id === imageId
-      //       ? { ...img, isPrimary: true }
-      //       : { ...img, isPrimary: false }
-      //   )
-      // );
     } catch (error) {
       console.error('Error when setting primary image:', error);
     }
   };
-
-  // const handleSetPrimaryImage = (imageId) => {
-  //   // Cập nhật tất cả ảnh, chỉ giữ lại một ảnh là chính
-  //   const updatedImages = allimages.map((img) => {
-  //     if (img.mediaIds === imageId) {
-  //       return { ...img, isPrimary: true }; // Chọn ảnh làm chính
-  //     }
-  //     return { ...img, isPrimary: false }; // Các ảnh còn lại sẽ là phụ
-  //   });
-
-  //   setallImages(updatedImages); // Cập nhật state
-  // };
 
   const handleDeleteImage = async (imageId) => {
     try {
@@ -432,90 +362,6 @@ export default function StaffPage() {
     setallImages((prevImages) => [...prevImages, newImage]);
     alert("Ảnh mới đã được thêm thành công!");
   };
-  // const handleAddImage = async (newImageFile) => {
-  //   if (!newImageFile) {
-  //     alert("Không có file nào được chọn!");
-  //     return;
-  //   }
-
-  //   try {
-  //     const base64Link = await fileToBase64(newImageFile);
-
-  //     // Tạo đối tượng dữ liệu cần gửi lên backend
-  //     const newImageLink = {
-  //       isPrimary: false,
-  //       link: base64Link,
-  //     };
-  //     // Gửi tệp ảnh tới API
-  //     const response = await postMesiaAPI(selectedProduct.id, newImageLink);
-
-  //     console.log("selectedProduct.id:", selectedProduct.id);
-  //     console.log("newImageFile:", newImageLink);
-
-  //     // Kiểm tra phản hồi từ API
-  //     if (!response || !response.success) {
-  //       alert("Tải ảnh lên thất bại! Vui lòng thử lại.");
-  //       return;
-  //     }
-
-  //     // Tạo đối tượng ảnh mới với URL tạm thời
-  //     const imageUrl = URL.createObjectURL(newImageFile);
-  //     const newImage = {
-  //       mediaIds: response.data?.mediaId || `new-${Date.now()}`, // Sử dụng mediaId từ API nếu có
-  //       imageUrl,
-  //       isPrimary: false,
-  //     };
-
-  //     // Cập nhật danh sách ảnh
-  //     setallImages((prevImages) => [...prevImages, newImage]);
-
-  //     // Thông báo thành công
-  //     alert("Ảnh mới đã được thêm thành công!");
-
-  //     // Giải phóng bộ nhớ sau khi cập nhật UI
-  //     setTimeout(() => URL.revokeObjectURL(imageUrl), 3000);
-  //   } catch (error) {
-  //     console.error("Lỗi khi thêm ảnh:", error);
-  //     alert("Đã xảy ra lỗi khi thêm ảnh. Vui lòng thử lại sau.");
-  //   }
-  // };
-
-
-  // const handleSetPrimaryImage = (imageId) => {
-  //   // Cập nhật tất cả ảnh, chỉ giữ lại một ảnh là chính
-  //   const updatedImages = allimages.map((img) => {
-  //     if (img.mediaIds === imageId) {
-  //       return { ...img, isPrimary: true }; // Chọn ảnh làm chính
-  //     }
-  //     return { ...img, isPrimary: false }; // Các ảnh còn lại sẽ là phụ
-  //   });
-
-  //   setallImages(updatedImages); // Cập nhật state
-  // };
-
-
-  // const deletemedia = async (id, index) => {
-  //   try {
-  //     console.log("Xóa media ID:", id);
-  //     const response = await deleteMesiaAPI(id);
-  //     console.log("Response:", response);
-
-  //     if (response.ok) {
-  //       setRemovedImages((prev) => [...prev, productImages[index]]);
-  //       setProductImages((prev) => prev.filter((_, i) => i !== index));
-  //       setAddedImages((prev) =>
-  //         prev.filter((img) => img.file !== productImages[index].file)
-  //       );
-  //       alert("Xóa media thành công!");
-  //     } else {
-  //       alert("Xóa media thất bại!");
-  //     }
-  //   } catch (error) {
-  //     console.error("Lỗi khi xóa media:", error);
-  //     alert("Có lỗi xảy ra khi xóa media!");
-  //   }
-  // };
-
   const handleSave = async (e) => {
     e.preventDefault();
 
@@ -529,13 +375,12 @@ export default function StaffPage() {
     formData.append("description", product.description);
     formData.append("categoryId", product.categoryId);
     formData.append("brandId", product.brandId);
-
     try {
       const response = await updateProductAPI(product.id, formData);
-      console.log("Response:", response.data);
-
-      if (response.ok) {
+      // console.log("Response:", response);
+      if (response) {
         alert("Cập nhật sản phẩm thành công!");
+        window.location.reload();
       } else {
         alert("Cập nhật sản phẩm thất bại!");
       }
@@ -561,7 +406,7 @@ export default function StaffPage() {
 
     try {
       console.log("Response data:", formData);
-      const response = await UPDE(selectedDeProduct.id,selectedProduct.id, formData);
+      const response = await UPDE(selectedDeProduct.id, selectedProduct.id, formData);
       console.log("Response:", response.data);
 
       if (response.ok) {
@@ -673,242 +518,222 @@ export default function StaffPage() {
     <React.Fragment>
       <Row>
         <Col sm={12}>
-          <Card>
-            <div className="bg-light rounded text-center h-100 p-4">
-              <div className="d-flex align-items-center justify-content-between mb-4">
-                <div className="form-floating">
-                  <input
-                    type="text"
-                    className="form-control"
-                    id="search"
-                    value={searchTerm}
-                    onChange={(e) => setSearchTerm(e.target.value)}
-                    placeholder="Tìm kiếm"
-                  />
-                  <label htmlFor="search">Tìm kiếm</label>
-                </div>
-                {/* <a href="/dashboard/staff/create" className="create-stall">
+          <div className="bg-light rounded text-center h-100 p-4 page-header bg-white">
+            <div className="d-flex align-items-center justify-content-between mb-4">
+              <div className="form-floating">
+                <input
+                  type="text"
+                  className="form-control"
+                  id="search"
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                  placeholder="Tìm kiếm"
+                />
+                <label htmlFor="search">Tìm kiếm</label>
+              </div>
+              {/* <a href="/dashboard/staff/create" className="create-stall">
                   Thêm mới
                 </a> */}
-                <Link to={"/dashboard/product/create"}>
-                  <Button
-                    variant="primary"
-                    className="custom-button"
-                    sx={{ mr: 2 }}
-                  >
-                    <ControlPointIcon sx={{ marginRight: 1 }} />
-                    Thêm mới
-                  </Button>
-                </Link>
-              </div>
-              <div className="table-responsive">
-                <table className="table">
-                  <thead>
-                    <tr>
-                      <th scope="col">#</th>
-                      <th scope="col">Hình ảnh</th>
-                      <th scope="col">Tên sản phẩm</th>
-                      <th scope="col">Thương hiệu</th>
-                      <th scope="col">Loại</th>
-                      <th scope="col">Thao tác</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {currentCustomers.map((item, stt) => {
+              <Link to={"/dashboard/product/create"}>
+                <Button
+                  variant="primary"
+                  className="custom-button"
+                  sx={{ mr: 2 }}
+                >
+                  <ControlPointIcon sx={{ marginRight: 1 }} />
+                  Thêm mới
+                </Button>
+              </Link>
+            </div>
+            <div className="table-responsive">
+              <table className="table">
+                <thead>
+                  <tr>
+                    <th scope="col">#</th>
+                    <th scope="col">Hình ảnh</th>
+                    <th scope="col">Tên sản phẩm</th>
+                    <th scope="col">Thương hiệu</th>
+                    <th scope="col">Loại</th>
+                    <th scope="col">Thao tác</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {currentCustomers.map((item, stt) => {
+                    const productMedia = medias.filter((media) => media.productId === item.id);
+                    const productBrans = brands.filter((bran) => bran.id === item.brandId);
+                    const productCategorys = categories.filter((catego) => catego.id === item.categoryId);
+                    return (
+                      <tr key={item.id}>
+                        <th scope="row">{indexOfFirstCustomer + stt + 1}</th>
+                        <td>
+                          {productMedia.map((media, index) => {
 
-                      const productMedia = medias.filter((media) => media.productId === item.id);
-                      const productBrans = brands.filter((bran) => bran.id === item.brandId);
-                      const productCategorys = categories.filter((catego) => catego.id === item.categoryId);
-                      return (
-                        <tr key={item.id}>
-                          <th scope="row">{indexOfFirstCustomer + stt + 1}</th>
-                          <td>
-                            {productMedia.map((media, index) => {
+                            const productImage = images.find((image) => image.mediaId === media.imagesId);
 
-                              const productImage = images.find((image) => image.mediaId === media.imagesId);
-
-                              return (
-                                productImage && (
-                                  <img
-                                    key={index}
-                                    src={productImage.imageUrl}
-                                    alt={`media-${item.id}`}
-                                    style={{ width: "50px", height: "50px", objectFit: "cover" }}
-                                  />
-                                )
-                              );
-                            })}
-                          </td>
-                          <td>{item.productName}</td>
-                          <td>
-                            {productCategorys.length > 0 && (
-                              <p>{productCategorys[0].categoryName}</p>
-                            )}
-                            {/* {Categorys.categoryName} */}
-                          </td>
-                          <td>
-                            {productBrans.length > 0 && (
-                              <p>{productBrans[0].brandName}</p>
-                            )}
-                          </td>
-                          <td>
-                            <IconButton
-                              color="primary"
-                              onClick={() => detaile(item)}
-                              sx={{ padding: "4px" }}
+                            return (
+                              productImage && (
+                                <img
+                                  key={index}
+                                  src={productImage.imageUrl}
+                                  alt={`media-${item.id}`}
+                                  style={{ width: "50px", height: "50px", objectFit: "cover" }}
+                                />
+                              )
+                            );
+                          })}
+                        </td>
+                        <td>{item.productName}</td>
+                        <td>
+                          {productCategorys.length > 0 && (
+                            <p>{productCategorys[0].categoryName}</p>
+                          )}
+                          {/* {Categorys.categoryName} */}
+                        </td>
+                        <td>
+                          {productBrans.length > 0 && (
+                            <p>{productBrans[0].brandName}</p>
+                          )}
+                        </td>
+                        <td>
+                          <IconButton
+                            color="primary"
+                            onClick={() => detaile(item)}
+                            sx={{ padding: "4px" }}
+                          >
+                            <RemoveRedEyeIcon />
+                          </IconButton>
+                          <IconButton
+                            color="primary"
+                            onClick={() => CTNV(item)}
+                            sx={{ padding: "4px" }} // Reduced padding for action buttons
+                          >
+                            <Edit />
+                          </IconButton>
+                          {/* <EditProductModal
+                            show={showModal}
+                            handleClose={handleCloseModal}
+                            selectedProduct={selectedProduct}
+                            brands={brands}
+                            categories={categories}
+                            images={images}
+                            handleSave={handleSaveChanges}
+                          /> */}
+                        </td>
+                      </tr>
+                    );
+                  })}
+                  <Modal show={showDetailModal}
+                    onHide={handleClose} size="xl">
+                    <Modal.Header closeButton>
+                      <Modal.Title>
+                        Thông Tin Chi Tiết Sản Phẩm: {selectedProduct?.productName || "N/A"}
+                      </Modal.Title>
+                    </Modal.Header>
+                    <Modal.Body>
+                      {detailproducts ? (
+                        <div className="">
+                          <div className="dialog-tabs">
+                            <button
+                              className={`tab-btn ${activeTab === "info" ? "active" : ""}`}
+                              onClick={() => setActiveTab("info")}
                             >
-                              <RemoveRedEyeIcon />
-                            </IconButton>
-                            <IconButton
-                              color="primary"
-                              onClick={() => CTNV(item)}
-                              sx={{ padding: "4px" }} // Reduced padding for action buttons
-                            >
-                              <Edit />
-                            </IconButton>
-                            {/* <EditProductModal
-        show={showModal}
-        handleClose={handleCloseModal}
-        selectedProduct={selectedProduct}
-        brands={brands}
-        categories={categories}
-        images={images}
-        handleSave={handleSaveChanges}
-      /> */}
-                          </td>
-                        </tr>
-                      );
-                    })}
-                    <Modal show={showDetailModal}
-                      onHide={handleClose} size="lg">
-                      <Modal.Header closeButton>
-                        <Modal.Title>
-                          Thông Tin Chi Tiết Sản Phẩm: {selectedProduct?.productName || "N/A"}
-                        </Modal.Title>
-                      </Modal.Header>
-                      <Modal.Body>
-                        {detailproducts ? (
-                          <div className="dialog">
-                            <div className="dialog-tabs">
-                              <button
-                                className={`tab-btn ${activeTab === "info" ? "active" : ""}`}
-                                onClick={() => setActiveTab("info")}
-                              >
-                                Xem Thông Tin
-                              </button>
-                              <button
-                                className={`tab-btn ${activeTab === "description" ? "active" : ""}`}
-                                onClick={() => setActiveTab("description")}
-                              >
-                                Xem Mô Tả Sản Phẩm
-                              </button>
-                            </div>
-                            <div className="dialog-content">
-                              {activeTab === "info" && (
-                                <div className="table-responsive">
-                                  <table className="table">
-                                    <thead>
-                                      <tr>
-                                        <th scope="col">#</th>
-                                        <th scope="col">Hình ảnh</th>
-                                        <th scope="col">Tên sản phẩm</th>
-                                        <th scope="col">Kích thước</th>
-                                        <th scope="col">Màu sắc</th>
-                                        <th scope="col">Số lượng</th>
-                                        <th scope="col">Giá</th>
-                                        <th scope="col">Giới tính</th>
-                                        <th scope="col">Thao tác</th>
-                                      </tr>
-                                    </thead>
-                                    <tbody>
-                                      {detailproducts.map((detail, index) => {
-                                        const productMedia = medias.filter((media) => media.productId === selectedProduct?.id);
-                                        const mediaForProduct = productMedia.filter(
-                                          (media) => media.productId === selectedProduct?.id
-                                        );
-                                        return (
-                                          <tr key={detail.id}>
-                                            <th scope="row">{index + 1}</th>
-                                            <td>
-                                              {mediaForProduct.map((media, mediaIndex) => {
-                                                const productImage = images.find(
-                                                  (image) => image.mediaId === media.imagesId
-                                                );
-                                                // console.log("productImage: ", productImage);
-                                                return (
-                                                  productImage && (
-                                                    // <img
-                                                    //   key={mediaIndex}
-                                                    //   src={productImage.imageUrl}
-                                                    //   alt={`media-${detail.id}`}
-                                                    //   style={{
-                                                    //     width: "50px",
-                                                    //     height: "50px",
-                                                    //     objectFit: "cover",
-                                                    //   }}
-                                                    // />
-                                                    <img
-                                                      key={mediaIndex
-                                                      }
-                                                      src={productImage.imageUrl}
-                                                      alt={`media-${selectedProduct.id}`}
-                                                      style={{ width: "50px", height: "50px", objectFit: "cover" }}
-                                                    />
-                                                  )
-                                                );
-                                              })}
-                                            </td>
-                                            <td>{selectedProduct.productName}</td>
-                                            <td>{detail.size}</td>
-                                            <td>{detail.colorId}</td>
-                                            <td>{detail.quantity}</td>
-                                            <td>{detail.price}</td>
-                                            <td>{detail.gender}</td>
-                                            <td>
-
-
-                                              <Button variant="primary" type="submit" onClick={() => CTSP(detail, selectedProduct.id)}>
-                                                Sửa
-                                              </Button>
-
-
-                                              <Button variant="primary" type="submit">
-                                                Thêm
-                                              </Button>
-                                            </td>
-                                          </tr>
-                                        );
-                                      })}
-                                    </tbody>
-                                  </table>
-                                </div>)}
-                              {activeTab === "description" && (
-                                <div className="description-container">
-                                  <h5>Mô Tả Sản Phẩm</h5>
-                                  <p>{selectedProduct?.description || "Không có mô tả."}</p>
-                                </div>
-                              )}
-                              <div className="dialog-actions">
-                                <button className="close-btn" onClick={handleClose}>
-                                  Đóng
-                                </button>
-                              </div>
-                            </div>
+                              THÔNG TIN CHI TIẾT SẢN PHẨM
+                            </button>
                           </div>
-                        ) : (
-                          <p>Đang tải thông tin...</p>
-                        )}
-                      </Modal.Body>
-                    </Modal>
 
-                    <Modal show={showDEModal} onHide={handleDEClose} size="lg">
-                      <Modal.Header closeButton>
-                        <Modal.Title>Sửa Thông Tin Chi Tiết Sản Phẩm : {selectedProduct?.productName}</Modal.Title>
-                      </Modal.Header>
-                      <Modal.Body>
-                        <div className="container">
-                          {selectedDeProduct ? (
-                            <form onSubmit={handleupde}>
+                          <div className="">
+                            <table className="table">
+                              <thead>
+                                <tr>
+                                  <th scope="col">#</th>
+                                  <th scope="col">Hình ảnh</th>
+                                  <th scope="col">Tên sản phẩm</th>
+                                  <th scope="col">Kích thước</th>
+                                  <th scope="col">Màu sắc</th>
+                                  <th scope="col">Số lượng</th>
+                                  <th scope="col">Giá</th>
+                                  <th scope="col">Giới tính</th>
+                                  <th scope="col">
+                                    <Button variant="primary" type="submit">
+                                      Thêm
+                                    </Button>
+                                  </th>
+                                </tr>
+                              </thead>
+                              <tbody>
+                                {detailproducts.map((detail, index) => {
+                                  const productMedia = medias.filter((media) => media.productId === selectedProduct?.id);
+                                  const mediaForProduct = productMedia.filter(
+                                    (media) => media.productId === selectedProduct?.id
+                                  );
+                                  return (
+                                    <tr key={detail.id}>
+                                      <th scope="row">{index + 1}</th>
+                                      <td>
+                                        {mediaForProduct.map((media, mediaIndex) => {
+                                          const productImage = images.find(
+                                            (image) => image.mediaId === media.imagesId
+                                          );
+                                          // console.log("productImage: ", productImage);
+                                          return (
+                                            productImage && (
+                                              // <img
+                                              //   key={mediaIndex}
+                                              //   src={productImage.imageUrl}
+                                              //   alt={`media-${detail.id}`}
+                                              //   style={{
+                                              //     width: "50px",
+                                              //     height: "50px",
+                                              //     objectFit: "cover",
+                                              //   }}
+                                              // />
+                                              <img
+                                                key={mediaIndex
+                                                }
+                                                src={productImage.imageUrl}
+                                                alt={`media-${selectedProduct.id}`}
+                                                style={{ width: "50px", height: "50px", objectFit: "cover" }}
+                                              />
+                                            )
+                                          );
+                                        })}
+                                      </td>
+                                      <td>{selectedProduct.productName}</td>
+                                      <td>{detail.size}</td>
+                                      <td>{detail.colorId}</td>
+                                      <td>{detail.quantity}</td>
+                                      <td>{detail.price}</td>
+                                      <td>{detail.gender}</td>
+                                      <td>
+                                        <Button variant="primary" type="submit" onClick={() => CTSP(detail, selectedProduct.id)}>
+                                          Sửa
+                                        </Button>
+                                      </td>
+                                    </tr>
+                                  );
+                                })}
+                              </tbody>
+                            </table>
+                          </div>
+                        </div>
+                      ) : (
+                        <p>Đang tải thông tin...</p>
+                      )}
+                    </Modal.Body>
+                    <Modal.Footer>
+                      <button className="close-btn" onClick={handleClose}>
+                        Đóng
+                      </button>
+                    </Modal.Footer>
+                  </Modal>
+                  <Modal show={showDEModal} onHide={handleDEClose} size="xl">
+                    <Modal.Header closeButton>
+                      <Modal.Title>Sửa Thông Tin Chi Tiết Sản Phẩm : {selectedProduct?.productName}</Modal.Title>
+                    </Modal.Header>
+                    <Modal.Body>
+                      <div className="container">
+                        {selectedDeProduct ? (
+                          <form onSubmit={handleupde}>
                             <div key={selectedDeProduct.id}>
                               <div className="variant-header">
                                 {/* Nút trạng thái */}
@@ -995,7 +820,7 @@ export default function StaffPage() {
                                     className="form-select"
                                     id="size"
                                     value={selectedDeProduct.size || ""}
-                                    onChange={(e) => handleDEInputChange( "size", e.target.value)}
+                                    onChange={(e) => handleDEInputChange("size", e.target.value)}
                                   >
                                     <option value="" >
                                       Chọn kích thước
@@ -1012,93 +837,103 @@ export default function StaffPage() {
                             </div>
 
                             <Button variant="primary" type="submit">
-                          Lưu Thay Đổi
-                        </Button>
-                            </form>
-                          ) : (
-                            <p>Không có thông tin biến thể.</p>
-                          )}
-                        </div>
-                      </Modal.Body>
-                      <Modal.Footer>
-                        <Button variant="secondary" onClick={handleDEClose}>
-                          Đóng
-                        </Button>
-                      </Modal.Footer>
-                    </Modal>
+                              Lưu Thay Đổi
+                            </Button>
+                          </form>
+                        ) : (
+                          <p>Không có thông tin biến thể.</p>
+                        )}
+                      </div>
+                    </Modal.Body>
+                    <Modal.Footer>
+                      <Button variant="secondary" onClick={handleDEClose}>
+                        Đóng
+                      </Button>
+                    </Modal.Footer>
+                  </Modal>
 
-
-                    <Modal show={showModal} onHide={handleCloseModal} size="lg">
-                      <Modal.Header closeButton>
-                        <Modal.Title>Sửa Thông Tin Sản Phẩm : {selectedProduct?.productName}</Modal.Title>
-                      </Modal.Header>
-                      <Modal.Body>
-                        {product ? (
-                          <>
-                            <div className="dialog-tabs">
-                              <button
-                                className={`tab-btn ${activeTab === "info" ? "active" : ""}`}
-                                onClick={() => setActiveTab("info")}
-                              >
-                                Thông Tin Sản Phẩm
-                              </button>
-                              <button
-                                className={`tab-btn ${activeTab === "des" ? "active" : ""}`}
-                                onClick={() => setActiveTab("des")}
-                              >
-                                Mô Tả Sản Phẩm
-                              </button>
-                            </div>
-
-                            <form onSubmit={handleSave}>
-                              {activeTab === "info" && (
-                                <>
-                                  <Card>
-                                    <h2>Thông tin sản phẩm</h2>
-                                    <div className="row">
-                                      {renderInput("Tên Sản Phẩm", product.productName, "productName")}
-                                      <div className="col-md-4">
-                                        <div className="form-floating custom-floating-label">
-                                          <select
-                                            className="form-select"
-                                            id="categoryId"
-                                            value={product.categoryId}
-                                            onChange={(e) => handleInputChange("categoryId", e.target.value)}
-                                          >
-                                            <option value="" disabled hidden>Loại sản phẩm</option>
-                                            {categories.map((item) => (
-                                              <option key={item.id} value={item.id}>
-                                                {item.categoryName}
-                                              </option>
-                                            ))}
-                                          </select>
-                                          <label htmlFor="categoryId">Danh mục</label>
-                                        </div>
-                                      </div>
-                                      <div className="col-md-4">
-                                        <div className="form-floating custom-floating-label">
-                                          <select
-                                            className="form-select"
-                                            id="brandId"
-                                            value={product.brandId}
-                                            onChange={(e) => handleInputChange("brandId", e.target.value)}
-                                          >
-                                            <option value="" disabled hidden>Chọn thương hiệu</option>
-                                            {brands.map((item) => (
-                                              <option key={item.id} value={item.id}>
-                                                {item.brandName}
-                                              </option>
-                                            ))}
-                                          </select>
-                                          <label htmlFor="brand">Thương hiệu</label>
-                                        </div>
+                  <Modal show={showModal} onHide={handleCloseModal} size="xl">
+                    <Modal.Header closeButton>
+                      <Modal.Title>Sửa Thông Tin Sản Phẩm : {selectedProduct?.productName}</Modal.Title>
+                    </Modal.Header>
+                    <Modal.Body>
+                      {product ? (
+                        <div className="overflow-y-auto">
+                          <div className="dialog-tabs">
+                            <button className={`tab-btn active`} >
+                              THÔNG TIN SẢN PHẨM
+                            </button>
+                          </div>
+                          <form>
+                            {activeTab === "info" && (
+                              <>
+                                <div className="mt-4">
+                                  <div className="row">
+                                    {renderInput("Tên Sản Phẩm", product.productName, "productName")}
+                                    <div className="col-md-4">
+                                      <div className="form-floating custom-floating-label">
+                                        <select
+                                          className="form-select"
+                                          id="categoryId"
+                                          value={product.categoryId}
+                                          onChange={(e) => handleInputChange("categoryId", e.target.value)}
+                                        >
+                                          <option value="" disabled hidden>Loại sản phẩm</option>
+                                          {categories.map((item) => (
+                                            <option key={item.id} value={item.id}>
+                                              {item.categoryName}
+                                            </option>
+                                          ))}
+                                        </select>
+                                        <label htmlFor="categoryId">Danh mục</label>
                                       </div>
                                     </div>
-                                  </Card>
-                                  <Card>
-                                    <div className="container">
-                                      {/* Khu vực chọn ảnh bìa */}
-                                      <div className="from-img image-up">
+                                    <div className="col-md-4">
+                                      <div className="form-floating custom-floating-label">
+                                        <select
+                                          className="form-select"
+                                          id="brandId"
+                                          value={product.brandId}
+                                          onChange={(e) => handleInputChange("brandId", e.target.value)}
+                                        >
+                                          <option value="" disabled hidden>Chọn thương hiệu</option>
+                                          {brands.map((item) => (
+                                            <option key={item.id} value={item.id}>
+                                              {item.brandName}
+                                            </option>
+                                          ))}
+                                        </select>
+                                        <label htmlFor="brand">Thương hiệu</label>
+                                      </div>
+                                    </div>
+
+                                  </div>
+                                  <div className="row">
+                                    <div className="col-md-12">
+                                      <div className="form-floating custom-floating-label">
+                                        <input
+                                          type="text"
+                                          className="form-control"
+                                          value={product.description || ""}
+                                          onChange={(e) => setProduct({ ...product, ["description"]: e.target.value })}
+                                        />
+                                        <label>Mô tả sản phẩm</label>
+                                      </div>
+                                    </div>
+                                  </div>
+                                </div>
+                                <div>
+                                  <div className="dialog-tabs">
+                                    <button
+                                      className={`tab-btn active`}
+                                    >
+                                      HÌNH ẢNH SẢN PHẨM
+                                    </button>
+                                  </div>
+                                  <div className="mt-4">
+                                    {/* Khu vực hiển thị danh sách ảnh */}
+                                    <div className="list-images">
+                                      <div className="image-preview" style={{ height: '16rem' }}>
                                         <label htmlFor="image" className="image-label">
                                           <div className="image-placeholder">
                                             <i className="fas fa-camera"></i>
@@ -1113,196 +948,97 @@ export default function StaffPage() {
                                           style={{ display: 'none' }}
                                         />
                                       </div>
-
-                                      {/* Khu vực hiển thị danh sách ảnh */}
-                                      <div
-                                        className="image-previews"
-                                        style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '10px' }}
-                                      >
-                                        {allimages.map((img) => (
-                                          <div key={img.mediaIds} className="image-item" style={{ position: 'relative' }}>
-                                            <img
-                                              src={img.imageUrl}
-                                              alt="Product"
-                                              className="image-preview"
-                                              style={{
-                                                width: '100%',
-                                                height: '150px',
-                                                objectFit: 'cover',
-                                                borderRadius: '5px',
-                                              }}
-                                            />
-                                            {/* Nút xóa */}
-                                            <button
-                                              onClick={() => handleDeleteImage(img.mediaIds)}
-                                              style={{
-                                                position: 'absolute',
-                                                top: '5px',
-                                                right: '5px',
-                                                backgroundColor: 'rgba(255, 0, 0, 0.7)',
-                                                border: 'none',
-                                                borderRadius: '50%',
-                                                color: 'white',
-                                                cursor: 'pointer',
-                                                padding: '5px',
-                                              }}
-                                            >
+                                      {allimages.map((img) => (
+                                        <div key={img.mediaIds} className="image-item">
+                                          <img
+                                            src={img.imageUrl}
+                                            alt="Product"
+                                          />
+                                          {/* Nút xóa */}
+                                          {!img.isPrimary && (
+                                            <button onClick={() => handleDeleteImage(img.mediaIds)} >
                                               X
                                             </button>
-                                            {/* Nút thay đổi ảnh */}
-                                            <label
-                                              htmlFor={`change-image-${img.mediaIds}`}
-                                              style={{
-                                                display: 'block',
-                                                textAlign: 'center',
-                                                marginTop: '10px',
-                                                cursor: 'pointer',
-                                                color: '#007bff',
-                                              }}
-                                            >
-                                              Thay đổi ảnh
-                                            </label>
-                                            <input
-                                              type="file"
-                                              id={`change-image-${img.mediaIds}`}
-                                              onChange={(e) => handleChangeImage(img.mediaIds, e.target.files[0])}
-                                              accept="image/*"
-                                              style={{ display: 'none' }}
-                                            />
-                                            {/* Nút đánh dấu là ảnh chính */}
-                                            <button
-                                              onClick={() => handleSetPrimaryImage(img.mediaIds)}
-                                              style={{
-                                                position: 'absolute',
-                                                bottom: '5px',
-                                                left: '5px',
-                                                backgroundColor: img.isPrimary ? 'green' : 'gray',
-                                                border: 'none',
-                                                color: 'white',
-                                                cursor: 'pointer',
-                                                padding: '5px',
-                                              }}
-                                            >
-                                              {img.isPrimary ? 'Ảnh chính' : 'Chọn làm ảnh chính'}
-                                            </button>
-                                          </div>
-                                        ))}
-                                      </div>
-
-                                      {/* Nút thêm ảnh mới */}
-                                      <div style={{ marginTop: '20px', textAlign: 'center' }}>
-                                        <input
-                                          type="file"
-                                          id="add-new-image"
-                                          onChange={(e) => handleAddImage(e.target.files[0])}
-                                          accept="image/*"
-                                          style={{ display: 'none' }}
-                                        />
-                                        <label htmlFor="add-new-image" style={{ cursor: 'pointer', color: '#007bff' }}>
-                                          + Thêm ảnh mới
-                                        </label>
-                                      </div>
+                                          )}
+                                          {/* Nút đánh dấu là ảnh chính */}
+                                          {!img.isPrimary && (
+                                            <div onClick={() => handleSetPrimaryImage(img.mediaIds)} >
+                                              Chọn làm ảnh chính
+                                            </div>
+                                          )}
+                                        </div>
+                                      ))}
                                     </div>
-                                  </Card>
-
-
-                                </>
-                              )}
-
-                              {activeTab === "des" && (
-                                <div className="container">
-                                  <h3>Thông tin mô tả</h3>
-                                  {renderInput("Mô tả sản phẩm", product.description, "description")}
-                                  {/* <div className="form-floating">
-                                    <input
-                                      type="text"
-                                      className="form-control"
-                                      id="description"
-                                      placeholder="Mô tả sản phẩm"
-                                      value={product.description || ""}
-                                      onChange={(e) => handleInputChange("description", e.target.value)}
-                                    />
-                                    <label htmlFor="description">Mô tả</label>
-                                  </div> */}
+                                  </div>
                                 </div>
-                              )}
+                              </>
+                            )}
+                          </form>
+                        </div>
+                      ) : (
+                        <p>Đang tải thông tin...</p>
+                      )}
+                    </Modal.Body>
+                    <Modal.Footer>
+                      <Button variant="secondary" onClick={handleCloseModal}>
+                        Đóng
+                      </Button>
+                      <Button variant="primary" onClick={handleSave}>
+                        Lưu Thay Đổi
+                      </Button>
+                    </Modal.Footer>
+                  </Modal>
+                </tbody>
+              </table>
+              <div className="row">
+                <div className="col-lg-8">
 
-                              <Button variant="primary" type="submit">
-                                Lưu Thay Đổi
-                              </Button>
-                            </form>
-                          </>
-                        ) : (
-                          <p>Đang tải thông tin...</p>
-                        )}
-                      </Modal.Body>
-                      <Modal.Footer>
-                        <Button variant="secondary" onClick={handleCloseModal}>
-                          Đóng
-                        </Button>
-                        {/* Chỉnh sửa nút này để gọi handleSave nếu muốn */}
-                        {/* <Button variant="primary" onClick={handleSave}>
-      Lưu Thay Đổi
-    </Button> */}
-                      </Modal.Footer>
-                    </Modal>
-
-
-
-
-                  </tbody>
-
-                </table>
-                <div className="row">
-                  <div className="col-lg-8">
-
-                  </div>
-                  <div className="col-lg-4">
-                    <div
-                      style={{
-                        display: "flex",
-                        justifyContent: "space-between",
-                        alignItems: "center",
-                        marginTop: "10px",
-                      }}
+                </div>
+                <div className="col-lg-4">
+                  <div
+                    style={{
+                      display: "flex",
+                      justifyContent: "space-between",
+                      alignItems: "center",
+                      marginTop: "10px",
+                    }}
+                  >
+                    <span>Số dòng mỗi trang</span>
+                    <select
+                      style={{ padding: "5px", border: "none" }}
+                      value={customersPerPage}
+                      onChange={(e) => setCustomersPerPage(Number(e.target.value))}
                     >
-                      <span>Số dòng mỗi trang</span>
-                      <select
-                        style={{ padding: "5px", border: "none" }}
-                        value={customersPerPage}
-                        onChange={(e) => setCustomersPerPage(Number(e.target.value))}
+                      <option value="5">5</option>
+                      <option value="10">10</option>
+                      <option value="15">15</option>
+                      <option value="25">25</option>
+                    </select>
+                    <span>{`${indexOfFirstCustomer + 1}-${Math.min(indexOfLastCustomer, items.length)}`}</span>
+                    <div>
+                      <button
+                        style={{ padding: "5px", marginRight: "5px", border: "none" }}
+                        onClick={() => handlePageChange(currentPage - 1)}
+                        disabled={currentPage === 1}
                       >
-                        <option value="5">5</option>
-                        <option value="10">10</option>
-                        <option value="15">15</option>
-                        <option value="25">25</option>
-                      </select>
-                      <span>{`${indexOfFirstCustomer + 1}-${Math.min(indexOfLastCustomer, items.length)}`}</span>
-                      <div>
-                        <button
-                          style={{ padding: "5px", marginRight: "5px", border: "none" }}
-                          onClick={() => handlePageChange(currentPage - 1)}
-                          disabled={currentPage === 1}
-                        >
-                          &lt;
-                        </button>
-                        <button
-                          style={{ padding: "5px", border: "none" }}
-                          onClick={() => handlePageChange(currentPage + 1)}
-                          disabled={currentPage === totalPages}
-                        >
-                          &gt;
-                        </button>
-                      </div>
+                        &lt;
+                      </button>
+                      <button
+                        style={{ padding: "5px", border: "none" }}
+                        onClick={() => handlePageChange(currentPage + 1)}
+                        disabled={currentPage === totalPages}
+                      >
+                        &gt;
+                      </button>
                     </div>
-
                   </div>
+
                 </div>
               </div>
             </div>
-          </Card>
+          </div>
         </Col>
       </Row>
-    </React.Fragment>
+    </React.Fragment >
   );
 }

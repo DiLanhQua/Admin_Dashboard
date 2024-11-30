@@ -26,12 +26,13 @@ const END_POINT = {
     AddMedia: `${URL_API}/Medias/add-medias`,
     DeleteMedia: `${URL_API}/Medias/delete-medias`,
     GetALLMedia: `${URL_API}/Medias/get-all-medias`,
+    PostIsMedia: `${URL_API}/Medias /setPrimaryImage`,
+
+    GetCategory: `${URL_API}/Category/get-category-by-id`,
 
     // Image
     GetImage: `${URL_API}/Image/get-Image`,
     AddImage: `${URL_API}/Image/add-Image`,
-    GetCategory: `${URL_API}/Category/get-category-by-id`,
-    PostIsMedia: `${URL_API}/Image/setPrimaryImage`,
     PostMedia: `${URL_API}/Image/changeImage`,
 
     // Brand
@@ -90,7 +91,6 @@ export const getCategoryAPI = (idpruduct) => {
 export const postProductAPI = async (productData) =>  {
     try {
         const response = await axiosS.post(`${END_POINT.AddProduct}`, productData);
-        console.log("ID Response:", productData); 
         return response;
     } catch (error) {
         console.error("POST Error:", error);
@@ -123,7 +123,6 @@ export const postMediaAPI = async (imageId,selectedProductId,  newImageLink) => 
 export const updateProductAPI = async (id,formData) =>  {
     try {
         const response = await axiosS.put(`${END_POINT.UpProduct}/${id}`, formData);
-        console.log("ID Response:", formData); 
         return response;
     } catch (error) {
         console.error("POST Error:", error);
