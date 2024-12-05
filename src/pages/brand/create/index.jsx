@@ -47,7 +47,7 @@ export default function BrandForm({
       formData.append("Picture", imageFile);
     }
     for (let pair of formData.entries()) {
-      console.log(pair[0]+ ': ' + pair[1]);
+      console.log(pair[0] + ': ' + pair[1]);
     }
     console.log("image file:", imageFile);
 
@@ -67,9 +67,9 @@ export default function BrandForm({
       initialValues={initialValues}
       validationSchema={Yup.object().shape({
         BrandName: Yup.string().required("Tên thương hiệu không được để trống")
-        .test('no-number', 'Tên thương hiệu không được chứa số', value => !/[0-9]/.test(value)),
+          .test('no-number', 'Tên thương hiệu không được chứa số', value => !/[0-9]/.test(value)),
         country: Yup.string().required("Xuất xứ không được để trống")
-        .test('no-number', 'Xuất xứ không được chứa số', value => !/[0-9]/.test(value)),
+          .test('no-number', 'Xuất xứ không được chứa số', value => !/[0-9]/.test(value)),
       })}
       onSubmit={handleSubmit}
       enableReinitialize={true}

@@ -77,6 +77,7 @@ export default function StaffPage() {
     const GetStall = async () => {
       try {
         const res = await getProductAPI(customersPerPage, currentPage);
+        console.log(res);
         if (Array.isArray(res.data)) {
           setItems(res.data);
         } else {
@@ -187,15 +188,14 @@ export default function StaffPage() {
       setCurrentPage(newPage);
     }
   };
+
+  let [pro, setPro] = useState({});
   const detaile = async (item) => {
     try {
-      console.log("id ", item.productName)
       const response = await getDetailproductAPI(item.id);
-      // const responsee = await getDeLoginAPI(id);
+      setPro(item);
       setDetailproduct(response);
       setSelectedProduct(item);
-      //  setLogin(responsee);
-      console.log("de: " + response);
       handleShow();
     } catch (error) {
       console.error("Lỗi khi tải thông tin chi tiết sản phẩm: ", error);
@@ -204,24 +204,10 @@ export default function StaffPage() {
   const CTNV = async (item) => {
     try {
       const response = await getProduct(item.id); // Lấy thông tin sản phẩm
-      const resolvedMedias = await getAllMediaAPI(item.id); // Lấy danh sách media
-      console.log("Resolved medias:", resolvedMedias);
 
-      setallMedias(resolvedMedias); // Cập nhật danh sách media vào state
-
-      const imagePromises = resolvedMedias.map((media) =>
-        getImageAPI(media.imagesId).then((image) => ({
-          mediaIds: media.imagesId,
-          imageUrl: image.link,
-          isPrimary: media.isPrimary,
-        }))
-      );
-
-      const resolvedImages = await Promise.all(imagePromises); // Đợi tất cả ảnh tải về
+      const resolvedImages = await getImageAPI(item.id)
       console.log("resolvedImages:", resolvedImages);
       setallImages(resolvedImages); // Lưu các hình ảnh vào state
-
-
       setProduct(response); // Cập nhật thông tin sản phẩm
       setSelectedProduct(item); // Lưu sản phẩm đã chọn
       handleOpenModal(); // Mở modal
@@ -353,11 +339,10 @@ export default function StaffPage() {
     };
     // Gửi tệp ảnh tới API
     const response = await postMesiaAPI(selectedProduct.id, newImageLink);
-    console.log("Response từ API:", response);
     const newImage = {
-      mediaIds: `new-${Date.now()}`,
-      imageUrl: URL.createObjectURL(newImageFile),
-      isPrimary: false,
+      id: response.data.id,
+      link: response.data.link,
+      isImage: false,
     };
     setallImages((prevImages) => [...prevImages, newImage]);
     alert("Ảnh mới đã được thêm thành công!");
@@ -559,28 +544,17 @@ export default function StaffPage() {
                 </thead>
                 <tbody>
                   {currentCustomers.map((item, stt) => {
-                    const productMedia = medias.filter((media) => media.productId === item.id);
                     const productBrans = brands.filter((bran) => bran.id === item.brandId);
                     const productCategorys = categories.filter((catego) => catego.id === item.categoryId);
                     return (
                       <tr key={item.id}>
                         <th scope="row">{indexOfFirstCustomer + stt + 1}</th>
                         <td>
-                          {productMedia.map((media, index) => {
-
-                            const productImage = images.find((image) => image.mediaId === media.imagesId);
-
-                            return (
-                              productImage && (
-                                <img
-                                  key={index}
-                                  src={productImage.imageUrl}
-                                  alt={`media-${item.id}`}
-                                  style={{ width: "50px", height: "50px", objectFit: "cover" }}
-                                />
-                              )
-                            );
-                          })}
+                          <img
+                            src={`https://localhost:7048/${item.imagePrimary}`}
+                            alt={`media-${item.id}`}
+                            style={{ width: "50px", height: "50px", objectFit: "cover" }}
+                          />
                         </td>
                         <td>{item.productName}</td>
                         <td>
@@ -670,33 +644,12 @@ export default function StaffPage() {
                                     <tr key={detail.id}>
                                       <th scope="row">{index + 1}</th>
                                       <td>
-                                        {mediaForProduct.map((media, mediaIndex) => {
-                                          const productImage = images.find(
-                                            (image) => image.mediaId === media.imagesId
-                                          );
-                                          // console.log("productImage: ", productImage);
-                                          return (
-                                            productImage && (
-                                              // <img
-                                              //   key={mediaIndex}
-                                              //   src={productImage.imageUrl}
-                                              //   alt={`media-${detail.id}`}
-                                              //   style={{
-                                              //     width: "50px",
-                                              //     height: "50px",
-                                              //     objectFit: "cover",
-                                              //   }}
-                                              // />
-                                              <img
-                                                key={mediaIndex
-                                                }
-                                                src={productImage.imageUrl}
-                                                alt={`media-${selectedProduct.id}`}
-                                                style={{ width: "50px", height: "50px", objectFit: "cover" }}
-                                              />
-                                            )
-                                          );
-                                        })}
+                                        <img
+                                          key={pro.id}
+                                          src={`https://localhost:7048/${pro.imagePrimary}`}
+                                          alt={`media-${pro.id}`}
+                                          style={{ width: "50px", height: "50px", objectFit: "cover" }}
+                                        />
                                       </td>
                                       <td>{selectedProduct.productName}</td>
                                       <td>{detail.size}</td>
@@ -726,6 +679,7 @@ export default function StaffPage() {
                       </button>
                     </Modal.Footer>
                   </Modal>
+
                   <Modal show={showDEModal} onHide={handleDEClose} size="xl">
                     <Modal.Header closeButton>
                       <Modal.Title>Sửa Thông Tin Chi Tiết Sản Phẩm : {selectedProduct?.productName}</Modal.Title>
@@ -949,20 +903,20 @@ export default function StaffPage() {
                                         />
                                       </div>
                                       {allimages.map((img) => (
-                                        <div key={img.mediaIds} className="image-item">
+                                        <div key={img.id} className="image-item">
                                           <img
-                                            src={img.imageUrl}
+                                            src={`https://localhost:7048/${img.link}`}
                                             alt="Product"
                                           />
                                           {/* Nút xóa */}
-                                          {!img.isPrimary && (
-                                            <button onClick={() => handleDeleteImage(img.mediaIds)} >
+                                          {!img.isImage && (
+                                            <button onClick={() => handleDeleteImage(img.id)} >
                                               X
                                             </button>
                                           )}
                                           {/* Nút đánh dấu là ảnh chính */}
-                                          {!img.isPrimary && (
-                                            <div onClick={() => handleSetPrimaryImage(img.mediaIds)} >
+                                          {!img.isImage && (
+                                            <div onClick={() => handleSetPrimaryImage(img.id)} >
                                               Chọn làm ảnh chính
                                             </div>
                                           )}

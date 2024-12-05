@@ -29,7 +29,7 @@ const NavRight = () => {
   const avatar = storedUserInfo?.image;
 
   const handleLogout = () => {
-    window.location.href = "/"; 
+    window.location.href = "/";
     // Xóa toàn bộ thông tin trong localStorage
     localStorage.clear();
     // Điều hướng về trang đăng nhập

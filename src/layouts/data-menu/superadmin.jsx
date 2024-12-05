@@ -35,10 +35,16 @@ const menuItems = {
         },
         {
           id: "brands",
-          title: "Thương hiệu",
+          title: "Thương hiệu & Màu",
           type: "collapse",
           icon: "feather icon-award",
           children: [
+            {
+              id: "color-list",
+              title: "Danh sách màu",
+              type: "item",
+              url: "/dashboard/page-color",
+            },
             {
               id: "brand-list",
               title: "Danh sách thương hiệu",

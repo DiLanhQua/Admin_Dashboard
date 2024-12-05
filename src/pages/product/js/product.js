@@ -28,7 +28,6 @@ const END_POINT = {
     DeleteMedia: `${URL_API}/Medias/delete-medias`,
     GetALLMedia: `${URL_API}/Medias/get-all-medias`,
     PostIsMedia: `${URL_API}/Medias /setPrimaryImage`,
-
     GetCategory: `${URL_API}/Category/get-category-by-id`,
 
     // Image

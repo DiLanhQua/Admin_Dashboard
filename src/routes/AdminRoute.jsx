@@ -35,6 +35,7 @@ import EditProduct from "../pages/product/update";
 import TagPage from "../pages/tags";
 import ShippingPage from "../pages/shippingConfig";
 import UserInfo from "../pages/profiles/UserInfo"
+import ColorPages from "../pages/color";
 
 
 
@@ -50,7 +51,9 @@ const AdminRoute = () => {
       <Route path="category" element={<CategoryPage />} />
       <Route path="category/create" element={<CategoryCreate />} />
       <Route path="category/update/:id" element={<CategoryEdit />} />
-      
+
+      <Route path="page-color" element={<ColorPages />} />
+
 
       <Route path="brand" element={<BrandPage />} />
 
