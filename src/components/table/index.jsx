@@ -151,7 +151,7 @@ const ReusableTable = ({
                   columns={columns}
                   handleEye={handleEye}
                   handleApprove={() => handleApprove(row.id)}  // Truyền row.id ở đây
-  handleReject={() => handleReject(row.id)} 
+                  handleReject={() => handleReject(row.id)}
                 />
               ))}
           </TableBody>

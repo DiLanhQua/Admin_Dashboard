@@ -1,7 +1,6 @@
 import axios from "axios";
-
 const instance = axios.create({
-    baseURL: import.meta.env.VITE_Media,
+    baseURL: import.meta.env.VITE_Order,
     timeout: 30000
 });
 instance.interceptors.response.use(
@@ -12,5 +11,4 @@ instance.interceptors.response.use(
         console.log(error);
     }
 );
-
 export default instance;

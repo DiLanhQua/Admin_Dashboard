@@ -5,6 +5,7 @@ import axiosImage from "./axiosImage";
 import axiosBrand from "./axiosBrand";
 import axiosColor from "./axiosColor";
 import axiosCategory from "./axiosCategory";
+import axiosOrder from "./axiosOrder";
 
 const URL_API = 'https://localhost:7048/api';
 
@@ -42,7 +43,21 @@ const END_POINT = {
     // Color
     GetAllColor: `${URL_API}/Color/get-all-color`,
     GetAllCategory: `${URL_API}/Category/get-all-category`,
+
+    // Order
+    getAllOrder : `${URL_API}/Order/get-all-order`,
+    updateStatusOrder : `${URL_API}/Order/UP-order`
 }
+
+//#region Order
+export const getAllOrder = () =>{
+    return axiosOrder.get(`${END_POINT.getAllOrder}`)
+}
+export const updateStatusOrder = (id,request) => {
+    return axiosOrder.put(`${END_POINT.updateStatusOrder}/${id}`,request)
+}
+//#endregion
+
 export const getProductAPI = (customersPerPage,currentPage) => {
     return axiosS.get(`${END_POINT.GetAllProduct}?maxPageSize=${customersPerPage}&Pagesize=${customersPerPage}&PageNumber=${currentPage}`)
 }
