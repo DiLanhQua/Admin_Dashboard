@@ -26,8 +26,6 @@ export default function CouponsList() {
   const fetchCoupons = async () => {
     try {
       const response = await axios.get("https://localhost:7048/api/Voucher/get-all-vouchers");
-
-      console.log("Dữ liệu API:", response.data);
       const responseData = response.data;
       if (!responseData || !responseData.data || !Array.isArray(responseData.data)) {
         throw new Error("Dữ liệu API không hợp lệ");
@@ -46,7 +44,7 @@ export default function CouponsList() {
         Max_Discount: item.max_Discount || 0,
         Status: item.status === 0 ? "Không hoạt động" : "Hoạt động",
       }));
-
+      console.log(data);
       setCoupons(data);
     } catch (error) {
       console.error("Lỗi khi tải dữ liệu:", error.message || error);
@@ -61,7 +59,7 @@ export default function CouponsList() {
   const handleEdit = useCallback(
     (voucher) => {
       navigate(`/dashboard/coupons/edit/${voucher.id}`, {
-        state: { voucher }, 
+        state: { voucher },
       });
     },
     [navigate]

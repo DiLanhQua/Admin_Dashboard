@@ -22,7 +22,6 @@ export const postStaffAPI = async (formData) =>  {
    
         try {
             const response = await axiosS.post(`${END_POINT.PostStaff}`, formData);
-          
             console.log("ID Response:", formData); 
             console.log("Full POST Response:", response); // Log toàn bộ phản hồi POST
             console.log("POST Response Data:", response.data); // Log thuộc tính data của phản hồi POST

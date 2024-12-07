@@ -26,7 +26,7 @@ export default function StaffPage() {
 
   const [searchTerm, setSearchTerm] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
-  const [customersPerPage, setCustomersPerPage] = useState(2);
+  const [customersPerPage, setCustomersPerPage] = useState(7);
   const [currentMax, setCurrentMax] = useState(200);
   const [open, setOpen] = useState(false);
 
@@ -65,17 +65,17 @@ export default function StaffPage() {
   };
 
 
-  const totalPages = Math.ceil(currentMax / customersPerPage); 
-  console.log("totalPages ",totalPages) ;// Tính tổng số trang
+  const totalPages = Math.ceil(currentMax / customersPerPage);
+  console.log("totalPages ", totalPages);// Tính tổng số trang
   const indexOfLastCustomer = currentPage * customersPerPage;
-  console.log("indexOfFirstCustomer ",indexOfLastCustomer);
+  console.log("indexOfFirstCustomer ", indexOfLastCustomer);
   const indexOfFirstCustomer = indexOfLastCustomer - customersPerPage;
 
-  console.log("indexOfFirstCustomer ",indexOfFirstCustomer);
+  console.log("indexOfFirstCustomer ", indexOfFirstCustomer);
   // Lọc ra dữ liệu của trang hiện tại
-  const currentCustomers = items.slice(indexOfFirstCustomer, indexOfLastCustomer);
+  const currentCustomers = items.filter((item) => item.role === 1).slice(indexOfFirstCustomer, indexOfLastCustomer);
 
-  console.log("currentCustomers ",currentCustomers);
+  console.log("currentCustomers ", currentCustomers);
 
   const handlePageChange = (newPage) => {
     if (newPage >= 1 && newPage <= totalPages) {
@@ -161,6 +161,7 @@ export default function StaffPage() {
                     </thead>
                     <tbody>
                       {currentCustomers?.map((item, stt) => (
+
                         <tr key={item.id}>
                           <th scope="row">{indexOfFirstCustomer + stt + 1}</th>
                           <td>{item.fullName}</td>
@@ -318,10 +319,8 @@ export default function StaffPage() {
                       </div>
                     </div>
                   </div>
-
                 </div>
               </div>
-
             </Card>
           </Col>
         </Row>

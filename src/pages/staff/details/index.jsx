@@ -25,45 +25,45 @@ import { fDateVN } from "../../../utils/format-time";
 export default function EyeStaff({ open, handleClose, selectedData }) {
   return (
     <div class="dialog">
-  <div class="dialog-content">
-    <div class="avatar-container">
-      <img src="selectedData?.Image || '/static/images/avatar/1.jpg'" alt="Profile Image" class="avatar"/>
-      <h3 class="name">selectedData?.FullName</h3>
-      <p class="role">Role: selectedData?.Role</p>
-    </div>
+      <div class="dialog-content">
+        <div class="avatar-container">
+          <img src="selectedData?.Image || '/static/images/avatar/1.jpg'" alt="Profile Image" class="avatar" />
+          <h3 class="name">selectedData?.FullName</h3>
+          <p class="role">Role: selectedData?.Role</p>
+        </div>
 
-    <div class="info-grid">
-      <div class="info-item">
-        <span class="icon">&#x1F4C5;</span>
-        <p>Id: selectedData?.Id</p>
-      </div>
-      <div class="info-item">
-        <span class="icon">&#x1F464;</span>
-        <p>UserName: selectedData?.UserName</p>
-      </div>
-      <div class="info-item">
-        <span class="icon">&#x2709;</span>
-        <p>Email: selectedData?.Email</p>
-      </div>
-      <div class="info-item">
-        <span class="icon">&#x1F4F1;</span>
-        <p>Phone: selectedData?.Phone</p>
-      </div>
-      <div class="info-item">
-        <span class="icon">&#x1F4CD;</span>
-        <p>Address: selectedData?.Address</p>
-      </div>
-      <div class="info-item">
-        <span class="icon">&#x1F4B0;</span>
-        <p>Role: selectedData?.Role</p>
-      </div>
-    </div>
+        <div class="info-grid">
+          <div class="info-item">
+            <span class="icon">&#x1F4C5;</span>
+            <p>Id: selectedData?.Id</p>
+          </div>
+          <div class="info-item">
+            <span class="icon">&#x1F464;</span>
+            <p>UserName: selectedData?.UserName</p>
+          </div>
+          <div class="info-item">
+            <span class="icon">&#x2709;</span>
+            <p>Email: selectedData?.Email</p>
+          </div>
+          <div class="info-item">
+            <span class="icon">&#x1F4F1;</span>
+            <p>Phone: selectedData?.Phone</p>
+          </div>
+          <div class="info-item">
+            <span class="icon">&#x1F4CD;</span>
+            <p>Address: selectedData?.Address</p>
+          </div>
+          <div class="info-item">
+            <span class="icon">&#x1F4B0;</span>
+            <p>Role: selectedData?.Role</p>
+          </div>
+        </div>
 
-    <div class="dialog-actions">
-      <button class="close-btn" onclick="handleClose()">Đóng</button>
+        <div class="dialog-actions">
+          <button class="close-btn" onclick="handleClose()">Đóng</button>
+        </div>
+      </div>
     </div>
-  </div>
-</div>
 
   );
 }

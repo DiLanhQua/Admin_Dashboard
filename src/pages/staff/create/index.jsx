@@ -8,7 +8,7 @@ import React, { useState } from "react";
 import { Card } from 'react-bootstrap';
 import MapPicker from '../Map/MapPicker';
 
-import {postStaffAPI} from "../js/AxiosStaff";
+import { postStaffAPI } from "../js/AxiosStaff";
 
 function AddStaff() {
   const [image, setImage] = useState(null);
@@ -21,7 +21,7 @@ function AddStaff() {
   const [role, setRole] = useState("");
   const [password, setPassword] = useState("");
   const [showMap, setShowMap] = useState(false);
-  const [isLoading, setIsLoading] = useState(false); 
+  const [isLoading, setIsLoading] = useState(false);
   const [selectedLocation, setSelectedLocation] = useState(null);
   const navigate = useNavigate();
   const dispatch = useDispatch();
@@ -78,28 +78,28 @@ function AddStaff() {
   //   helperText: formik.touched[name] && formik.errors[name],
   // });
   const validateForm = () => {
-    if (!fullName || !userName || !email || !phone || !address || !role || !password ) {
+    if (!fullName || !userName || !email || !phone || !address || !role || !password) {
       handleToast("error", "Vui lòng điền đầy đủ thông tin.", "top-right");
       return false;
     }
-  
+
     if (fullName.length <= 5 || /\d/.test(fullName)) {
       handleToast("error", "Họ và tên phải dài hơn 5 ký tự và không chứa số.", "top-right");
       return false;
     }
-  
-    const usernameRegex = /^[a-zA-Z0-9_]+$/; 
+
+    const usernameRegex = /^[a-zA-Z0-9_]+$/;
     if (!usernameRegex.test(userName)) {
       handleToast("error", "Tên người dùng không hợp lệ. Không được chứa dấu cách hoặc ký tự đặc biệt.", "top-right");
       return false;
     }
-  
+
     // const phoneRegex = /^0389\d{6,8}$/; 
     // if (!phoneRegex.test(phone)) {
     //   handleToast("error", "Số điện thoại không hợp lệ. Phải bắt đầu bằng 0389 và dài từ 10 đến 12 chữ số.", "top-right");
     //   return false;
     // }
-  
+
     if (password.length < 5) {
       handleToast("error", "Mật khẩu phải ít nhất 5 ký tự.", "top-right");
       return false;
@@ -107,7 +107,7 @@ function AddStaff() {
     setIsLoading(true);
     return true;
   };
-  
+
   const addnv = async (e) => {
     e.preventDefault();
     if (!validateForm()) return;
@@ -124,11 +124,11 @@ function AddStaff() {
     }
 
     try {
-      const response = await  postStaffAPI(formData);
-      handleToast("success", "Nhân viên đã được sửa thành công!", "top-right");
+      const response = await postStaffAPI(formData);
+      handleToast("success", "Nhân viên đã được thêm thành công!", "top-right");
       navigate("/dashboard/staff");
     } catch (error) {
-      handleToast("error", "Sửa nhân viên thất bại.", "top-right");
+      handleToast("error", "Thêm nhân viên thất bại.", "top-right");
     }
   };
   const handleImageChange = (e) => {
@@ -142,41 +142,41 @@ function AddStaff() {
     }
   };
 
- 
-const handleLocationSelect = async (location) => {
-  setSelectedLocation(location);
 
-  const address = await getAddressFromLatLng(location.lat, location.lng);
-  
-  if (address) {
-    setAddress(address); 
-  } else {
-    setAddress(`Vĩ độ: ${location.lat}, Kinh độ: ${location.lng}`); 
-  }
+  const handleLocationSelect = async (location) => {
+    setSelectedLocation(location);
 
-  setShowMap(false); 
-};
+    const address = await getAddressFromLatLng(location.lat, location.lng);
 
-const getAddressFromLatLng = async (lat, lng) => {
-  const url = `https://nominatim.openstreetmap.org/reverse?lat=${lat}&lon=${lng}&format=json`;
-
-  try {
-    const response = await fetch(url);
-    const data = await response.json();
-    
-    if (data.address) {
-      const fullAddress = `${data.address.road || ''}, ${data.address.city || ''}, ${data.address.country || ''}`;
-      console.log('Địa chỉ: ', fullAddress);
-      return fullAddress;
+    if (address) {
+      setAddress(address);
     } else {
-      console.error('Không tìm thấy địa chỉ');
+      setAddress(`Vĩ độ: ${location.lat}, Kinh độ: ${location.lng}`);
+    }
+
+    setShowMap(false);
+  };
+
+  const getAddressFromLatLng = async (lat, lng) => {
+    const url = `https://nominatim.openstreetmap.org/reverse?lat=${lat}&lon=${lng}&format=json`;
+
+    try {
+      const response = await fetch(url);
+      const data = await response.json();
+
+      if (data.address) {
+        const fullAddress = `${data.address.road || ''}, ${data.address.city || ''}, ${data.address.country || ''}`;
+        console.log('Địa chỉ: ', fullAddress);
+        return fullAddress;
+      } else {
+        console.error('Không tìm thấy địa chỉ');
+        return null;
+      }
+    } catch (error) {
+      console.error('Lỗi khi gọi API: ', error);
       return null;
     }
-  } catch (error) {
-    console.error('Lỗi khi gọi API: ', error);
-    return null;
-  }
-};
+  };
 
   const handleAddressChange = async (e) => {
     setAddress(e.target.value);
@@ -316,34 +316,34 @@ const getAddressFromLatLng = async (lat, lng) => {
                         required
                       >
                         <option value="" disabled hidden></option>
-                        <option value="1">Quản lý</option>
-                        <option value="2">Nhân viên</option>
-                        <option value="0">Khách Hàng</option>
+
+                        <option value="1">Nhân viên</option>
+
                       </select>
                       <label htmlFor="chucVu">Chức vụ</label>
                     </div>
                   </div>
 
                 </div>
-                
+
                 <div className="form-floating d-flex ">
-                    <input
-                      type="text"
-                      className="form-control"
-                        id="address"
-                      placeholder="Địa Chỉ"
-                      value={address}
-                      onChange={handleAddressChange} 
-                      required // Xử lý thay đổi địa chỉ từ người dùng
-                    />
+                  <input
+                    type="text"
+                    className="form-control"
+                    id="address"
+                    placeholder="Địa Chỉ"
+                    value={address}
+                    onChange={handleAddressChange}
+                    required // Xử lý thay đổi địa chỉ từ người dùng
+                  />
                   <label htmlFor="address">Địa Chỉ</label>
-                    <button
-                      type="button"
-                      className="btn btn-outline-secondary ms-2"
-                      onClick={() => setShowMap((prev) => !prev)}
-                    >
-                      <i className="fas fa-map-marker-alt"></i>
-                    </button>
+                  <button
+                    type="button"
+                    className="btn btn-outline-secondary ms-2"
+                    onClick={() => setShowMap((prev) => !prev)}
+                  >
+                    <i className="fas fa-map-marker-alt"></i>
+                  </button>
                 </div>
 
                 {/* Hiển thị Bản Đồ khi click */}
@@ -354,25 +354,18 @@ const getAddressFromLatLng = async (lat, lng) => {
                 )}
               </div>
               <div className="text-center">
-          <button type="submit" className="create-luu" 
-          disabled={isLoading || !fullName || !email || !phone || !address || !role || !password}
-        >
-          {isLoading ? <span ><i className="loading-icon">⏳</i>Đang tải</span> : "Thêm nhân viên"}
-          </button>
-        </div>
+                <button type="submit" className="create-luu"
+                  disabled={isLoading || !fullName || !email || !phone || !address || !role || !password}
+                >
+                  {isLoading ? <span ><i className="loading-icon ">⏳</i>Đang tải</span> : "Thêm nhân viên"}
+                </button>
+              </div>
             </Card>
-
-
-
           </div>
         </div>
-
-        
-
       </form>
 
     </div>
   );
 }
-
 export default AddStaff;

@@ -1,19 +1,19 @@
 import { useDispatch, useSelector } from "react-redux";
-import { useNavigate ,useParams} from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import { handleToast } from "../../../utils/toast";
 // import { createStaff, resetState } from "../../../redux/slices/staff";
-import React, { useState,useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import axios from 'axios';
 // import "../staff/css/staff.css";
 import { Card } from 'react-bootstrap';
 import MapPicker from '../Map/MapPicker';
 
-import {upStaffAPI, getDeStaffAPI} from "../js/AxiosStaff";
+import { upStaffAPI, getDeStaffAPI } from "../js/AxiosStaff";
 
 
 const EditStaff = () => {
   const [image, setImage] = useState(null);
-  const [imagePreview, setImagePreview] = useState(null); // Thêm state để lưu hình ảnh xem trước
+  const [imagePreview, setImagePreview] = useState(null);
   const [fullName, setFullName] = useState("");
   const [userName, setUserName] = useState("");
   const [email, setEmail] = useState("");
@@ -32,65 +32,61 @@ const EditStaff = () => {
 
   useEffect(() => {
     if (!id) {
-        console.log("ID không hợp lệ");
-        return;
+      console.log("ID không hợp lệ");
+      return;
     }
 
     const fetchData = async () => {
-        try {
-            const res = await getDeStaffAPI(id);
-            const nhanV = res;
-            console.log("id: " + res);  // Kiểm tra dữ liệu trả về từ API
-            // Cập nhật các state tương ứng khi dữ liệu nhân viên được lấy về
-            setFullName(nhanV.fullName);
-            setUserName(nhanV.userName);
-            setEmail(nhanV.email);
-            setPassword(nhanV.password);
-            setPhone(nhanV.phone);
-            setAddress(nhanV.address);
-            setRole(nhanV.role);
-            // Nếu có hình ảnh, hiển thị preview URL
-            if (nhanV.hinhanh) {
-                setPreviewUrl(URL.createObjectURL(nhanV.hinhanh));
-            }
-        } catch (err) {
-            console.log("Lỗi: ", err);
+      try {
+        const res = await getDeStaffAPI(id);
+        const nhanV = res;
+        console.log("id: " + res);  // Kiểm tra dữ liệu trả về từ API
+        // Cập nhật các state tương ứng khi dữ liệu nhân viên được lấy về
+        setFullName(nhanV.fullName);
+        setUserName(nhanV.userName);
+        setEmail(nhanV.email);
+        setPassword(nhanV.password);
+        setPhone(nhanV.phone);
+        setAddress(nhanV.address);
+        setRole(nhanV.role);
+        // Nếu có hình ảnh, hiển thị preview URL
+        if (nhanV.image) {
+          setImagePreview(nhanV.image);
         }
+      } catch (err) {
+        console.log("Lỗi: ", err);
+      }
     };
 
     fetchData();
-}, [id]);
+  }, [id]);
 
-const validateForm = () => {
-  if (!fullName || !userName || !email || !phone || !address || !role || !password ) {
-    handleToast("error", "Vui lòng điền đầy đủ thông tin.", "top-right");
-    return false;
-  }
+  const validateForm = () => {
+    if (!fullName || !userName || !email || !phone || !address || !role || !password) {
+      handleToast("error", "Vui lòng điền đầy đủ thông tin.", "top-right");
+      return false;
+    }
 
-  if (fullName.length <= 5 || /\d/.test(fullName)) {
-    handleToast("error", "Họ và tên phải dài hơn 5 ký tự và không chứa số.", "top-right");
-    return false;
-  }
+    if (fullName.length <= 5 || /\d/.test(fullName)) {
+      handleToast("error", "Họ và tên phải dài hơn 5 ký tự và không chứa số.", "top-right");
+      return false;
+    }
 
-  const usernameRegex = /^[a-zA-Z0-9_]+$/; 
-  if (!usernameRegex.test(userName)) {
-    handleToast("error", "Tên người dùng không hợp lệ. Không được chứa dấu cách hoặc ký tự đặc biệt.", "top-right");
-    return false;
-  }
+    const usernameRegex = /^[a-zA-Z0-9_]+$/;
+    if (!usernameRegex.test(userName)) {
+      handleToast("error", "Tên người dùng không hợp lệ. Không được chứa dấu cách hoặc ký tự đặc biệt.", "top-right");
+      return false;
+    }
 
-  const phoneRegex = /^0389\d{6,8}$/; 
-  if (!phoneRegex.test(phone)) {
-    handleToast("error", "Số điện thoại không hợp lệ. Phải bắt đầu bằng 0389 và dài từ 10 đến 12 chữ số.", "top-right");
-    return false;
-  }
 
-  if (password.length < 5) {
-    handleToast("error", "Mật khẩu phải ít nhất 5 ký tự.", "top-right");
-    return false;
-  }
 
-  return true;
-};
+    if (password.length < 5) {
+      handleToast("error", "Mật khẩu phải ít nhất 5 ký tự.", "top-right");
+      return false;
+    }
+
+    return true;
+  };
 
   const addnv = async (e) => {
     e.preventDefault();
@@ -117,50 +113,50 @@ const validateForm = () => {
     }
   };
   const handleImageChange = (e) => {
-    const file = e.target.files?.[0] || null;  
+    const file = e.target.files?.[0] || null;
     if (file) {
-      setImage(file); 
-      setImagePreview(URL.createObjectURL(file));  
+      setImage(file);
+      setImagePreview(URL.createObjectURL(file));
     } else {
-      setImage(null);  
-      setImagePreview(null);  
+      setImage(null);
+      setImagePreview(null);
     }
   };
 
-const handleLocationSelect = async (location) => {
-  setSelectedLocation(location);
+  const handleLocationSelect = async (location) => {
+    setSelectedLocation(location);
 
-  const address = await getAddressFromLatLng(location.lat, location.lng);
-  
-  if (address) {
-    setAddress(address); 
-  } else {
-    setAddress(`Vĩ độ: ${location.lat}, Kinh độ: ${location.lng}`); 
-  }
+    const address = await getAddressFromLatLng(location.lat, location.lng);
 
-  setShowMap(false); 
-};
-
-const getAddressFromLatLng = async (lat, lng) => {
-  const url = `https://nominatim.openstreetmap.org/reverse?lat=${lat}&lon=${lng}&format=json`;
-
-  try {
-    const response = await fetch(url);
-    const data = await response.json();
-    
-    if (data.address) {
-      const fullAddress = `${data.address.road || ''},  ${data.address.city || ''}, ${data.address.country || ''}`;
-      console.log('Địa chỉ: ', fullAddress);
-      return fullAddress;
+    if (address) {
+      setAddress(address);
     } else {
-      console.error('Không tìm thấy địa chỉ');
+      setAddress(`Vĩ độ: ${location.lat}, Kinh độ: ${location.lng}`);
+    }
+
+    setShowMap(false);
+  };
+
+  const getAddressFromLatLng = async (lat, lng) => {
+    const url = `https://nominatim.openstreetmap.org/reverse?lat=${lat}&lon=${lng}&format=json`;
+
+    try {
+      const response = await fetch(url);
+      const data = await response.json();
+
+      if (data.address) {
+        const fullAddress = `${data.address.road || ''},  ${data.address.city || ''}, ${data.address.country || ''}`;
+        console.log('Địa chỉ: ', fullAddress);
+        return fullAddress;
+      } else {
+        console.error('Không tìm thấy địa chỉ');
+        return null;
+      }
+    } catch (error) {
+      console.error('Lỗi khi gọi API: ', error);
       return null;
     }
-  } catch (error) {
-    console.error('Lỗi khi gọi API: ', error);
-    return null;
-  }
-};
+  };
 
 
 
@@ -180,7 +176,7 @@ const getAddressFromLatLng = async (lat, lng) => {
         console.error("Lỗi khi geocode địa chỉ:", error);
       }
     } else {
-      setSelectedLocation(null);  
+      setSelectedLocation(null);
     }
   };
   return (
@@ -302,8 +298,8 @@ const getAddressFromLatLng = async (lat, lng) => {
                         required
                       >
                         <option value="" disabled hidden></option>
-                        <option value="1">Quản lý</option>
-                        <option value="2">Nhân viên</option>
+                        <option value="2">Quản lý</option>
+                        <option value="1">Nhân viên</option>
                         <option value="0">Khách Hàng</option>
                       </select>
                       <label htmlFor="chucVu">Chức vụ</label>
@@ -311,25 +307,25 @@ const getAddressFromLatLng = async (lat, lng) => {
                   </div>
 
                 </div>
-                
+
                 <div className="form-floating d-flex ">
-                    <input
-                      type="text"
-                      className="form-control"
-                        id="address"
-                      placeholder="Địa Chỉ"
-                      value={address}
-                      onChange={handleAddressChange} 
-                      required 
-                    />
+                  <input
+                    type="text"
+                    className="form-control"
+                    id="address"
+                    placeholder="Địa Chỉ"
+                    value={address}
+                    onChange={handleAddressChange}
+                    required
+                  />
                   <label htmlFor="address">Địa Chỉ</label>
-                    <button
-                      type="button"
-                      className="btn btn-outline-secondary ms-2"
-                      onClick={() => setShowMap((prev) => !prev)}
-                    >
-                      <i className="fas fa-map-marker-alt"></i>
-                    </button>
+                  <button
+                    type="button"
+                    className="btn btn-outline-secondary ms-2"
+                    onClick={() => setShowMap((prev) => !prev)}
+                  >
+                    <i className="fas fa-map-marker-alt"></i>
+                  </button>
                 </div>
 
                 {showMap && (
@@ -339,23 +335,15 @@ const getAddressFromLatLng = async (lat, lng) => {
                 )}
               </div>
               <div className="text-center">
-          <button type="submit" className="create-luu">
-          Sửa nhân viên
-          </button>
-        </div>
+                <button type="submit" className="create-luu">
+                  Sửa nhân viên
+                </button>
+              </div>
             </Card>
-
-
-
           </div>
         </div>
-
-        
-
       </form>
-
     </div>
   );
 };
-
 export default EditStaff;
