@@ -2,8 +2,8 @@ import React, { useEffect, useState } from "react";
 import { Row, Col, Card, Button, Modal } from "react-bootstrap";
 import {
   getProductAPI, getMediaAPI, getImageAPI, getBrandAPI, deleteMesiaAPI, updateProductAPI, postMesiaAPI,
-  getDetailproductAPI, getAllMediaAPI, postIsMediaAPI, postMediaAPI, getdetailAPI, getAllColorAPI,
-  getCategoryAPI, getProduct, UPDE
+  getDetailproductAPI, postIsMediaAPI, postMediaAPI, getdetailAPI, getAllColorAPI, getProduct, UPDE,
+  getAllCategoryAPI, getAllBrandAPI
 } from "./js/product";
 import { useNavigate, Link } from "react-router-dom";
 import ControlPointIcon from "@mui/icons-material/ControlPoint";
@@ -93,9 +93,8 @@ export default function StaffPage() {
   useEffect(() => {
     const fetchBrand = async () => {
       try {
-        const brandPromises = items.map((item) => getBrandAPI(item.brandId));
-        const resolvedBrands = await Promise.all(brandPromises);
-        setBrands(resolvedBrands);
+        const brans = await getAllBrandAPI(1000, currentPage);
+        setBrands(brans.data);
       } catch (error) {
         console.error("Lỗi khi lấy media cho sản phẩm:", error);
       }
@@ -108,9 +107,8 @@ export default function StaffPage() {
   useEffect(() => {
     const fetchCategory = async () => {
       try {
-        const CategoryPromises = items.map((item) => getCategoryAPI(item.categoryId));
-        const resolvedBrands = await Promise.all(CategoryPromises);
-        setCategorys(resolvedBrands);
+        const categorys = await getAllCategoryAPI(customersPerPage, currentPage);
+        setCategorys(categorys.data);
       } catch (error) {
         console.error("Lỗi khi lấy media cho sản phẩm:", error);
       }

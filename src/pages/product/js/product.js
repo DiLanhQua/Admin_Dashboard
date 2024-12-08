@@ -28,8 +28,10 @@ const END_POINT = {
     DeleteMedia: `${URL_API}/Medias/delete-medias`,
     GetALLMedia: `${URL_API}/Medias/get-all-medias`,
     PostIsMedia: `${URL_API}/Medias /setPrimaryImage`,
-    GetCategory: `${URL_API}/Category/get-category-by-id`,
 
+    GetCategory: `${URL_API}/Category/get-category-by-id`,
+    GetAllCategory : `${URL_API}/Category/get-all-category?Pagesize=1000`,
+    
     // Image
     GetImage: `${URL_API}/Image/get-Image`,
     AddImage: `${URL_API}/Image/add-Image`,
@@ -41,7 +43,6 @@ const END_POINT = {
 
     // Color
     GetAllColor: `${URL_API}/Color/get-all-color`,
-    GetAllCategory: `${URL_API}/Category/get-all-category`,
 
     // Order
     getAllOrder : `${URL_API}/Order/get-all-order`,
@@ -98,7 +99,7 @@ export const getAllColorAPI = (customersPerPage,currentPage) => {
     return axiosColor.get(`${END_POINT.GetAllColor}?maxPageSize=${customersPerPage}&Pagesize=${customersPerPage}&PageNumber=${currentPage}`)
 }
 export const getAllCategoryAPI = (customersPerPage,currentPage) => {
-    return axiosCategory.get(`${END_POINT.GetAllCategory}?maxPageSize=${customersPerPage}&Pagesize=${customersPerPage}&PageNumber=${currentPage}`)
+    return axiosCategory.get(`${END_POINT.GetAllCategory}`)
 }
 export const getCategoryAPI = (idpruduct) => {
     return axiosCategory.get(`${END_POINT.GetCategory}/${idpruduct}`)}

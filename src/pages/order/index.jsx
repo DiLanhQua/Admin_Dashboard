@@ -20,7 +20,6 @@ export default function OrderPage() {
   ];
   const statusOptions = [
     { value: "pending", label: "Chờ xác nhận" },
-    { value: "processing", label: "Đang xử lý" },
     { value: "shipped", label: "Đang giao hàng" },
     { value: "completed", label: "Hoàn thành" },
     { value: "cancelled", label: "Đã hủy" },
