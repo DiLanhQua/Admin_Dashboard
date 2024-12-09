@@ -1,275 +1,219 @@
-/* eslint-disable no-useless-escape */
-import {
-  Grid,
-  Box,
-  Typography,
-  Paper,
-  Button,
-  Select,
-  MenuItem,
-  FormControl,
-  InputLabel,
-  FormHelperText,
-} from "@mui/material";
-import { useFormik } from "formik";
-import CustomInputField from "../../../components/InputField";
-import Textarea from "../../../components/textarea";
+import { useRef, useState } from 'react';
+import { Editor } from '@tinymce/tinymce-react';
+import { createBlog } from '../post-api/post-api';
 import { useNavigate } from "react-router-dom";
-import { handleToast } from "../../../utils/toast";
-import ImageUploader from "../../../components/upload";
-import { PostSchema } from "../validate";
-import { useDispatch, useSelector } from "react-redux";
-import { getCategory } from "../../../redux/slices/category";
-import { useEffect, useState } from "react";
-import { createPost, resetState } from "../../../redux/slices/post";
 
 function AddPost() {
-  const dispatch = useDispatch();
+  const editorRef = useRef(null);
   const navigate = useNavigate();
-  const [categoryOptions, setCategoryOptions] = useState([]);
-  const category = useSelector((state) => state.category.data);
-  const statusCategory = useSelector((state) => state.category.status);
-  useEffect(() => {
-    dispatch(getCategory());
-  }, [dispatch]);
+  const [images, setImages] = useState([]); // Danh sách ảnh với thuộc tính isPrimary
+  const MAX_IMAGES = 2; // Giới hạn số lượng ảnh
+  const [title, setTitle] = useState(""); // State cho ô input
+  const [editorContent, setEditorContent] = useState(""); // State cho nội dung TinyMCE
 
-  useEffect(() => {
-    if (statusCategory === "success") {
-      setCategoryOptions(
-        category.map((item) => ({
-          label: item.name,
-          value: item._id,
-        }))
-      );
-    } else if (statusCategory === "failed") {
-      console.log("Failed to fetch category");
+  const handleInputChange = (event) => {
+    setTitle(event.target.value); // Cập nhật giá trị input
+  };
+
+  const handleEditorChange = (content) => {
+    setEditorContent(content); // Cập nhật nội dung editor
+  };
+
+  const handleImageChange = (event) => {
+    const files = Array.from(event.target.files);
+    const newImages = [];
+
+    if (images.length + files.length > MAX_IMAGES) {
+      alert(`Chỉ được thêm tối đa ${MAX_IMAGES} hình ảnh.`);
+      return;
     }
-    dispatch(resetState({ key: "getcategoryStatus", value: "idle" }));
-  }, [statusCategory, category, dispatch]);
-  const formik = useFormik({
-    initialValues: {
-      postTitle: "",
-      slug: "",
-      thumbnail: "",
-      shortDescription: "",
-      seoKeyWords: "",
-      metaDescription: "",
-      shortSeoDescription: "",
-      content: "",
-      category: "",
-      status: "draft",
-    },
-    validationSchema: PostSchema,
-    validateOnChange: true,
-    validateOnBlur: true,
-    onSubmit: (values, { resetForm }) => {
-      dispatch(createPost(values)).then((res) => {
-        if (res.type === "post/createPost/fulfilled") {
-          handleToast("success", "Thêm bài viết thành công");
-          resetForm();
-          navigate("/dashboard/post");
-        } else {
-          handleToast("error", "Có lỗi xảy ra, vui lòng thử lại");
+
+    files.forEach((file) => {
+      const reader = new FileReader();
+      reader.onload = () => {
+        newImages.push({ url: reader.result, isPrimary: images.length === 0 && newImages.length === 0, });
+        if (newImages.length === files.length) {
+          setImages((prevImages) => [...prevImages, ...newImages]);
         }
-      });
-    },
-  });
-
-  const handleUploadComplete = (url) => {
-    formik.setFieldValue("thumbnail", url);
+      };
+      reader.readAsDataURL(file);
+    });
   };
 
-  const handleDelete = () => {
-    formik.setFieldValue("thumbnail", "");
+  const handleRemoveImage = (index) => {
+    const updatedImages = images.filter((_, i) => i !== index);
+    setImages(updatedImages);
+    // Nếu ảnh bị xóa là ảnh chính, đặt ảnh chính mới nếu có
+    if (images[index]?.isPrimary && updatedImages.length > 0) {
+      updatedImages[0].isPrimary = true;
+    }
   };
 
-  const getErrorProps = (name) => ({
-    error: formik.touched[name] && Boolean(formik.errors[name]),
-    helperText: formik.touched[name] && formik.errors[name],
-  });
-  const handleTitleChange = (e) => {
-    const title = e.target.value;
-    formik.setFieldValue("postTitle", title);
-    // Convert the title to slug
-    const slug = title
-      .toLowerCase()
-      .replace(/\s+/g, "-")
-      .replace(/[^a-z0-9\-]/g, "");
-    formik.setFieldValue("slug", slug);
+  const handleSetMainImage = (index) => {
+    setImages((prevImages) =>
+      prevImages.map((image, i) => ({
+        ...image,
+        isPrimary: i === index, // Đặt isPrimary = true nếu là ảnh chính
+      }))
+    );
   };
+
+  const validateForm = () => {
+    if (!title || !editorContent) {
+      alert("Vui lý nhập đầy đủ thống tin");
+      return false;
+    }
+    if (images.length === 0) {
+      alert("Vui lý chọn hình ảnh bìa");
+      return false;
+    }
+    return true;
+  }
+  const submitForm = async () => {
+    const user = JSON.parse(localStorage.getItem("userInfo"));
+    if (!validateForm()) {
+      return;
+    }
+    const data = {
+      headLine: title,
+      content: editorContent,
+      accountId: user.id,
+      images: images
+    }
+    try {
+      const response = await createBlog(data);
+      if (response) {
+        alert("Thêm bài viet thanh cong");
+        navigate("/dashboard/post");
+      }
+    }
+    catch (err) {
+      alert('Thêm bài viết thất bại')
+      console.log(err);
+    }
+  }
   return (
-    <form onSubmit={formik.handleSubmit}>
-      <Box p={3}>
-        <Grid container spacing={3}>
-          {/* Thumbnail Upload Section */}
-          <Grid item xs={12} md={4}>
-            <Paper elevation={3} sx={{ padding: 2 }}>
-              <Box textAlign="center" mb={2}>
-                <Typography variant="h6">Ảnh bìa bài viết</Typography>
-                <Box>
-                  <ImageUploader
-                    onUploadComplete={handleUploadComplete}
-                    onDelete={handleDelete}
-                    avatarSize={100}
-                    {...getErrorProps("thumbnail")}
-                    onBlur={formik.handleBlur}
-                    fooder="post" // You can make it dynamic if needed
-                  />
-                </Box>
-              </Box>
-            </Paper>
-          </Grid>
-          {/* Post Information Section */}
-          <Grid item xs={12} md={8}>
-            <Paper elevation={3} sx={{ padding: 2 }}>
-              <Grid container spacing={2}>
-                <Grid item xs={12} md={6}>
-                  <CustomInputField
-                    label="Tiêu đề bài viết"
-                    name="postTitle"
-                    value={formik.values.postTitle}
-                    onChange={handleTitleChange} // Use the new function
-                    {...getErrorProps("postTitle")}
-                    error={
-                      formik.touched.postTitle &&
-                      Boolean(formik.errors.postTitle)
-                    }
-                    helperText={
-                      formik.touched.postTitle && formik.errors.postTitle
-                    }
-                  />
-                </Grid>
-                <Grid item xs={12} md={6}>
-                  <CustomInputField
-                    label="Slug"
-                    name="slug"
-                    value={formik.values.slug}
-                    onChange={formik.handleChange}
-                    {...getErrorProps("slug")}
-                    placeholder="Slug will be generated"
-                    disabled
-                    error={formik.touched.slug && Boolean(formik.errors.slug)}
-                    helperText={formik.touched.slug && formik.errors.slug}
-                  />
-                </Grid>
+    <div className="bg-light rounded h-100 p-4 page-header bg-white">
+      <div className="">
+        <div className="dialog-tabs">
+          <button
+            className={`tab-btn active`}
+          >
+            HÌNH ẢNH BÀI VIẾT
+          </button>
+        </div>
 
-                <Grid item xs={12} md={6}>
-                  <FormControl fullWidth>
-                    <InputLabel>Danh mục</InputLabel>
-                    <Select
-                      label="Danh mục"
-                      name="category"
-                      value={formik.values.category}
-                      onChange={formik.handleChange}
-                      error={
-                        formik.touched.category &&
-                        Boolean(formik.errors.category)
-                      }
-                      onBlur={formik.handleBlur}
-                    >
-                      {categoryOptions.map((option) => (
-                        <MenuItem key={option.value} value={option.value}>
-                          {option.label}
-                        </MenuItem>
-                      ))}
-                    </Select>
-                    {formik.touched.category && formik.errors.category && (
-                      <FormHelperText error>
-                        {formik.errors.category}
-                      </FormHelperText>
-                    )}
-                  </FormControl>
-                </Grid>
-                <Grid item xs={12} md={6}>
-                  <CustomInputField
-                    label="Từ khóa SEO"
-                    name="seoKeyWords"
-                    value={formik.values.seoKeyWords}
-                    onChange={formik.handleChange}
-                    {...getErrorProps("seoKeywords")}
-                    error={
-                      formik.touched.seoKeyWords &&
-                      Boolean(formik.errors.seoKeyWords)
-                    }
-                    helperText={
-                      formik.touched.seoKeyWords && formik.errors.seoKeyWords
-                    }
-                  />
-                </Grid>
-                <Grid item xs={12} md={6}>
-                  <CustomInputField
-                    label="Mô tả SEO"
-                    name="metaDescription"
-                    value={formik.values.metaDescription}
-                    onChange={formik.handleChange}
-                    {...getErrorProps("metaDescription")}
-                    error={
-                      formik.touched.metaDescription &&
-                      Boolean(formik.errors.metaDescription)
-                    }
-                    helperText={
-                      formik.touched.metaDescription &&
-                      formik.errors.metaDescription
-                    }
-                  />
-                </Grid>
-                <Grid item xs={12}>
-                  <Textarea
-                    label="Mô tả ngắn"
-                    name="shortDescription"
-                    value={formik.values.shortDescription || ""}
-                    onChange={formik.handleChange}
-                    error={
-                      formik.touched.shortDescription &&
-                      Boolean(formik.errors.shortDescription)
-                    }
-                    helperText={
-                      formik.touched.shortDescription &&
-                      formik.errors.shortDescription
-                    }
-                    height={250}
-                  />
-                </Grid>
-                <Grid item xs={12}>
-                  <Textarea
-                    label="Nội dung bài viết"
-                    name="content"
-                    value={formik.values.content || ""}
-                    onChange={formik.handleChange}
-                    error={
-                      formik.touched.content && Boolean(formik.errors.content)
-                    }
-                    helperText={formik.touched.content && formik.errors.content}
-                    height={300}
-                  />
-                </Grid>
-              </Grid>
+        <div className="image-previews mt-2">
+          {/* Input để chọn hình ảnh */}
+          {images.length < MAX_IMAGES && (
+            <div className="image-preview">
+              <label htmlFor="image" className="image-label">
+                <div className="image-placeholder">
+                  <i className="fas fa-camera"></i>
+                  <span className="image-tx">Chọn hình ảnh bìa</span>
+                </div>
+              </label>
+              <input
+                type="file"
+                id="image"
+                accept="image/*"
+                multiple
+                style={{ display: "none" }}
+                onChange={handleImageChange}
+              />
+            </div>
+          )}
 
-              {/* Submit and Cancel Buttons */}
-              <Box mt={3} textAlign="right">
-                <Button
-                  variant="contained"
-                  type="submit"
-                  color="success"
-                  aria-label="Add Post"
+          {/* Hiển thị các ảnh preview */}
+          {images.map((image, index) => (
+            <div className="image-preview" key={index}>
+              <img src={image.url} alt={`Preview ${index + 1}`} className="img-fluid" />
+              <div>
+                <div
+                  className={`btn-set-primary`}
+                  onClick={() => handleSetMainImage(index)}
                 >
-                  Thêm bài viết
-                </Button>
-                <Button
-                  variant="contained"
-                  color="error"
-                  onClick={() => navigate("/dashboard/post")}
-                  style={{ marginLeft: 10 }}
-                  aria-label="Cancel"
-                >
-                  Hủy
-                </Button>
-              </Box>
-            </Paper>
-          </Grid>
-        </Grid>
-      </Box>
-    </form>
+                  {image.isPrimary ? "Ảnh bìa" : "Đặt làm ảnh bìa"}
+                </div>
+
+                {image.isPrimary == false && (
+                  <a className="ima" onClick={() => handleRemoveImage(index)}>
+                    X
+                  </a>
+                )}
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      <div className="mt-3">
+        <div className="dialog-tabs">
+          <button
+            className={`tab-btn active`}
+          >
+            THÔNG TIN BÀI VIẾT
+          </button>
+        </div>
+
+        <form >
+          {/* ============== Thông tin sản phẩm ============== */}
+          <div className="col-md-12" style={{ marginTop: "20px" }}>
+            <div className="">
+              <div className="row">
+                <div className="col-md-12">
+                  <div className="form-floating custom-floating-label">
+                    <input
+                      type="text"
+                      className="form-control"
+                      id="description"
+                      value={title} // Liên kết với state
+                      onChange={handleInputChange} // Cập nhật state khi thay đổi
+                    />
+                    <label htmlFor="categoryId">Tiêu đề </label>
+                  </div>
+                </div>
+              </div>
+              <div className="row">
+                <div className="form-floating">
+                  <Editor
+                    apiKey='7tl9v670y6tk99ky8gryopwvrpw9re1h6tsvs5wauxsr8gmn'
+                    init={{
+                      plugins: [
+                        // Core editing features
+                        'anchor', 'autolink', 'charmap', 'codesample', 'emoticons', 'image', 'link', 'lists', 'media', 'searchreplace', 'table', 'visualblocks', 'wordcount',
+                        // Your account includes a free trial of TinyMCE premium features
+                        // Try the most popular premium features until Dec 22, 2024:
+                        'checklist', 'mediaembed', 'casechange', 'export', 'formatpainter', 'pageembed', 'a11ychecker', 'tinymcespellchecker', 'permanentpen', 'powerpaste', 'advtable', 'advcode', 'editimage', 'advtemplate', 'ai', 'mentions', 'tinycomments', 'tableofcontents', 'footnotes', 'mergetags', 'autocorrect', 'typography', 'inlinecss', 'markdown',
+                        // Early access to document converters
+                        'importword', 'exportword', 'exportpdf'
+                      ],
+                      toolbar: 'undo redo | blocks fontfamily fontsize | bold italic underline strikethrough | link image media table mergetags | addcomment showcomments | spellcheckdialog a11ycheck typography | align lineheight | checklist numlist bullist indent outdent | emoticons charmap | removeformat',
+                      tinycomments_mode: 'embedded',
+                      tinycomments_author: 'Author name',
+                      mergetags_list: [
+                        { value: 'First.Name', title: 'First Name' },
+                        { value: 'Email', title: 'Email' },
+                      ],
+                      ai_request: (request, respondWith) => respondWith.string(() => Promise.reject('See docs to implement AI Assistant')),
+                    }}
+                    initialValue="Welcome to TinyMCE!"
+                    onEditorChange={handleEditorChange}
+                  />
+                </div>
+              </div>
+            </div>
+          </div>
+          {/* ============== Thông tin sản phẩm ============== */}
+        </form>
+      </div>
+
+      <div className="border-t pt-4 mt-5 d-flex justify-content-end">
+        <button className="create-luu" onClick={submitForm}>
+          Thêm bài viết mới
+        </button>
+      </div>
+    </div>
   );
 }
 

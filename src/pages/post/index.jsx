@@ -1,113 +1,127 @@
-import EyePost from "./details";
-import { useNavigate } from "react-router-dom";
-import ReusableTablePost from "./table";
 import { useCallback, useEffect, useState } from "react";
-import { useDispatch, useSelector } from "react-redux";
-import { deletePost, getAll, resetState } from "../../redux/slices/post";
-import { fDateVN } from "../../utils/format-time";
-import { DeleteConfirmationModal, handleToast } from "../../utils/toast";
-
-const columns = [
-  { label: "Tác giả", field: "name" },
-  { label: "Tiêu đề bài viết", field: "post_title" },
-  { label: "Mô tả ngắn", field: "postShortDescription" },
-  { label: "Từ khóa SEO", field: "seoKeywords" },
-  { label: "Ngày đăng ", field: "dateStart" },
-];
+import { Row, Col, Button } from "react-bootstrap";
+import ControlPointIcon from "@mui/icons-material/ControlPoint";
+import { IconButton } from "@mui/material";
+import { Edit, Delete } from "@mui/icons-material";
+import { Link } from "react-router-dom";
+import { getBlog, deleteBlogApi } from "./post-api/post-api";
 
 export default function PostList() {
-  const dispatch = useDispatch();
-  const [open, setOpen] = useState(false);
-  const [selectedData, setSelectedData] = useState(null);
-  const navigate = useNavigate();
   const [data, setData] = useState([]);
-
-  const handleEdit = (id) => {
-    const postId = id.id;
-    navigate(`/dashboard/post/edit/${postId}`);
-  };
-  const handleDelete = useCallback(
-    (index) => {
-      DeleteConfirmationModal({
-        title: "Xác nhận xóa Bài đăng",
-        content: "Bạn có chắc chắn muốn xóa bài đăng này?",
-        okText: "Xóa",
-        cancelText: "Hủy",
-        icon: "warning",
-        confirmButtonText: "Xóa",
-        onConfirm: () => dispatch(deletePost(index.id)),
-      });
-    },
-    [dispatch]
-  );
-
-  const handleEye = (index) => {
-    setSelectedData(index);
-    setOpen(true);
-  };
-
-  const handleClose = () => {
-    setOpen(false);
-  };
-  const status = useSelector((state) => state.post.getAllStatus);
-  const initialData = useSelector((state) => state.post.posts);
-  const deleteStatus = useSelector((state) => state.post.deleteStatus);
-
-  useEffect(() => {
-    dispatch(getAll());
-  }, [dispatch]);
-
-  useEffect(() => {
-    if (status === "success") {
-      setData(
-        initialData.map((item) => ({
-          id: item._id,
-          name: item.author.name,
-          post_title: item.postTitle,
-          postShortDescription: item.shortDescription,
-          seoKeywords: item.seoKeyWords,
-          rating: item.rating,
-          content: item.content,
-          dateStart: fDateVN(item.createdAt),
-          slug: item.slug,
-          metaDescription: item?.metaDescription,
-          thumbnail: item?.thumbnail,
-          statustPost: item.status,
-          category: item.category?.name,
-        }))
-      );
-
-      dispatch(resetState({ key: "getAllStatus", value: "idle" }));
+  const getAllBlog = async () => {
+    try {
+      const response = await getBlog();
+      setData(response);
+    } catch (error) {
+      console.log(error);
     }
-  }, [dispatch, status, initialData]);
+  };
 
   useEffect(() => {
-    if (deleteStatus === "success") {
-      dispatch(getAll());
-      dispatch(resetState({ key: "deleteStatus", value: "idle" }));
-      handleToast("success", "Xóa bài viết thành công");
+    getAllBlog();
+  }, []);
+
+  const deleteBlog = async (id) => {
+    try {
+      const response = await deleteBlogApi(id);
+      if (response) {
+        alert("Xóa bài viết thành công");
+        getAllBlog();
+      }
     }
-  }, [dispatch, deleteStatus]);
+    catch (error) {
+      console.log(error);
+    }
+  }
 
   return (
     <>
-      <ReusableTablePost
-        data={data}
-        columns={columns}
-        handleEdit={handleEdit}
-        handleDelete={handleDelete}
-        handleEye={handleEye}
-        navigate={"/dashboard/post/create"}
-      />
-      {selectedData && (
-        <EyePost
-          open={open}
-          handleClose={handleClose}
-          selectedData={selectedData}
-          handleDelete={handleDelete}
-          handleEdit={handleEdit}
-        />
-      )}
+      <Row>
+        <Col sm={12}>
+          <div className="bg-light rounded text-center h-100 p-4 page-header bg-white">
+            <div className="d-flex align-items-center justify-content-between mb-4">
+              <div className="form-floating">
+                <input
+                  type="text"
+                  className="form-control"
+                  id="search"
+                  placeholder="Tìm kiếm"
+                />
+                <label htmlFor="search">Tìm kiếm</label>
+              </div>
+              {/* <a href="/dashboard/staff/create" className="create-stall">
+                  Thêm mới
+                </a> */}
+              <Link to={"/dashboard/post/create"}>
+                <Button
+                  variant="primary"
+                  className="custom-button"
+                  sx={{ mr: 2 }}
+                >
+                  <ControlPointIcon sx={{ marginRight: 1 }} />
+                  Thêm mới
+                </Button>
+              </Link>
+            </div>
+            <div className="table-responsive">
+              <table className="table">
+                <thead>
+                  <tr>
+                    <th scope="col">#</th>
+                    <th scope="col">Hình ảnh</th>
+                    <th scope="col">Tiêu đề</th>
+                    <th scope="col">Người đăng</th>
+                    <th scope="col">Ngày đăng</th>
+                    <th scope="col">Thao tác</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {data.map((item, index) => (
+                    <tr>
+                      <th>
+                        {index + 1}
+                      </th>
+                      <th>
+                        <img
+                          src={`https://localhost:7048/${item.image}`}
+                          alt={`media-${item.id}`}
+                          style={{ width: "50px", height: "50px", objectFit: "cover" }}
+                        />
+                      </th>
+                      <th>
+                        {item.headLine}
+                      </th>
+                      <th>
+                        {item.fullName}
+                      </th>
+                      <th>
+                        {item.datePush}
+                      </th>
+                      <th>
+                        <Link to={`/dashboard/post/edit/${item.id}`}>
+                          <IconButton
+                            color="primary"
+                            sx={{ padding: "4px" }} // Reduced padding for action buttons
+                          >
+                            <Edit />
+                          </IconButton>
+                        </Link>
+
+                        <IconButton
+                          onClick={() => deleteBlog(item.id)}
+                          sx={{ color: "red", padding: "4px" }} // Reduced padding for action buttons
+                        >
+                          <Delete />
+                        </IconButton>
+                      </th>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </Col>
+      </Row>
     </>
   );
 }

@@ -18,9 +18,9 @@ const Item = styled(Paper)(({ theme }) => ({
 function CategoryPage() {
   const navigate = useNavigate();
   const [categories, setCategories] = useState([]);
-  const [maxPageSize, setMaxPageSize] = useState(100); 
-  const [rowsPerPage, setRowsPerPage] = useState(100); 
-  const [page, setPage] = useState(0); 
+  const [maxPageSize, setMaxPageSize] = useState(100);
+  const [rowsPerPage, setRowsPerPage] = useState(100);
+  const [page, setPage] = useState(0);
 
   const columns = [
     { label: "Tên danh mục", field: "CategoryName" },

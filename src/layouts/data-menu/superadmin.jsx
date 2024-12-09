@@ -72,13 +72,6 @@ const menuItems = {
               type: "item",
               url: "/dashboard/product/create",
             },
-
-            {
-              id: "variant",
-              title: "Danh sách biến thể",
-              type: "item",
-              url: "/dashboard/product/variant",
-            },
           ],
         },
         {
@@ -204,16 +197,16 @@ const menuItems = {
           icon: "feather icon-file-text",
           children: [
             {
-              id: "add-blog",
-              title: "Thêm bài viết",
-              type: "item",
-              url: "/dashboard/post/create",
-            },
-            {
               id: "post-list",
               title: "Danh sách bài đăng",
               type: "item",
               url: "/dashboard/post",
+            },
+            {
+              id: "add-blog",
+              title: "Thêm bài viết",
+              type: "item",
+              url: "/dashboard/post/create",
             },
           ],
         },
