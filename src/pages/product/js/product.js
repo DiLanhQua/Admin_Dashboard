@@ -15,12 +15,14 @@ const END_POINT = {
     GetProduct : `${URL_API}/Products/get-product`,
     AddProduct: `${URL_API}/Products/add-product`,
     UpProduct:`${URL_API}/Products/UP-product`,
+    IsPrimary: `${URL_API}/Products/is-primary`,
 
     // DetailProduct
     GetDetailproduct : `${URL_API}/DetailProduct/get-detailproduct`,
     AddDetailproduct: `${URL_API}/DetailProduct/add-detailproduct`,
-    UPDetailproduct:`${URL_API}/DetailProduct/update-detailproduct-by-id`,
+    UPDetailproduct:`${URL_API}/DetailProduct/update-id`,
     Getdetail: `${URL_API}/DetailProduct/get-detail`,
+    CreateDetail : `${URL_API}/DetailProduct/create-id`,
 
     // Media
     GetMedia: `${URL_API}/Medias/get-medias`,
@@ -53,10 +55,18 @@ const END_POINT = {
 export const getAllOrder = () =>{
     return axiosOrder.get(`${END_POINT.getAllOrder}`)
 }
+
+export const createDetailProduct = (idProduct, request) => {
+    return axiosOrder.post(`${END_POINT.CreateDetail}/${idProduct}`,request)
+}
 export const updateStatusOrder = (id,request) => {
     return axiosOrder.put(`${END_POINT.updateStatusOrder}/${id}`,request)
 }
 //#endregion
+
+export const isPrimaryImageProduct = (idImage) => {
+    return axiosS.patch(`${END_POINT.IsPrimary}/${idImage}`)
+}
 
 export const getProductAPI = (customersPerPage,currentPage) => {
     return axiosS.get(`${END_POINT.GetAllProduct}?maxPageSize=${customersPerPage}&Pagesize=${customersPerPage}&PageNumber=${currentPage}`)
@@ -67,9 +77,9 @@ export const getProduct = (id) => {
 export const getdetailAPI = (id,productid) => {
     return axiosDE.get(`${END_POINT.Getdetail}?id=${id}&productid=${productid}`);
 }
-export const UPDE = async (id,selectedProductId, formData) => {
+export const UPDE = async (id, formData) => {
     try {
-      const response = await axiosDE.put(`${END_POINT.UPDetailproduct}?id=${id}&idproduct=${selectedProductId}`,formData);
+      const response = await axiosDE.put(`${END_POINT.UPDetailproduct}/${id}`,formData);
       console.log("Response ID:", response.data);
       return response;
     } catch (error) {

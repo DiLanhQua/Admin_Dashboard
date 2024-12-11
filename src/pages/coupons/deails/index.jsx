@@ -15,7 +15,6 @@ import { StatusChip } from "../../../components/StatusColor"; // Assuming you ha
 import "./details.scss";
 
 const EyeCoupons = ({ open, handleClose, selectedData }) => {
-  console.log(selectedData);
   //   const renderDiscount = () => {
   //     if (selectedData?.type === "fixed") {
   //       return selectedData.discount;
@@ -25,10 +24,12 @@ const EyeCoupons = ({ open, handleClose, selectedData }) => {
   //     return selectedData?.discount || "";
   //   };
   const renderDiscount = () => {
-    if (selectedData?.type === "fixed") {
-      return `${selectedData.discount} VND`;
-    } else if (selectedData?.type === "percent") {
-      return `${selectedData.discount}%`;
+    if (selectedData?.DiscountType === "Fixed") {
+      return `${selectedData.Discount
+        }.000VND`;
+    } else if (selectedData?.DiscountType === "Percentage") {
+      return `${selectedData.Discount
+        }%`;
     } else {
       return "No discount available";
     }
@@ -55,7 +56,7 @@ const EyeCoupons = ({ open, handleClose, selectedData }) => {
           >
             <span>Chiến dịch</span>
             <span>: </span>
-            {selectedData?.name}
+            {selectedData?.VoucherName}
           </Typography>
           <Typography
             variant="body1"
@@ -71,7 +72,7 @@ const EyeCoupons = ({ open, handleClose, selectedData }) => {
           {/* Loại giảm giá */}
           <Box className="discountCoupons">
             <Typography>
-              {selectedData?.type === "percent" ? "giảm" : "Giảm trực tiếp"}{" "}
+              {selectedData?.DiscountType === "Percentage" ? "Giảm" : "Giảm trực tiếp"}{" "}
               {renderDiscount()}
             </Typography>
           </Box>
@@ -89,7 +90,7 @@ const EyeCoupons = ({ open, handleClose, selectedData }) => {
             <DateRangeIcon sx={{ marginRight: 1 }} />
             <Typography>
               <span>Ngày bắt đầu: </span>
-              <span className="date">{selectedData?.startDate}</span>
+              <span className="date">{selectedData?.TimeStart}</span>
             </Typography>
           </Grid>
 
@@ -105,32 +106,21 @@ const EyeCoupons = ({ open, handleClose, selectedData }) => {
             <DateRangeIcon sx={{ marginRight: 1 }} />
             <Typography>
               <span>Ngày kết thúc: </span>
-              <span>{selectedData?.endDate}</span>
+              <span>{selectedData?.TimeEnd}</span>
             </Typography>
           </Grid>
           {/* Số lượng */}
           <Grid
             item
             xs={12}
-            sm={6}
+            sm={12}
             display="flex"
             alignItems="center"
             sx={{ borderBottom: "1px solid #ccc", paddingBottom: 1 }}
           >
-            <Typography>{`Số lượng: ${selectedData?.quantity}`}</Typography>
+            <Typography>{`Số lượng: ${selectedData?.Quantity}`}</Typography>
           </Grid>
 
-          {/* Số lượng đã dùng */}
-          <Grid
-            item
-            xs={12}
-            sm={6}
-            display="flex"
-            alignItems="center"
-            sx={{ borderBottom: "1px solid #ccc", paddingBottom: 1 }}
-          >
-            <Typography>{`Số lượng đã dùng: ${selectedData?.quantityUsed}`}</Typography>
-          </Grid>
           {/* Hiển thị thông tin bổ sung khi showMore là true */}
           {showMore && (
             <>
@@ -271,14 +261,6 @@ const EyeCoupons = ({ open, handleClose, selectedData }) => {
             </>
           )}
         </Grid>
-
-        <Button
-          onClick={() => setShowMore(!showMore)}
-          color="primary"
-          sx={{ mt: 2 }}
-        >
-          {showMore ? "Ẩn thông tin bổ sung" : "Hiển thị thêm thông tin"}
-        </Button>
       </DialogContent>
       <DialogActions>
         <Button onClick={handleClose} color="primary">

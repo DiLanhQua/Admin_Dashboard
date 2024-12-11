@@ -66,6 +66,8 @@ export default function CouponsList() {
   );
 
   const handleEye = (index) => {
+    console.log(index);
+
     setSelectedData(index);
     setOpen(true);
   };

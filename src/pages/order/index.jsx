@@ -39,6 +39,10 @@ export default function OrderPage() {
   }, []);
 
   const handleEdit = (data) => {
+    if (data.statusOrder == 4 || data.statusOrder == 5) {
+      alert("Không thể cập nhật đơn hàng này")
+      return;
+    }
     setOpen(true);
     setCurrentStatus(data.orderStatus);
     setOrder(data);

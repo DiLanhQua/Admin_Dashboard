@@ -3,7 +3,8 @@ import { Row, Col, Card, Button, Modal } from "react-bootstrap";
 import {
   getProductAPI, getMediaAPI, getImageAPI, getBrandAPI, deleteMesiaAPI, updateProductAPI, postMesiaAPI,
   getDetailproductAPI, postIsMediaAPI, postMediaAPI, getdetailAPI, getAllColorAPI, getProduct, UPDE,
-  getAllCategoryAPI, getAllBrandAPI
+  getAllCategoryAPI, getAllBrandAPI, isPrimaryImageProduct,
+  createDetailProduct
 } from "./js/product";
 import { useNavigate, Link } from "react-router-dom";
 import ControlPointIcon from "@mui/icons-material/ControlPoint";
@@ -204,7 +205,6 @@ export default function StaffPage() {
       const response = await getProduct(item.id); // Lấy thông tin sản phẩm
 
       const resolvedImages = await getImageAPI(item.id)
-      console.log("resolvedImages:", resolvedImages);
       setallImages(resolvedImages); // Lưu các hình ảnh vào state
       setProduct(response); // Cập nhật thông tin sản phẩm
       setSelectedProduct(item); // Lưu sản phẩm đã chọn
@@ -217,16 +217,12 @@ export default function StaffPage() {
 
   const CTSP = async (detail, id) => {
     try {
-      console.log("idsản phẩm: ", detail.id);
-      console.log("id: ", id);
       // Gọi API để lấy thông tin sản phẩm chi tiết
       const response = await getdetailAPI(detail.id, id);
 
       console.log("thông tin chi tiết sản phẩm: ", response);
       // Cập nhật dữ liệu sản phẩm vào state
       setSelectedDeProduct(response);
-
-      console.log("thông tin chi tiết: ", selectedDeProduct);
       // Mở modal để hiển thị thông tin sản phẩm
       handleDEShow();
       handleCloseModal();
@@ -258,11 +254,9 @@ export default function StaffPage() {
 
   const handleChangeImage = async (imageId, file) => {
     if (!file) return;
-
     try {
       // Chuyển đổi file gốc sang Base64
       const base64Link = await fileToBase64(file);
-
       // Tạo đối tượng dữ liệu cần gửi lên backend
       const newImageLink = {
         isPrimary: false,
@@ -287,17 +281,13 @@ export default function StaffPage() {
   // Hàm xử lý chọn ảnh chính
   const handleSetPrimaryImage = async (imageId) => {
     try {
-      const response = await postIsMediaAPI(selectedProduct.id, imageId);
-      // Cập nhật giao diện người dùng với ảnh chính mới
-      console.log(response);
-      const updatedImages = allimages.map((img) => {
-        if (img.mediaIds === imageId) {
-          return { ...img, isPrimary: true }; // Chọn ảnh làm chính
-        }
-        return { ...img, isPrimary: false }; // Các ảnh còn lại sẽ là phụ
-      });
+      const response = await isPrimaryImageProduct(imageId);
 
-      setallImages(updatedImages);
+      if (response) {
+        alert("Cập nhật ảnh chính thành công")
+        const resolvedImages = await getImageAPI(response.productId)
+        setallImages(resolvedImages); // Lưu các hình ảnh vào state
+      }
     } catch (error) {
       console.error('Error when setting primary image:', error);
     }
@@ -374,28 +364,18 @@ export default function StaffPage() {
   };
   const handleupde = async (e) => {
     e.preventDefault();
-
     if (!product) {
       alert("Dữ liệu sản phẩm không hợp lệ!");
       return;
     }
-    const formData = new FormData();
-    formData.append("size", selectedDeProduct.size);
-    formData.append("price", selectedDeProduct.price);
-    formData.append("quantity", selectedDeProduct.quantity);
-    formData.append("colorId", selectedDeProduct.colorId);
-    formData.append("gender", selectedDeProduct.gender);
-    formData.append("status", selectedDeProduct.status);
-
     try {
-      console.log("Response data:", formData);
-      const response = await UPDE(selectedDeProduct.id, selectedProduct.id, formData);
-      console.log("Response:", response.data);
-
-      if (response.ok) {
-        alert("Cập nhật thành công!");
-      } else {
-        alert("Cập nhật thất bại!");
+      const response = await UPDE(selectedDeProduct.id, selectedDeProduct);
+      if (response) {
+        alert("Cập nhật sản phẩm chi tiết thành công!");
+        setDEShowModal(false); // This will close the modal
+        handleShow();
+        const productsDetail = await getDetailproductAPI(selectedDeProduct.productId);
+        setDetailproduct(productsDetail);
       }
     } catch (error) {
       console.error("Lỗi khi lưu:", error);
@@ -415,6 +395,56 @@ export default function StaffPage() {
       [field]: value,
     }));
   };
+
+  //#region Thêm chi tiết đơn hàng
+  const [openCreate, setOpenCreate] = useState(false);
+  const [detaiProducts, setDetailProduct] = useState({
+    id: '',
+    size: '',
+    price: '',
+    quantity: '',
+    colorId: '',
+    gender: '',
+    status: '',
+  });
+
+  const closeCreate = () => {
+    setOpenCreate(false); // This will close the modal
+    handleShow();
+  }
+  const onChangeCreate = (field, value) => {
+    setDetailProduct(prevState => ({
+      ...prevState,  // Giữ lại các thuộc tính khác
+      [field]: value // Cập nhật giá trị của trường được chọn
+    }));
+  };
+
+  const handleCreateDetail = async () => {
+    try {
+      const reponse = await createDetailProduct(detailproducts[0].productId, detaiProducts);
+      if (reponse) {
+        alert("Thêm chi tiết đơn hàng thành công")
+        const productsDetail = await getDetailproductAPI(detailproducts[0].productId);
+        setDetailproduct(productsDetail);
+        closeCreate();
+        setDetailProduct({
+          id: '',
+          size: '',
+          price: '',
+          quantity: '',
+          colorId: '',
+          gender: '',
+          status: '',
+        });
+      }
+    }
+    catch (err) {
+      console.log(err);
+      alert("Thêm chi tiết sản phẩm thất bại");
+    }
+  }
+
+  //#endregion
 
   // Hàm render input sản phẩm
   const renderInput = (label, value, key) => (
@@ -618,15 +648,13 @@ export default function StaffPage() {
                               <thead>
                                 <tr>
                                   <th scope="col">#</th>
-                                  <th scope="col">Hình ảnh</th>
-                                  <th scope="col">Tên sản phẩm</th>
                                   <th scope="col">Kích thước</th>
                                   <th scope="col">Màu sắc</th>
                                   <th scope="col">Số lượng</th>
                                   <th scope="col">Giá</th>
                                   <th scope="col">Giới tính</th>
                                   <th scope="col">
-                                    <Button variant="primary" type="submit">
+                                    <Button variant="primary" onClick={() => setOpenCreate(true)}>
                                       Thêm
                                     </Button>
                                   </th>
@@ -641,20 +669,11 @@ export default function StaffPage() {
                                   return (
                                     <tr key={detail.id}>
                                       <th scope="row">{index + 1}</th>
-                                      <td>
-                                        <img
-                                          key={pro.id}
-                                          src={`https://localhost:7048/${pro.imagePrimary}`}
-                                          alt={`media-${pro.id}`}
-                                          style={{ width: "50px", height: "50px", objectFit: "cover" }}
-                                        />
-                                      </td>
-                                      <td>{selectedProduct.productName}</td>
-                                      <td>{detail.size}</td>
-                                      <td>{detail.colorId}</td>
+                                      <td>Size {detail.size}</td>
+                                      <td>{detail.color.nameColor}</td>
                                       <td>{detail.quantity}</td>
-                                      <td>{detail.price}</td>
-                                      <td>{detail.gender}</td>
+                                      <td>{detail.price.toLocaleString("vi-VN")}.000VND</td>
+                                      <td style={{ textTransform: "uppercase" }}>{detail.gender}</td>
                                       <td>
                                         <Button variant="primary" type="submit" onClick={() => CTSP(detail, selectedProduct.id)}>
                                           Sửa
@@ -675,6 +694,118 @@ export default function StaffPage() {
                       <button className="close-btn" onClick={handleClose}>
                         Đóng
                       </button>
+                    </Modal.Footer>
+                  </Modal>
+
+                  {/* Thêm chi tiết sản phẩm */}
+                  <Modal show={openCreate} onHide={closeCreate} size="xl">
+                    <Modal.Header closeButton>
+                      <Modal.Title>Thêm Thông Tin Chi Tiết Sản Phẩm</Modal.Title>
+                    </Modal.Header>
+                    <Modal.Body>
+                      <div className="container">
+                        <form>
+                          <div>
+                            <div className="variant-header">
+                              {/* Tiêu đề biến thể */}
+                            </div>
+                            <div className="row">
+                              <div className="col-md-6">
+                                <div className="form-floating custom-floating-label">
+                                  <select
+                                    className="form-select"
+                                    id="colorId"
+                                    value={detaiProducts.colorId}
+                                    onChange={(e) => onChangeCreate("colorId", e.target.value)}
+                                  >
+                                    <option value="">Chọn màu sắc</option>
+                                    {colors.map((item) => (
+                                      <option key={item.id} value={item.id}>
+                                        {item.nameColor}  {/* Hiển thị tên màu */}
+                                      </option>
+                                    ))}
+                                  </select>
+                                  <label htmlFor="colorId">Màu sắc</label>
+                                </div>
+
+                              </div>
+                              <div className="col-md-6">
+                                <div className="form-floating custom-floating-label">
+                                  <select
+                                    className="form-select"
+                                    id="gender"
+                                    value={detaiProducts.gender}
+                                    onChange={(e) => onChangeCreate("gender", e.target.value)}
+                                  >
+                                    <option value="" >Chọn giới tính</option>
+                                    <option value="male">Nam</option>
+                                    <option value="female">Nữ</option>
+                                    <option value="other">Khác</option>
+                                  </select>
+                                  <label htmlFor="gender">Giới tính</label>
+                                </div>
+                              </div>
+                            </div>
+                            {/* Size - select */}
+
+
+                            <div className="row">
+                              <div className="col-md-6">
+                                <div className="form-floating custom-floating-label">
+                                  <input
+                                    type="number"
+                                    className="form-control"
+                                    value={detaiProducts.quantity}
+                                    onChange={(e) => onChangeCreate("quantity", e.target.value)}
+                                  />
+                                  <label>Số lượng</label>
+                                </div>
+                              </div>
+
+                              <div className="col-md-6">
+                                <div className="form-floating custom-floating-label">
+                                  <input
+                                    type="number"
+                                    className="form-control"
+                                    value={detaiProducts.price}
+                                    onChange={(e) => onChangeCreate("price", e.target.value)}
+                                  />
+                                  <label>Giá bán</label>
+                                </div>
+                              </div>
+                            </div>
+                            <div className="col-md-12">
+                              <div className="form-floating custom-floating-label">
+                                <select
+                                  className="form-select"
+                                  id="size"
+                                  value={detaiProducts.size || ""}
+                                  onChange={(e) => onChangeCreate("size", e.target.value)}
+                                >
+                                  <option value="" >
+                                    Chọn kích thước
+                                  </option>
+                                  <option value="S">S</option>
+                                  <option value="X">X</option>
+                                  <option value="M">M</option>
+                                  <option value="L">L</option>
+                                  <option value="XL">XL</option>
+                                </select>
+                                <label htmlFor="size">Kích thước</label>
+                              </div>
+
+                            </div>
+                          </div>
+                        </form>
+                      </div>
+                    </Modal.Body>
+                    <Modal.Footer>
+                      <Button variant="secondary" onClick={closeCreate}>
+                        Đóng
+                      </Button>
+                      <Button variant="primary" onClick={handleCreateDetail}>
+                        Thêm chi tiết sản phẩm
+                      </Button>
                     </Modal.Footer>
                   </Modal>
 
@@ -778,6 +909,7 @@ export default function StaffPage() {
                                       Chọn kích thước
                                     </option>
                                     <option value="S">S</option>
+                                    <option value="X">X</option>
                                     <option value="M">M</option>
                                     <option value="L">L</option>
                                     <option value="XL">XL</option>
@@ -940,6 +1072,8 @@ export default function StaffPage() {
                       </Button>
                     </Modal.Footer>
                   </Modal>
+
+
                 </tbody>
               </table>
               <div className="row">
