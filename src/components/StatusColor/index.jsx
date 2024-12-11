@@ -26,7 +26,7 @@ StatusChip.propTypes = {
 
 export const StatusOrderChip = ({ status }) => {
   const { label, color } = statusOrder[status?.toLowerCase()] || {
-    label: "N/A",
+    label: "Đã hủy",
     color: "default",
   };
   return (

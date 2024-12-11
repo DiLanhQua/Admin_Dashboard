@@ -2,19 +2,19 @@ import { useState } from "react";
 import ReusableTable from "../../components/table";
 import EditStatusOrder from "./edit";
 import { getAllOrder, updateStatusOrder } from "../product/js/product";
+import DetailOrder from "./detail-order/detail-order";
+import { useNavigate } from "react-router-dom";
 
 export default function OrderPage() {
   const [open, setOpen] = useState(false);
   const [currentStatus, setCurrentStatus] = useState("");
   const [order, setOrder] = useState({});
-
   const [data, setData] = useState([]);
 
   const columns = [
     { label: "Mã đơn hàng", field: "orderCode" },
     { label: "Tên khách hàng", field: "name" },
     { label: "Ngày đặt hàng", field: "timeOrder" },
-    { label: "Tổng tiền", field: "total" },
     { label: "phương thức", field: "paymentMethod" },
     { label: "Trạng thái", field: "orderStatus" },
   ];
@@ -29,7 +29,6 @@ export default function OrderPage() {
     try {
       const data = await getAllOrder();
       setData(data.orders);
-      console.log(data.orders);
     }
     catch (error) {
       console.log(error);
@@ -44,6 +43,14 @@ export default function OrderPage() {
     setCurrentStatus(data.orderStatus);
     setOrder(data);
   };
+
+  const [openDetail, setOpenDetail] = useState(false);
+  const navigate = useNavigate(); // Khởi tạo navigate
+  const handleEye = (data) => {
+    setOpenDetail(true);
+    navigate(`/dashboard/order?orderId=${data.id}`);
+  };
+
   const handleDelete = (data) => {
     console.log(data);
   };
@@ -80,6 +87,7 @@ export default function OrderPage() {
         handleEdit={handleEdit}
         handleDelete={handleDelete}
         StatusOrder={statusOptions}
+        handleEye={handleEye}
       />
       <EditStatusOrder
         open={open}
@@ -88,6 +96,8 @@ export default function OrderPage() {
         onSubmit={handleSubmit}
         statusOptions={statusOptions}
       />
+
+      <DetailOrder open={openDetail} handleClose={() => { setOpenDetail(false); navigate('/dashboard/order') }} />
     </>
   );
 }
