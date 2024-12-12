@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { handleToast } from "../../../utils/toast";
 // import { createStaff, resetState } from "../../../redux/slices/staff";
 import React, { useState } from "react";
-// import axios from 'axios';
+import axios from 'axios';
 // import "../staff/css/staff.css";
 import { Card } from 'react-bootstrap';
 import MapPicker from '../Map/MapPicker';
@@ -18,7 +18,8 @@ function AddStaff() {
   const [email, setEmail] = useState("");
   const [phone, setPhone] = useState("");
   const [address, setAddress] = useState("");
-  const [role, setRole] = useState("");
+  const [role, setRole] = useState(1);
+  const [statu, setstatus] = useState(1)
   const [password, setPassword] = useState("");
   const [showMap, setShowMap] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
@@ -78,7 +79,7 @@ function AddStaff() {
   //   helperText: formik.touched[name] && formik.errors[name],
   // });
   const validateForm = () => {
-    if (!fullName || !userName || !email || !phone || !address || !role || !password) {
+    if (!fullName || !userName || !email || !phone || !address || !password) {
       handleToast("error", "Vui lòng điền đầy đủ thông tin.", "top-right");
       return false;
     }
@@ -99,11 +100,26 @@ function AddStaff() {
     //   handleToast("error", "Số điện thoại không hợp lệ. Phải bắt đầu bằng 0389 và dài từ 10 đến 12 chữ số.", "top-right");
     //   return false;
     // }
-
-    if (password.length < 5) {
-      handleToast("error", "Mật khẩu phải ít nhất 5 ký tự.", "top-right");
-      return false;
+    const phoneRegex = /^\d+$/;
+    if (!phoneRegex.test(phone)) {
+        handleToast("error", "Số điện thoại không hợp lệ. Chỉ được chứa số và không có dấu cách.", "top-right");
+        return false;
     }
+    if (phone.length < 10 || phone.length > 12) {
+        handleToast("error", "Số điện thoại không hợp lệ. Vui lòng điền đầy đủ số điện thoại.", "top-right");
+        return false;
+    }
+    
+    const passwordRegex = /^(?=.*[A-Z])(?=.*[a-z])(?=.*\d)[A-Za-z\d]{8,}$/;
+if (!passwordRegex.test(password)) {
+    handleToast(
+        "error",
+        "Mật khẩu phải có ít nhất 8 ký tự, bao gồm chữ hoa, chữ thường và chữ số.",
+        "top-right"
+    );
+    return false;
+}
+
     setIsLoading(true);
     return true;
   };
@@ -119,6 +135,7 @@ function AddStaff() {
     formData.append('phone', phone);
     formData.append('address', address);
     formData.append('role', role);
+    formData.append('status', statu);
     if (image) {
       formData.append('picture', image); // Gửi hình ảnh kèm theo
     }
@@ -307,26 +324,7 @@ function AddStaff() {
                     </div>
                   </div>
                   <div className="col-md-6">
-                    <div className="form-floating custom-floating-label">
-                      <select
-                        className="form-select"
-                        id="chucVu"
-                        value={role}
-                        onChange={(e) => setRole(e.target.value)}
-                        required
-                      >
-                        <option value="" disabled hidden></option>
-
-                        <option value="1">Nhân viên</option>
-
-                      </select>
-                      <label htmlFor="chucVu">Chức vụ</label>
-                    </div>
-                  </div>
-
-                </div>
-
-                <div className="form-floating d-flex ">
+                  <div className="form-floating d-flex ">
                   <input
                     type="text"
                     className="form-control"
@@ -345,6 +343,11 @@ function AddStaff() {
                     <i className="fas fa-map-marker-alt"></i>
                   </button>
                 </div>
+                  </div>
+
+                </div>
+
+               
 
                 {/* Hiển thị Bản Đồ khi click */}
                 {showMap && (

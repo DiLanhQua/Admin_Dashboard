@@ -14,6 +14,9 @@ import { styled } from "@mui/material/styles";
 import ForgotPassword from "../ForgotPassword/ForgotPassword";
 import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
+import { Html5QrcodeScanner } from 'html5-qrcode';
+
+import { Modal } from 'react-bootstrap';
 
 const Card = styled(MuiCard)(({ theme }) => ({
   display: "flex",
@@ -59,12 +62,14 @@ const SignInContainer = styled(Stack)(({ theme }) => ({
 }));
 
 export default function SignIn() {
-   const navigate = useNavigate();
+  const navigate = useNavigate();
   const [usernameError, setUsernameError] = React.useState(false);
   const [passwordError, setPasswordError] = React.useState(false);
   const [passwordErrorMessage, setPasswordErrorMessage] = React.useState("");
   const [open, setOpen] = React.useState(false);
-
+  const [scanResult] = React.useState(null);
+  const [modelopen, setModelOpen] = React.useState(false);
+  const [scannerVisible, setScannerVisible] = React.useState(false);
   const handleClickOpen = () => {
     setOpen(true);
   };
@@ -72,24 +77,77 @@ export default function SignIn() {
   const handleClose = () => {
     setOpen(false);
   };
+  const OpenClick = () => {
+    setModelOpen(true); setScannerVisible(true);
+  };
+
+  const CloseClick = () => {
+    setModelOpen(false); setScannerVisible(false);
+  };
+  React.useEffect(() => {
+    if(scannerVisible){
+    const scanner = new Html5QrcodeScanner("reader", {
+      qrbox: { width: 250, height: 250 },
+      fps: 5,
+      verbose: true,
+    });
+
+    const success = (result) => {
+      scanner.clear();
+      try {
+        const rawData = result.trim();
+        console.log("Dữ liệu QR quét được:", rawData);
+
+        const usernameMatch = rawData.match(/Username:\s*([\w]+)/);
+        const passwordMatch = rawData.match(/pass:\s*([\w]+)/);
+
+        const Username = usernameMatch ? usernameMatch[1] : null;
+        const pass = passwordMatch ? passwordMatch[1] : null;
+
+        if (Username && pass) {
+          document.getElementById("username").value = Username;
+          document.getElementById("password").value = pass;
+          CloseClick();
+          handleSubmit(new Event("submit"));
+        } else {
+          toast.error("Không tìm thấy username hoặc password trong mã QR.");
+        }
+      } catch (error) {
+        console.error("Lỗi xử lý dữ liệu QR:", error);
+        toast.error("Không thể phân tích dữ liệu từ mã QR.");
+      }
+    };
+
+    const error = (err) => {
+      console.warn("Lỗi quét mã QR:", err);
+    };
+
+    scanner.render(success, error);
+
+    return () => {
+      scanner.clear();
+    };
+  };
+  }, [scannerVisible]);
+
 
   const handleSubmit = async (event) => {
     event.preventDefault();
     if (!validateInputs()) return;
-  
+
     const data = {
       userName: document.getElementById("username").value,
       password: document.getElementById("password").value,
     };
-  
+
     try {
       const response = await axios.post("https://localhost:7048/api/Account/login", data);
       console.log("Đăng nhập thành công:", response.data);
       toast.success("Đăng nhập thành công");
-  
+
       // Lưu thông tin vào localStorage
       localStorage.setItem("userInfo", JSON.stringify(response.data.data));
-  
+
       // Điều hướng đến trang profile
       navigate("/dashboard");
     } catch (error) {
@@ -97,7 +155,6 @@ export default function SignIn() {
       alert("Đăng nhập thất bại!");
     }
   };
-  
 
   const validateInputs = () => {
     const username = document.getElementById("username");
@@ -130,6 +187,8 @@ export default function SignIn() {
       <SignInContainer direction="column">
         <BackgroundContainer />
         <Card variant="outlined">
+          <div className="row">
+            <div className="col-11">
           <Typography
             component="h1"
             variant="h4"
@@ -137,6 +196,38 @@ export default function SignIn() {
           >
             Đăng nhập
           </Typography>
+            </div>
+            <div className="col-1">
+            <Button
+                variant="outlined"
+                sx={{
+                  // position: 'absolute',
+                  // top: '10px',
+                  // marginRight: '10px',
+                  right: '20px',
+                  borderRadius: '50%',
+                  minWidth: '40px',
+                  minHeight: '40px',
+                  padding: 0,
+                }}
+              onClick={OpenClick}
+              >
+                <img src="https://img.icons8.com/ios-filled/50/000000/qr-code.png" alt="QR Code" width="30" height="30" />
+              </Button>
+              <Modal show={modelopen} onHide={CloseClick} size="lg">
+                              <Modal.Header closeButton>
+                                <Modal.Title>Quét Mã QR</Modal.Title>
+                              </Modal.Header>
+                              <Modal.Body >
+                              <div id="reader" style={{ marginTop: '20px' }}></div>
+                              {scanResult && <div>Thông tin quét: {scanResult}</div>}
+                              </Modal.Body>
+                            </Modal>
+            </div>
+          </div>
+
+          {/* <div id="reader" style={{ marginTop: '20px' }}></div>
+          {scanResult && <div>Thông tin quét: {scanResult}</div>} */}
           <Box
             component="form"
             onSubmit={handleSubmit}

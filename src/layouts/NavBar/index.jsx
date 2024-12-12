@@ -58,8 +58,8 @@ const NavBar = () => {
           <span />
         </Link>
         <Link to="#" className="b-brand">
-          <img id="main-logo" src={logo} alt="" className="logo" />
-        </Link>
+  <h3 style={{ color: 'white', marginTop: '20px' }}>COZAStore</h3>
+</Link>
         <Link
           to="#"
           className={moreClass.join(" ")}

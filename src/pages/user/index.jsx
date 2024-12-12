@@ -21,7 +21,7 @@ export default function UserPage() {
       });
 
       const { data, pageSize, pageNumber: currentPage, pageCount } = response.data;
-      const formattedData = data.map((item) => ({
+      const formattedData = data.filter((item) => item.role === 2).map((item) => ({
         id: item.id,
         UserName: item.userName,
         Email: item.email,

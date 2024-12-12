@@ -7,7 +7,7 @@ import { deleteStaff, getStaff, resetState } from "../../redux/slices/staff";
 import { DeleteConfirmationModal, handleToast } from "../../utils/toast";
 import { Row, Col, Card, Modal, Button } from 'react-bootstrap';
 // import axios from 'axios';
-import { getStaffAPI, getDeStaffAPI, getDeLoginAPI } from "./js/AxiosStaff";
+import {  getDeStaffAPI, getDeLoginAPI, getAPIStaff } from "./js/AxiosStaff";
 import "../staff/css/staff.css";
 import EyeStaff from './details/index';
 import ControlPointIcon from "@mui/icons-material/ControlPoint";
@@ -26,10 +26,10 @@ export default function StaffPage() {
 
   const [searchTerm, setSearchTerm] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
-  const [customersPerPage, setCustomersPerPage] = useState(7);
+  const [customersPerPage, setCustomersPerPage] = useState(5);
   const [currentMax, setCurrentMax] = useState(200);
   const [open, setOpen] = useState(false);
-
+  const [totalItems, setTotalItems] = useState(0); 
   const [showDetailModal, setShowDetailModal] = useState(false);
   const handleShow = () => setShowDetailModal(true);
   const handleClose = () => setShowDetailModal(false);
@@ -38,20 +38,34 @@ export default function StaffPage() {
   useEffect(() => {
     const GetStall = async () => {
       try {
-        const res = await getStaffAPI(currentMax, customersPerPage, currentPage);
-        console.log("DỮ LIỆU:", res.data);
-        if (Array.isArray(res.data)) {
-          setItems(res.data);
+        const res = await getAPIStaff(currentMax, customersPerPage, currentPage);
+        console.log("Dữ liệu trả về:", res);
+
+        if (res && res.data) {
+          setItems(res.data); // Lưu danh sách nhân viên vào state
+          setTotalItems(res.pageCount * customersPerPage);  // Cập nhật tổng số nhân viên
         } else {
           setItems([]);
         }
       } catch (er) {
-        console.error("Không thể xuất danh sách: ", er);
+        console.error("Không thể xuất danh sách:", er);
       }
     };
 
     GetStall();
   }, [currentMax, customersPerPage, currentPage]);
+  console.log("customersPerPage :", customersPerPage);
+  const totalPages = Math.ceil(totalItems / customersPerPage);  // Tính tổng số trang từ totalItems
+  console.log("Tổng số :", totalItems);
+  console.log("Tổng số trang:", totalPages);
+  const indexOfLastCustomer = currentPage * customersPerPage;
+  console.log("indexOfLastCustomer:", indexOfLastCustomer);
+  const indexOfFirstCustomer = indexOfLastCustomer - customersPerPage;
+  console.log("indexOfFirstCustomer:", indexOfFirstCustomer);
+
+  // Lọc ra dữ liệu của trang hiện tại
+  const currentCustomers = items.slice(indexOfFirstCustomer, indexOfLastCustomer);
+  console.log("Khách hàng trang hiện tại:", currentCustomers);
 
   const detaile = async (id) => {
     console.log("id ", id)
@@ -65,20 +79,20 @@ export default function StaffPage() {
   };
 
 
-  const totalPages = Math.ceil(currentMax / customersPerPage);
-  console.log("totalPages ", totalPages);// Tính tổng số trang
-  const indexOfLastCustomer = currentPage * customersPerPage;
-  console.log("indexOfFirstCustomer ", indexOfLastCustomer);
-  const indexOfFirstCustomer = indexOfLastCustomer - customersPerPage;
+  // const totalPages = Math.ceil(currentMax / customersPerPage);
+  // console.log("totalPages ", totalPages);// Tính tổng số trang
+  // const indexOfLastCustomer = currentPage * customersPerPage;
+  // console.log("indexOfFirstCustomer ", indexOfLastCustomer);
+  // const indexOfFirstCustomer = indexOfLastCustomer - customersPerPage;
 
-  console.log("indexOfFirstCustomer ", indexOfFirstCustomer);
-  // Lọc ra dữ liệu của trang hiện tại
-  const currentCustomers = items.filter((item) => item.role === 1).slice(indexOfFirstCustomer, indexOfLastCustomer);
+  // console.log("indexOfFirstCustomer ", indexOfFirstCustomer);
+  // // Lọc ra dữ liệu của trang hiện tại
+  // const currentCustomers = items.slice(indexOfFirstCustomer, indexOfLastCustomer);
 
-  console.log("currentCustomers ", currentCustomers);
+  // console.log("currentCustomers ", currentCustomers);
 
   const handlePageChange = (newPage) => {
-    if (newPage >= 1 && newPage <= totalPages) {
+    if (newPage > 0 && newPage <= totalPages) {
       setCurrentPage(newPage);  // Cập nhật trang hiện tại
     }
   };
@@ -99,8 +113,7 @@ export default function StaffPage() {
 
   const roleNames = {
     0: "Quản lý",
-    2: "Nhân viên",
-    1: "Khách hàng"
+    1: "Nhân viên",
   };
   return (
     <>
@@ -160,9 +173,9 @@ export default function StaffPage() {
                       </tr>
                     </thead>
                     <tbody>
-                      {currentCustomers?.map((item, stt) => (
+                      {items.map((item, stt) => (
 
-                        <tr key={item.id}>
+                        <tr key={item}>
                           <th scope="row">{indexOfFirstCustomer + stt + 1}</th>
                           <td>{item.fullName}</td>
                           <td>{item.address || "Chưa có địa chỉ"}</td>

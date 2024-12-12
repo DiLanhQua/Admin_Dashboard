@@ -5,9 +5,13 @@ const END_POINT = {
     GetDEStall: "getDe-account",
     GetDELogin: "getDe-login",
     UpStaff: "up-account",
+    GetStaff: "get-all-staff"
 }
 export const getStaffAPI = (currentMax,customersPerPage,currentPage) => {
     return axiosS.get(`${END_POINT.GetAllStaff}?maxPageSize=${currentMax}&Pagesize=${customersPerPage}&PageNumber=${currentPage}`)
+}
+export const getAPIStaff = (currentMax,customersPerPage,currentPage) => {
+    return axiosS.get(`${END_POINT.GetStaff}?maxPageSize=${currentMax}&Pagesize=${customersPerPage}&PageNumber=${currentPage}`, )
 }
 export const getDeStaffAPI = (id) => {
     return axiosS.get(`${END_POINT.GetDEStall}/${id}`);

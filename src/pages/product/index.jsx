@@ -311,8 +311,7 @@ export default function StaffPage() {
     }
   };
 
-
-  // Thêm ảnh mới
+  //#region Thêm ảnh mới
   const handleAddImage = async (newImageFile) => {
     if (!newImageFile) {
       alert("Không có file nào được chọn!");

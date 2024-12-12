@@ -19,9 +19,10 @@ const EditStaff = () => {
   const [email, setEmail] = useState("");
   const [phone, setPhone] = useState("");
   const [address, setAddress] = useState("");
-  const [role, setRole] = useState("");
+  const [role, setRole] = useState(1);
   const [password, setPassword] = useState("");
   const [showMap, setShowMap] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
   const [selectedLocation, setSelectedLocation] = useState(null);
   const { id } = useParams();
   const navigate = useNavigate();
@@ -62,7 +63,7 @@ const EditStaff = () => {
   }, [id]);
 
   const validateForm = () => {
-    if (!fullName || !userName || !email || !phone || !address || !role || !password) {
+    if (!fullName || !userName || !email || !phone || !address || !password) {
       handleToast("error", "Vui lòng điền đầy đủ thông tin.", "top-right");
       return false;
     }
@@ -78,13 +79,31 @@ const EditStaff = () => {
       return false;
     }
 
-
-
-    if (password.length < 5) {
-      handleToast("error", "Mật khẩu phải ít nhất 5 ký tự.", "top-right");
-      return false;
+    // const phoneRegex = /^0389\d{6,8}$/; 
+    // if (!phoneRegex.test(phone)) {
+    //   handleToast("error", "Số điện thoại không hợp lệ. Phải bắt đầu bằng 0389 và dài từ 10 đến 12 chữ số.", "top-right");
+    //   return false;
+    // }
+    const phoneRegex = /^\d+$/;
+    if (!phoneRegex.test(phone)) {
+        handleToast("error", "Số điện thoại không hợp lệ. Chỉ được chứa số và không có dấu cách.", "top-right");
+        return false;
     }
-
+    if (phone.length < 10 || phone.length > 12) {
+        handleToast("error", "Số điện thoại không hợp lệ. Vui lòng điền đầy đủ số điện thoại.", "top-right");
+        return false;
+    }
+    
+    const passwordRegex = /^(?=.*[A-Z])(?=.*[a-z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
+    if (!passwordRegex.test(password)) {
+        handleToast(
+            "error",
+            "Mật khẩu phải có ít nhất 8 ký tự, bao gồm chữ hoa, chữ thường, chữ số và ký tự đặc biệt.",
+            "top-right"
+        );
+        return false;
+    }
+    setIsLoading(true);
     return true;
   };
 
@@ -289,25 +308,7 @@ const EditStaff = () => {
                     </div>
                   </div>
                   <div className="col-md-6">
-                    <div className="form-floating custom-floating-label">
-                      <select
-                        className="form-select"
-                        id="chucVu"
-                        value={role}
-                        onChange={(e) => setRole(e.target.value)}
-                        required
-                      >
-                        <option value="" disabled hidden></option>
-                        <option value="2">Quản lý</option>
-                        <option value="1">Nhân viên</option>
-                        <option value="0">Khách Hàng</option>
-                      </select>
-                      <label htmlFor="chucVu">Chức vụ</label>
-                    </div>
-                  </div>
-
-                </div>
-
+                    
                 <div className="form-floating d-flex ">
                   <input
                     type="text"
@@ -327,6 +328,10 @@ const EditStaff = () => {
                     <i className="fas fa-map-marker-alt"></i>
                   </button>
                 </div>
+                  </div>
+
+                </div>
+
 
                 {showMap && (
                   <div className="map-container" style={{ height: '300px' }}>
@@ -335,8 +340,13 @@ const EditStaff = () => {
                 )}
               </div>
               <div className="text-center">
-                <button type="submit" className="create-luu">
+                {/* <button type="submit" className="create-luu">
                   Sửa nhân viên
+                </button> */}
+                <button type="submit" className="create-luu"
+                  disabled={isLoading || !fullName || !email || !phone || !address || !role || !password}
+                >
+                  {isLoading ? <span ><i className="loading-icon ">⏳</i>Đang tải</span> : "Sửa nhân viên"}
                 </button>
               </div>
             </Card>
