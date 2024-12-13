@@ -1,7 +1,6 @@
-import React from "react";
-
+import React,{ useEffect, useState }  from "react";
 // react-bootstrap
-import { Row, Col, Card } from "react-bootstrap";
+import { Row, Col, Card,Form } from "react-bootstrap";
 
 // third party
 import Chart from "react-apexcharts";
@@ -17,13 +16,174 @@ import customerChart1 from "./chart/analytics-cuatomer-chart-1";
 // assets
 import OrderCard from "@/components/Widgets/OrderCard";
 import SocialCard from "@/components/Widgets/SocialCard";
-import barChartData from "./chart/barChartData";
+// import barChartData from "./chart/barChartData";
 import comboChartData from "./chart/comboChartData";
 import candlestickChartData from "./chart/candlestickChartData";
 
-// ==============================|| DASHBOARD ANALYTICS ||============================== //
+
+import { getStatisticsAPI ,AddStatisticsAPI} from "./js/StatisticsAPI";
 
 const DashAnalytics = () => {
+  const [viewType, setViewType] = useState('day');
+  const [items, setItems] = useState([]);
+  const [chartData, setChartData] = useState({
+    height: 150,
+    type: 'donut',
+    options: {
+      dataLabels: {
+        enabled: false,
+      },
+      plotOptions: {
+        pie: {
+          donut: {
+            size: '75%',
+          },
+        },
+      },
+      labels: ['Chưa xác nhận', 'Đã xác nhận'],
+      legend: {
+        show: false,
+      },
+      tooltip: {
+        theme: 'dark',
+      },
+      grid: {
+        padding: {
+          top: 20,
+          right: 0,
+          bottom: 0,
+          left: 0,
+        },
+      },
+      colors: ['#FF0000', '#2ed8b6'],
+      fill: {
+        opacity: [1, 1],
+      },
+      stroke: {
+        width: 0,
+      },
+    },
+    series: [0, 0], // Khởi tạo giá trị series
+  });
+  const [data, setData] = useState({
+    labels: [],
+    datasets: [{
+      label: 'Tổng tiền VND',
+      data: [],
+      backgroundColor: 'turquoise',
+      borderColor: 'aqua',
+      borderWidth: 1
+    }]
+  });
+  useEffect(() => {
+    const GetStatistics = async () => {
+      try {
+        const res = await getStatisticsAPI();
+        console.log("Dữ liệu trả về từ getStatisticsAPI:", res);
+    
+        if (res) {
+          setItems(res);
+    
+          // Cập nhật dữ liệu cho chartData
+          setChartData((prevData) => ({
+            ...prevData,
+            series: [res.demkhChuaXacNhan, res.demkhXacNhan] // Truyền giá trị vào series của biểu đồ
+          }));
+    
+          const response = await AddStatisticsAPI(viewType);
+          console.log("Dữ liệu trả về từ AddStatisticsAPI:", response);
+    
+          if (response && response.labels && response.numbers) {
+            // Cập nhật dữ liệu cho chart
+            setData({
+              labels: response.labels,
+              datasets: [{
+                label: 'Tổng tiền VND',
+                data: response.numbers,
+                backgroundColor: 'turquoise',
+                borderColor: 'aqua',
+                borderWidth: 1
+              }]
+            });
+          } else {
+            console.error("Dữ liệu trả về từ AddStatisticsAPI không hợp lệ.");
+          }
+        } else {
+          setItems([]);
+        }
+      } catch (er) {
+        console.error("Không thể xuất danh sách:", er);
+      }
+    };
+    
+
+    GetStatistics();
+  }, [viewType]);
+  const barChartData = {
+    height: 230,
+    type: "bar",
+    options: {
+      chart: {
+        toolbar: {
+          show: false,
+        },
+      },
+      plotOptions: {
+        bar: {
+          horizontal: false,
+          columnWidth: "55%",
+          endingShape: "rounded",
+        },
+      },
+      dataLabels: {
+        enabled: false,
+      },
+      stroke: {
+        show: true,
+        width: 2,
+        colors: ["transparent"],
+      },
+      xaxis: {
+        categories: data.labels || [], // Dữ liệu categories từ state data
+        labels: {
+          style: {
+            color: "#ccc",
+          },
+        },
+      },
+      yaxis: {
+        title: {
+          text: "Doanh thu",
+        },
+        labels: {
+          style: {
+            color: "#ccc",
+          },
+        },
+      },
+      fill: {
+        opacity: 1,
+      },
+      tooltip: {
+        y: {
+          formatter: (val) => `${val} VND`, // Hiển thị doanh thu với đơn vị VND
+        },
+      },
+      colors: ["#73b4ff"],
+      grid: {
+        borderColor: "#cccccc3b",
+      },
+    },
+    series: [{
+      name: "Doanh thu",
+      data: data.datasets[0].data || [], // Dữ liệu doanh thu từ state data
+    }],
+  };
+  
+
+  const handleChangeViewType = (e) => {
+    setViewType(e.target.value); // Cập nhật viewType khi người dùng chọn ngày/tháng/năm
+  };
   return (
     <React.Fragment>
       <Row>
@@ -34,9 +194,21 @@ const DashAnalytics = () => {
               title: "Đơn hàng đã nhận",
               class: "bg-c-blue",
               icon: "feather icon-shopping-cart",
-              primaryText: "486",
+              primaryText: `${items.count2}`,
               secondaryText: "Đơn hàng đã hoàn thành",
-              extraText: "351",
+              extraText: `${items.count1}`,
+            }}
+          />
+        </Col>
+        <Col md={6} xl={3}>
+          <OrderCard
+            params={{
+              title: "Tổng đơn hàng",
+              class: "bg-c-green",
+              icon: "feather icon-tag",
+              primaryText: `${items.tongdoanhthu}`,
+              secondaryText: "Tháng này",
+              extraText: `${items.tongdoanhthutheothang}`,
             }}
           />
         </Col>
@@ -44,52 +216,50 @@ const DashAnalytics = () => {
           <OrderCard
             params={{
               title: "Tổng doanh thu",
-              class: "bg-c-green",
-              icon: "feather icon-tag",
-              primaryText: "1641",
-              secondaryText: "Tháng này",
-              extraText: "213",
-            }}
-          />
-        </Col>
-        <Col md={6} xl={3}>
-          <OrderCard
-            params={{
-              title: "Doanh thu",
               class: "bg-c-yellow",
               icon: "feather icon-repeat",
-              primaryText: "$42,562",
+              primaryText: `${items.tongTienGioHang} VNĐ`,
               secondaryText: "Tháng này",
-              extraText: "$5,032",
+              extraText: `${items.totalAmount1} VNĐ`,
             }}
           />
         </Col>
         <Col md={6} xl={3}>
           <OrderCard
             params={{
-              title: "Tổng lợi nhuận",
+              title: "Số đơn đã hủy",
               class: "bg-c-red",
               icon: "feather icon-award",
-              primaryText: "$9,562",
+             primaryText: `${items.sodonhanghuy}`,
               secondaryText: "Tháng này",
-              extraText: "$542",
+              extraText: `${items.sodonhanghuytrongthang}`,
             }}
           />
         </Col>
 
-        <Col md={12} xl={6}>
-          <Card>
-            <Card.Header>
-              <h5>Khách truy cập duy nhất</h5>
-            </Card.Header>
-            <Card.Body className="ps-4 pt-4 pb-0">
-              <Chart {...uniqueVisitorChart} />
-            </Card.Body>
-          </Card>
-        </Col>
-        <Col md={12} xl={6}>
-          <Row>
-            <Col sm={6}>
+        <Col md={9} xl={9}>
+      <Card>
+        <Card.Header>
+        
+          {/* Form để chọn kiểu thống kê */}
+          <Form>
+            <Form.Group controlId="viewTypeSelect">
+              <Form.Label>Chọn khoảng thời gian</Form.Label>
+              <Form.Control as="select" onChange={handleChangeViewType} value={viewType}>
+                <option value="day">Ngày</option>
+                <option value="month">Tháng</option>
+                <option value="year">Năm</option>
+              </Form.Control>
+            </Form.Group>
+          </Form>
+        </Card.Header>
+        <Card.Body className="ps-4 pt-4 pb-0">
+          {/* Biểu đồ */}
+          <Chart {...barChartData} />
+        </Card.Body>
+      </Card>
+    </Col>
+        <Col md={3} xl={3}>
               <Card>
                 <Card.Body>
                   <Row>
@@ -97,72 +267,35 @@ const DashAnalytics = () => {
                       <span>Khách hàng</span>
                     </Col>
                     <Col className="text-end">
-                      <h2 className="mb-0">826</h2>
+                      
                       <span className="text-c-green">
-                        8.2%
-                        <i className="feather icon-trending-up ms-1" />
+                        <p className="mb-0 ">{items.demkh}    <i className="feather icon-trending-up ms-1" /></p>
+                     
                       </span>
                     </Col>
                   </Row>
-                  <Chart {...customerChart} />
+                  <Chart {...chartData} />
                   <Row className="mt-3 text-center">
                     <Col>
                       <h3 className="m-0">
                         <i className="fas fa-circle f-10 mx-2 text-success" />
-                        674
+                        {items.demkhXacNhan}
                       </h3>
-                      <span className="ms-3">Mới</span>
+                      <span className="ms-3">Xác nhận</span>
                     </Col>
                     <Col>
                       <h3 className="m-0">
-                        <i className="fas fa-circle text-primary f-10 mx-2" />
-                        182
+                        <i className="fas fa-circle text-danger f-10 mx-2" />
+                        {items.demkhChuaXacNhan}
                       </h3>
-                      <span className="ms-3">Trở lại</span>
+                      <span className="ms-3">Chưa xác nhận</span>
                     </Col>
                   </Row>
                 </Card.Body>
               </Card>
-            </Col>
-            <Col sm={6}>
-              <Card className="bg-primary text-white">
-                <Card.Body>
-                  <Row>
-                    <Col sm="auto">
-                      <span>Khách hàng</span>
-                    </Col>
-                    <Col className="text-end">
-                      <h2 className="mb-0 text-white">826</h2>
-                      <span className="text-white">
-                        8.2%
-                        <i className="feather icon-trending-up ms-1" />
-                      </span>
-                    </Col>
-                  </Row>
-                  <Chart {...customerChart1} />
-                  <Row className="mt-3 text-center">
-                    <Col>
-                      <h3 className="m-0 text-white">
-                        <i className="fas fa-circle f-10 mx-2 text-success" />
-                        674
-                      </h3>
-                      <span className="ms-3">Mới</span>
-                    </Col>
-                    <Col>
-                      <h3 className="m-0 text-white">
-                        <i className="fas fa-circle f-10 mx-2 text-white" />
-                        182
-                      </h3>
-                      <span className="ms-3">Trở lại</span>
-                    </Col>
-                  </Row>
-                </Card.Body>
-              </Card>
-            </Col>
-          </Row>
         </Col>
 
-        <Col lg={4} md={6}>
+        {/* <Col lg={4} md={6}>
           <SocialCard
             params={{
               icon: "fa fa-envelope-open",
@@ -233,20 +366,11 @@ const DashAnalytics = () => {
               label: "Xem tất cả người dùng",
             }}
           />
-        </Col>
+        </Col> */}
 
-        <Col md={12} xl={12}>
-          <Card>
-            <Card.Header>
-              <h5>Khách truy cập duy nhất</h5>
-            </Card.Header>
-            <Card.Body className="ps-4 pt-4 pb-0">
-              <Chart {...barChartData} />
-            </Card.Body>
-          </Card>
-        </Col>
+        
       </Row>
-      <Col md={12} xl={12}>
+      {/* <Col md={12} xl={12}>
         <Card>
           <Card.Header>
             <h5>Khách truy cập duy nhất</h5>
@@ -265,7 +389,7 @@ const DashAnalytics = () => {
             <Chart {...candlestickChartData} />
           </Card.Body>
         </Card>
-      </Col>
+      </Col> */}
     </React.Fragment>
   );
 };

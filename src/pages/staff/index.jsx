@@ -26,10 +26,12 @@ export default function StaffPage() {
 
   const [searchTerm, setSearchTerm] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
-  const [customersPerPage, setCustomersPerPage] = useState(5);
+  const [customersPerPage, setCustomersPerPage] = useState(100);
   const [currentMax, setCurrentMax] = useState(200);
   const [open, setOpen] = useState(false);
   const [totalItems, setTotalItems] = useState(0); 
+  
+  const [rowsPerPage, setRowsPerPage] = useState(5); 
   const [showDetailModal, setShowDetailModal] = useState(false);
   const handleShow = () => setShowDetailModal(true);
   const handleClose = () => setShowDetailModal(false);
@@ -43,7 +45,7 @@ export default function StaffPage() {
 
         if (res && res.data) {
           setItems(res.data); // Lưu danh sách nhân viên vào state
-          setTotalItems(res.pageCount * customersPerPage);  // Cập nhật tổng số nhân viên
+          // setTotalItems(res.pageCount * customersPerPage);  // Cập nhật tổng số nhân viên
         } else {
           setItems([]);
         }
@@ -55,18 +57,30 @@ export default function StaffPage() {
     GetStall();
   }, [currentMax, customersPerPage, currentPage]);
   console.log("customersPerPage :", customersPerPage);
-  const totalPages = Math.ceil(totalItems / customersPerPage);  // Tính tổng số trang từ totalItems
-  console.log("Tổng số :", totalItems);
-  console.log("Tổng số trang:", totalPages);
+  const totalPages = Math.ceil(totalItems / customersPerPage); 
   const indexOfLastCustomer = currentPage * customersPerPage;
-  console.log("indexOfLastCustomer:", indexOfLastCustomer);
   const indexOfFirstCustomer = indexOfLastCustomer - customersPerPage;
-  console.log("indexOfFirstCustomer:", indexOfFirstCustomer);
 
   // Lọc ra dữ liệu của trang hiện tại
   const currentCustomers = items.slice(indexOfFirstCustomer, indexOfLastCustomer);
-  console.log("Khách hàng trang hiện tại:", currentCustomers);
+const handleSearchChange = (event) => {
+    setSearchTerm(event.target.value);
+    setCurrentPage(0); // Đặt lại trang khi tìm kiếm mới
+  };
 
+  // Hàm lọc dữ liệu theo tên
+  const filteredItems = items.filter(item => {
+    return item.fullName.toLowerCase().includes(searchTerm.toLowerCase()); // Tìm kiếm không phân biệt chữ hoa, chữ thường
+  });
+  
+
+  const handleChangePage = (event, newPage) => {
+    setRowsPerPage(newPage);
+  };
+  const handleChangeRowsPerPage = (event) => {
+    setCustomersPerPage(+event.target.value);
+    setRowsPerPage(0);
+  };
   const detaile = async (id) => {
     console.log("id ", id)
     const response = await getDeStaffAPI(id);
@@ -173,10 +187,10 @@ export default function StaffPage() {
                       </tr>
                     </thead>
                     <tbody>
-                      {items.map((item, stt) => (
+                      {filteredItems.map((item, stt) => (
 
-                        <tr key={item}>
-                          <th scope="row">{indexOfFirstCustomer + stt + 1}</th>
+                        <tr key={stt}>
+                          <th scope="row">{ item.id}</th>
                           <td>{item.fullName}</td>
                           <td>{item.address || "Chưa có địa chỉ"}</td>
                           <td>{item.email || "Chưa có email"}</td>
