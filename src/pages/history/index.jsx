@@ -25,12 +25,15 @@ const columns = [
 
 export default function History() {
   const [historyData, setHistoryData] = useState([]);
+  const [page, setPage] = useState(0);
+  const [rowsPerPage, setRowsPerPage] = useState(1000);
+  const [totalCount, setTotalCount] = useState(1000); // Tổng số bản ghi
 
   // Fetch data from the API
   const fetchHistoryData = async () => {
     try {
-      const response = await axios.get("https://localhost:7048/api/Login/get-all-login"); // Replace with your actual API URL
-      
+      const response = await axios.get(`https://localhost:7048/api/Login/get-all-login?maxPageSize=${totalCount}&PageSize=${rowsPerPage}&PageNumber=${page + 1}`); // Replace with your actual API URL
+
       // Log the entire response to inspect the data structure
       console.log("API Response:", response);
 
@@ -66,7 +69,7 @@ export default function History() {
     fetchHistoryData();
   }, []); // Empty dependency array means this will run once on component mount
 
- 
+
 
   const handleDelete = (index) => {
     console.log("Delete", index);
@@ -74,7 +77,7 @@ export default function History() {
 
   return (
     <ReusableTable
-     
+
       handleDelete={handleDelete}
       data={historyData}
       columns={columns}

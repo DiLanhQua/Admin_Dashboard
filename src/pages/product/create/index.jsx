@@ -467,9 +467,14 @@ function ProductPage() {
                       onChange={(e) => handleProductDetailChange(index, "size", e.target.value)}
                     >
                       <option value="" disabled hidden>Chọn kích thước</option>
-                      <option value="M">M</option>
-                      <option value="X">X</option>
-                      <option value="XL">XL</option>
+                      <option value="36">36</option>
+                      <option value="37">37</option>
+                      <option value="38">38</option>
+                      <option value="39">39</option>
+                      <option value="40">40</option>
+                      <option value="41">41</option>
+                      <option value="42">42</option>
+                      <option value="43">43</option>
                     </select>
                     <input
                       type="number"
@@ -507,9 +512,8 @@ function ProductPage() {
                       }
                     >
                       <option value="">Chọn giới tính</option>
-                      <option value="male">Nam</option>
-                      <option value="female">Nữ</option>
-                      <option value="unisex">Unisex</option>
+                      <option value="Nam">Nam</option>
+                      <option value="Nữ">Nữ</option>
                     </select>
                   </div>
                 </div>

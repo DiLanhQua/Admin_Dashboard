@@ -13,7 +13,7 @@ const columns = [
   { label: "Ngày bắt đầu", field: "TimeStart" },
   { label: "Ngày kết thúc", field: "TimeEnd" },
   { label: "Số lượng", field: "Quantity" },
-  { label: "Trạng thái", field: "Status" },
+  { label: "Trạng thái", field: "status" },
 ];
 
 export default function CouponsList() {
@@ -42,7 +42,7 @@ export default function CouponsList() {
         Quantity: item.quantity || 0,
         Min_Order_Value: item.min_Order_Value || 0,
         Max_Discount: item.max_Discount || 0,
-        Status: item.status === 0 ? "Không hoạt động" : "Hoạt động",
+        status: item.status === 0 ? "Không hoạt động" : "Hoạt động",
       }));
       console.log(data);
       setCoupons(data);
