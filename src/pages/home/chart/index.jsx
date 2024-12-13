@@ -218,9 +218,9 @@ const DashAnalytics = () => {
               title: "Tổng doanh thu",
               class: "bg-c-yellow",
               icon: "feather icon-repeat",
-              primaryText: `${items.tongTienGioHang} VNĐ`,
+              primaryText: `${items.tongTienGioHang} VND`,
               secondaryText: "Tháng này",
-              extraText: `${items.totalAmount1} VNĐ`,
+              extraText: `${items.totalAmount1} VND`,
             }}
           />
         </Col>
