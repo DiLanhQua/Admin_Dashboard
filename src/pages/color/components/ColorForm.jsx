@@ -39,9 +39,9 @@ export default function ColorForm({
             initialValues={initialValues}
             onSubmit={handleSubmit} // Kết nối handleSubmit
             validationSchema={Yup.object().shape({
-                BrandName: Yup.string().required("Tên màu sắc không được để trống")
+                nameColor: Yup.string().required("Tên màu sắc không được để trống")
                     .test('no-number', 'Tên màu sắc không được chứa số', value => !/[0-9]/.test(value)),
-                country: Yup.string().required("Mã màu không được để trống")
+                colorCode: Yup.string().required("Mã màu không được để trống")
                     .test('no-number', 'Mã màu không được chứa số', value => !/[0-9]/.test(value)),
             })}
             enableReinitialize={true}

@@ -9,7 +9,7 @@ import { handleToast } from "../../../utils/toast";
 function VoucherCreate() {
   const navigate = useNavigate();
   const [isSubmitting, setIsSubmitting] = useState(false);
-
+  const currentDate = new Date().toISOString().slice(0, 16);
   const formik = useFormik({
     initialValues: {
       VoucherName: "",
@@ -24,12 +24,22 @@ function VoucherCreate() {
     },
     validationSchema: Yup.object({
       VoucherName: Yup.string().required("Tên voucher là bắt buộc"),
-      TimeStart: Yup.date().required("Ngày bắt đầu là bắt buộc"),
-      TimeEnd: Yup.date().required("Ngày kết thúc là bắt buộc"),
+      TimeStart: Yup.date()
+        .required("Ngày bắt đầu là bắt buộc")
+        .min(currentDate, "Ngày bắt đầu phải từ hôm nay trở đi"),
+      TimeEnd: Yup.date()
+        .required("Ngày kết thúc là bắt buộc")
+        .min(Yup.ref("TimeStart"), "Ngày kết thúc phải sau ngày bắt đầu"),
       DiscountType: Yup.string().required("Loại giảm giá là bắt buộc"),
-      Quantity: Yup.number().required("Số lượng voucher là bắt buộc").min(1, "Số lượng phải lớn hơn 0"),
-      Discount: Yup.number().required("Mức giảm giá là bắt buộc").min(1, "Giảm giá phải lớn hơn 0"),
-      Min_Order_Value: Yup.number().required("Giá trị đơn hàng tối thiểu là bắt buộc"),
+      Quantity: Yup.number()
+        .required("Số lượng voucher là bắt buộc")
+        .min(1, "Số lượng phải lớn hơn 0"),
+      Discount: Yup.number()
+        .required("Mức giảm giá là bắt buộc")
+        .min(1, "Giảm giá phải lớn hơn 0"),
+      Min_Order_Value: Yup.number().required(
+        "Giá trị đơn hàng tối thiểu là bắt buộc"
+      ),
       Max_Discount: Yup.number().required("Giảm giá tối đa là bắt buộc"),
       Status: Yup.number().required("Trạng thái là bắt buộc"),
     }),
