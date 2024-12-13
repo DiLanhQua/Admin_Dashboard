@@ -39,8 +39,8 @@ export default function OrderPage() {
   }, []);
 
   const handleEdit = (data) => {
-    if (data.statusOrder == 4 || data.statusOrder == 5) {
-      alert("Không thể cập nhật đơn hàng này")
+    if (data.statusOrder == 4) {
+      alert("Đơn hàng này đã hoàn thành không thể cập nhật!")
       return;
     }
     setOpen(true);
