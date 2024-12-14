@@ -12,6 +12,7 @@ import RemoveRedEyeIcon from "@mui/icons-material/RemoveRedEye";
 import { IconButton } from "@mui/material";
 import "./css/product.css";
 import { Edit } from "@mui/icons-material";
+import axios from "axios";
 export default function StaffPage() {
   const navigate = useNavigate();
   const [items, setItems] = useState([]);
@@ -26,7 +27,7 @@ export default function StaffPage() {
   const [selectedProduct, setSelectedProduct] = useState(null);
   const [searchTerm, setSearchTerm] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
-  const [customersPerPage, setCustomersPerPage] = useState(5);
+  const [customersPerPage, setCustomersPerPage] = useState(100);
   const [showDetailModal, setShowDetailModal] = useState(false);
   const [activeTab, setActiveTab] = useState("info");
   const [categories, setCategorys] = useState([]);
@@ -34,7 +35,7 @@ export default function StaffPage() {
     productName: '',
     categoryId: '',
     brandId: '',
-    description: ''
+    description: '',
   });
   const [productInfo, setProductInfo] = useState({
     medias: []
@@ -144,11 +145,8 @@ export default function StaffPage() {
             imageUrl: image.link,
           }));
         });
-
         const resolvedImages = await Promise.all(imagePromises);
-
         // console.log("resolvedImages: ", JSON.stringify(resolvedImages, null, 2));
-
         setImages(resolvedImages);
       } catch (error) {
         console.error("Lỗi khi lấy media cho sản phẩm:", error);
@@ -526,6 +524,20 @@ export default function StaffPage() {
   //     medias: prev.medias.filter((_, i) => i !== index),
   //   }));
   // };
+
+  const changeStatus = async (id) => {
+    try {
+      const reponse = await axios.patch(`https://localhost:7048/api/Products/change-status/${id}`)
+      if (reponse.data) {
+        alert("Cập nhật trạng thái thành công")
+        window.location.reload()
+      }
+    }
+    catch (err) {
+      console.log(err);
+      alert("Cập nhật trạng thái thất bại")
+    }
+  }
   return (
     <React.Fragment>
       <Row>
@@ -566,6 +578,7 @@ export default function StaffPage() {
                     <th scope="col">Tên sản phẩm</th>
                     <th scope="col">Thương hiệu</th>
                     <th scope="col">Loại</th>
+                    <th scope="col">Trạng thái</th>
                     <th scope="col">Thao tác</th>
                   </tr>
                 </thead>
@@ -594,6 +607,14 @@ export default function StaffPage() {
                           {productBrans.length > 0 && (
                             <p>{productBrans[0].brandName}</p>
                           )}
+                        </td>
+                        <td>
+                          <button onClick={() => changeStatus(item.id)}
+                            className={`custom-button btn ${item.status ? "btn-primary" : "btn-danger"
+                              }`}
+                          >
+                            {item.status ? "Hoạt động" : "Không hoạt động"}
+                          </button>
                         </td>
                         <td>
                           <IconButton
