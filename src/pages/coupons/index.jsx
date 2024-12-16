@@ -21,11 +21,13 @@ export default function CouponsList() {
   const [open, setOpen] = useState(false);
   const [selectedData, setSelectedData] = useState(null);
   const navigate = useNavigate();
-
+  const [maxPageSize, setMaxPageSize] = useState(50);
+  const [rowsPerPage, setRowsPerPage] = useState(100);
+  const [page, setPage] = useState(0);
   // Lấy dữ liệu từ API
   const fetchCoupons = async () => {
     try {
-      const response = await axios.get("https://localhost:7048/api/Voucher/get-all-vouchers");
+      const response = await axios.get(`https://localhost:7048/api/Voucher/get-all-vouchers?maxPageSize=${maxPageSize}&PageSize=${rowsPerPage}&PageNumber=${page + 1}`);
       const responseData = response.data;
       if (!responseData || !responseData.data || !Array.isArray(responseData.data)) {
         throw new Error("Dữ liệu API không hợp lệ");
@@ -54,7 +56,7 @@ export default function CouponsList() {
 
   useEffect(() => {
     fetchCoupons();
-  }, []);
+  }, [maxPageSize, rowsPerPage, page]);
 
   const handleEdit = useCallback(
     (voucher) => {

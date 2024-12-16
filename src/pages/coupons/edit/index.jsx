@@ -10,7 +10,6 @@ function VoucherEdit() {
   const navigate = useNavigate();
   const { id } = useParams();
   const [isSubmitting, setIsSubmitting] = useState(false);
-
   const currentDate = new Date().toISOString().slice(0, 16);
   // Formik setup
   const formik = useFormik({
@@ -26,26 +25,26 @@ function VoucherEdit() {
       Status: "",
     },
     validationSchema: Yup.object({
-          VoucherName: Yup.string().required("Tên voucher là bắt buộc"),
-          TimeStart: Yup.date()
-            .required("Ngày bắt đầu là bắt buộc")
-            .min(currentDate, "Ngày bắt đầu phải từ hôm nay trở đi"),
-          TimeEnd: Yup.date()
-            .required("Ngày kết thúc là bắt buộc")
-            .min(Yup.ref("TimeStart"), "Ngày kết thúc phải sau ngày bắt đầu"),
-          DiscountType: Yup.string().required("Loại giảm giá là bắt buộc"),
-          Quantity: Yup.number()
-            .required("Số lượng voucher là bắt buộc")
-            .min(1, "Số lượng phải lớn hơn 0"),
-          Discount: Yup.number()
-            .required("Mức giảm giá là bắt buộc")
-            .min(1, "Giảm giá phải lớn hơn 0"),
-          Min_Order_Value: Yup.number().required(
-            "Giá trị đơn hàng tối thiểu là bắt buộc"
-          ),
-          Max_Discount: Yup.number().required("Giảm giá tối đa là bắt buộc"),
-          Status: Yup.number().required("Trạng thái là bắt buộc"),
-        }),
+      VoucherName: Yup.string().required("Tên voucher là bắt buộc"),
+      TimeStart: Yup.date()
+        .required("Ngày bắt đầu là bắt buộc")
+        .min(currentDate, "Ngày bắt đầu phải từ hôm nay trở đi"),
+      TimeEnd: Yup.date()
+        .required("Ngày kết thúc là bắt buộc")
+        .min(Yup.ref("TimeStart"), "Ngày kết thúc phải sau ngày bắt đầu"),
+      DiscountType: Yup.string().required("Loại giảm giá là bắt buộc"),
+      Quantity: Yup.number()
+        .required("Số lượng voucher là bắt buộc")
+        .min(1, "Số lượng phải lớn hơn 0"),
+      Discount: Yup.number()
+        .required("Mức giảm giá là bắt buộc")
+        .min(1, "Giảm giá phải lớn hơn 0"),
+      Min_Order_Value: Yup.number().required(
+        "Giá trị đơn hàng tối thiểu là bắt buộc"
+      ),
+      Max_Discount: Yup.number().required("Giảm giá tối đa là bắt buộc"),
+      Status: Yup.number().required("Trạng thái là bắt buộc"),
+    }),
     onSubmit: async (values) => {
       setIsSubmitting(true);
       await handleEdit(values);
@@ -86,8 +85,8 @@ function VoucherEdit() {
             DiscountType: voucherData.discountType || "",
             Quantity: voucherData.quantity || "",
             Discount: voucherData.discount || "",
-            min_Order_Value: voucherData.min_Order_Value || "",
-            max_Discount: voucherData.max_Discount || "",
+            Min_Order_Value: voucherData.Min_Order_Value || "",
+            Max_Discount: voucherData.Max_Discount || "",
             Status: voucherData.status || "",
           });
         } else {
@@ -200,28 +199,28 @@ function VoucherEdit() {
           <TextField
             fullWidth
             label="Giá trị đơn hàng tối thiểu"
-            name="min_Order_Value"
+            name="Min_Order_Value"
             type="number"
-            value={formik.values.min_Order_Value}
+            value={formik.values.Min_Order_Value}
             onChange={formik.handleChange}
             margin="normal"
             error={
-              formik.touched.min_Order_Value && Boolean(formik.errors.min_Order_Value)
+              formik.touched.Min_Order_Value && Boolean(formik.errors.Min_Order_Value)
             }
-            helperText={formik.touched.min_Order_Value && formik.errors.min_Order_Value}
+            helperText={formik.touched.Min_Order_Value && formik.errors.Min_Order_Value}
           />
         </Grid>
         <Grid item xs={12} sm={6}>
           <TextField
             fullWidth
             label="Giảm giá tối đa"
-            name="max_Discount"
+            name="Max_Discount"
             type="number"
-            value={formik.values.max_Discount}
+            value={formik.values.Max_Discount}
             onChange={formik.handleChange}
             margin="normal"
-            error={formik.touched.max_Discount && Boolean(formik.errors.max_Discount)}
-            helperText={formik.touched.max_Discount && formik.errors.max_Discount}
+            error={formik.touched.Max_Discount && Boolean(formik.errors.Max_Discount)}
+            helperText={formik.touched.Max_Discount && formik.errors.Max_Discount}
           />
         </Grid>
         <Grid item xs={12} sm={6}>

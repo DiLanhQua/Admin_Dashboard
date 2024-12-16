@@ -7,7 +7,7 @@ import { deleteStaff, getStaff, resetState } from "../../redux/slices/staff";
 import { DeleteConfirmationModal, handleToast } from "../../utils/toast";
 import { Row, Col, Card, Modal, Button } from 'react-bootstrap';
 // import axios from 'axios';
-import {  getDeStaffAPI, getDeLoginAPI, getAPIStaff } from "./js/AxiosStaff";
+import { getDeStaffAPI, getDeLoginAPI, getAPIStaff } from "./js/AxiosStaff";
 import "../staff/css/staff.css";
 import EyeStaff from './details/index';
 import ControlPointIcon from "@mui/icons-material/ControlPoint";
@@ -29,14 +29,16 @@ export default function StaffPage() {
   const [customersPerPage, setCustomersPerPage] = useState(100);
   const [currentMax, setCurrentMax] = useState(200);
   const [open, setOpen] = useState(false);
-  const [totalItems, setTotalItems] = useState(0); 
-  
-  const [rowsPerPage, setRowsPerPage] = useState(5); 
+  const [totalItems, setTotalItems] = useState(0);
+
+  const [rowsPerPage, setRowsPerPage] = useState(5);
   const [showDetailModal, setShowDetailModal] = useState(false);
   const handleShow = () => setShowDetailModal(true);
   const handleClose = () => setShowDetailModal(false);
   const [account, setAccount] = useState();
   const [login, setLogin] = useState();
+  const [cPage, sPage] = useState(1); // Trang hiện tại
+  const itemsPerPage = 5;
   useEffect(() => {
     const GetStall = async () => {
       try {
@@ -56,31 +58,47 @@ export default function StaffPage() {
 
     GetStall();
   }, [currentMax, customersPerPage, currentPage]);
-  console.log("customersPerPage :", customersPerPage);
-  const totalPages = Math.ceil(totalItems / customersPerPage); 
-  const indexOfLastCustomer = currentPage * customersPerPage;
-  const indexOfFirstCustomer = indexOfLastCustomer - customersPerPage;
-
-  // Lọc ra dữ liệu của trang hiện tại
-  const currentCustomers = items.slice(indexOfFirstCustomer, indexOfLastCustomer);
-const handleSearchChange = (event) => {
-    setSearchTerm(event.target.value);
-    setCurrentPage(0); // Đặt lại trang khi tìm kiếm mới
-  };
-
-  // Hàm lọc dữ liệu theo tên
   const filteredItems = items.filter(item => {
     return item.fullName.toLowerCase().includes(searchTerm.toLowerCase()); // Tìm kiếm không phân biệt chữ hoa, chữ thường
   });
-  
+  const currentItems = filteredItems.slice(
+    (cPage - 1) * itemsPerPage,
+    cPage * itemsPerPage
+  );
 
+  // Tổng số trang
+  const totalPages = Math.ceil(filteredItems.length / itemsPerPage);
+
+  // Hàm chuyển trang
+  const handlePageChange = (newPage) => {
+    if (newPage >= 1 && newPage <= totalPages) {
+      sPage(newPage);
+    }
+  };
+  // const totalPages = Math.ceil(filteredItems.length / customersPerPage);
   const handleChangePage = (event, newPage) => {
     setRowsPerPage(newPage);
   };
+
   const handleChangeRowsPerPage = (event) => {
     setCustomersPerPage(+event.target.value);
     setRowsPerPage(0);
   };
+  const handleSearchChange = (event) => {
+    setSearchTerm(event.target.value);
+    setCurrentPage(0); // Đặt lại trang khi tìm kiếm mới
+  };
+
+
+
+
+  // const handleChangePage = (event, newPage) => {
+  //   setRowsPerPage(newPage);
+  // };
+  // const handleChangeRowsPerPage = (event) => {
+  //   setCustomersPerPage(+event.target.value);
+  //   setRowsPerPage(0);
+  // };
   const detaile = async (id) => {
     console.log("id ", id)
     const response = await getDeStaffAPI(id);
@@ -105,11 +123,11 @@ const handleSearchChange = (event) => {
 
   // console.log("currentCustomers ", currentCustomers);
 
-  const handlePageChange = (newPage) => {
-    if (newPage > 0 && newPage <= totalPages) {
-      setCurrentPage(newPage);  // Cập nhật trang hiện tại
-    }
-  };
+  // const handlePageChange = (newPage) => {
+  //   if (newPage > 0 && newPage <= totalPages) {
+  //     setCurrentPage(newPage);  // Cập nhật trang hiện tại
+  //   }
+  // };
 
   const openDetailModal = (employee) => {
     setSelectedEmployee(employee);
@@ -174,135 +192,141 @@ const handleSearchChange = (event) => {
                   </Link>
                 </div>
                 <div className="table-responsive">
-                  <table className="table">
-                    <thead>
-                      <tr>
-                        <th scope="col">#</th>
-                        <th scope="col">Họ tên</th>
-                        <th scope="col">Địa chỉ</th>
-                        <th scope="col">Email</th>
-                        <th scope="col">Số điện thoại</th>
-                        <th scope="col">Tên đăng nhập</th>
-                        <th scope="col">Thao tác</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {filteredItems.map((item, stt) => (
+                  {currentItems.length > 0 ? (
 
-                        <tr key={stt}>
-                          <th scope="row">{ item.id}</th>
-                          <td>{item.fullName}</td>
-                          <td>{item.address || "Chưa có địa chỉ"}</td>
-                          <td>{item.email || "Chưa có email"}</td>
-                          <td>{item.phone || "Chưa có số điện thoại"}</td>
-                          <td>{item.userName || "Chưa có tên đăng nhập"}</td>
-                          <td>
-                            <IconButton
-                              color="primary"
-                              onClick={() => detaile(item.id)}
-                              sx={{ padding: "4px" }} // Reduced padding for action buttons
-                            >
-                              <RemoveRedEyeIcon />
-                            </IconButton>
-                            {/* <Button variant="primary" onClick={() => detaile(item.id)}>
+                    <table className="table">
+                      <thead>
+                        <tr>
+                          <th scope="col">#</th>
+                          <th scope="col">Họ tên</th>
+                          <th scope="col">Địa chỉ</th>
+                          <th scope="col">Email</th>
+                          <th scope="col">Số điện thoại</th>
+                          <th scope="col">Tên đăng nhập</th>
+                          <th scope="col">Thao tác</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {currentItems.map((item, stt) => (
+
+                          <tr key={stt}>
+                            <th scope="row">{item.id}</th>
+                            <td>{item.fullName}</td>
+                            <td>{item.address || "Chưa có địa chỉ"}</td>
+                            <td>{item.email || "Chưa có email"}</td>
+                            <td>{item.phone || "Chưa có số điện thoại"}</td>
+                            <td>{item.userName || "Chưa có tên đăng nhập"}</td>
+                            <td>
+                              <IconButton
+                                color="primary"
+                                onClick={() => detaile(item.id)}
+                                sx={{ padding: "4px" }} // Reduced padding for action buttons
+                              >
+                                <RemoveRedEyeIcon />
+                              </IconButton>
+                              {/* <Button variant="primary" onClick={() => detaile(item.id)}>
         Xem 
       </Button> */}
 
-                            {/* Modal hiển thị thông tin chi tiết nhân viên */}
-                            <Modal show={showDetailModal} onHide={handleClose} size="lg">
-                              <Modal.Header closeButton>
-                                <Modal.Title>Thông Tin Chi Tiết Nhân Viên</Modal.Title>
-                              </Modal.Header>
-                              <Modal.Body >
-                                {account ? (
-                                  <div className="dialog">
-                                    <div className="dialog-content">
-                                      <div className="avatar-container">
-                                        <img
-                                          src={account?.image || '/static/images/avatar/1.jpg'}
-                                          alt="Profile Image"
-                                          className="avatar"
-                                        />
-                                        <h3 className="name">{account?.fullName}</h3>
-                                        <p className="role"> Role: {roleNames[account?.role] || "Không xác định"}</p>
+                              {/* Modal hiển thị thông tin chi tiết nhân viên */}
+                              <Modal show={showDetailModal} onHide={handleClose} size="lg">
+                                <Modal.Header closeButton>
+                                  <Modal.Title>Thông Tin Chi Tiết Nhân Viên</Modal.Title>
+                                </Modal.Header>
+                                <Modal.Body >
+                                  {account ? (
+                                    <div className="dialog">
+                                      <div className="dialog-content">
+                                        <div className="avatar-container">
+                                          <img
+                                            src={account?.image || '/static/images/avatar/1.jpg'}
+                                            alt="Profile Image"
+                                            className="avatar"
+                                          />
+                                          <h3 className="name">{account?.fullName}</h3>
+                                          <p className="role"> Role: {roleNames[account?.role] || "Không xác định"}</p>
 
-                                      </div>
-
-                                      <div className="info-grid">
-                                        <div className="info-item">
-                                          <span className="icon">&#x1F4C5;</span>
-                                          <p className="p-item">Id: {login?.accountId}</p>
-                                        </div>
-                                        <div className="info-item">
-                                          <span className="icon">&#x2709;</span>
-                                          <p className="p-item">Email: {account?.email}</p>
-                                        </div>
-                                        <div className="info-item">
-                                          <span className="icon">&#x1F464;</span>
-                                          <p className="p-item">Tên đăng nhập: {account?.userName}</p>
-                                        </div>
-                                        <div className="info-item">
-                                          <span className="icon"><i class=" fas fa-solid fa-lock"></i></span>
-                                          <p className="p-item">Mật khẩu: {account?.password}</p>
-                                        </div>
-                                        <div className="info-item">
-                                          <span className="icon">&#x1F4F1;</span>
-                                          <p className="p-item">SĐT: {account?.phone}</p>
-                                        </div>
-                                        <div className="info-item">
-                                          {login?.action === 'Chờ xác nhận' ? (
-                                            <span className="icon red-icon">&#x1F534;</span> // Icon màu đỏ
-                                          ) : (
-                                            <span className="icon green-icon">&#x1F7E2;</span> // Icon màu xanh
-                                          )}
-                                          <p className="p-item">Trạng Thái: {login?.action}</p>
                                         </div>
 
+                                        <div className="info-grid">
+                                          <div className="info-item">
+                                            <span className="icon">&#x1F4C5;</span>
+                                            <p className="p-item">Id: {login?.accountId}</p>
+                                          </div>
+                                          <div className="info-item">
+                                            <span className="icon">&#x2709;</span>
+                                            <p className="p-item">Email: {account?.email}</p>
+                                          </div>
+                                          <div className="info-item">
+                                            <span className="icon">&#x1F464;</span>
+                                            <p className="p-item">Tên đăng nhập: {account?.userName}</p>
+                                          </div>
+                                          <div className="info-item">
+                                            <span className="icon"><i class=" fas fa-solid fa-lock"></i></span>
+                                            <p className="p-item">Mật khẩu: {account?.password}</p>
+                                          </div>
+                                          <div className="info-item">
+                                            <span className="icon">&#x1F4F1;</span>
+                                            <p className="p-item">SĐT: {account?.phone}</p>
+                                          </div>
+                                          <div className="info-item">
+                                            {login?.action === 'Chờ xác nhận' ? (
+                                              <span className="icon red-icon">&#x1F534;</span> // Icon màu đỏ
+                                            ) : (
+                                              <span className="icon green-icon">&#x1F7E2;</span> // Icon màu xanh
+                                            )}
+                                            <p className="p-item">Trạng Thái: {login?.action}</p>
+                                          </div>
 
-                                      </div>
-                                      <div className="in-item">
-                                        <div className="info-item">
-                                          <span className="icon">
-                                            <i className="fas fa-map-marker-alt" />
-                                          </span>
-                                          <p className="p-item">Địa chỉ: {account?.address}</p>
+
                                         </div>
-                                        <div className="info-item">
-                                          <span className="icon"><i class="fas fa-regular fa-clock"></i></span>
-                                          <p className="p-item">Ngày tạo: {login?.timeStamp}</p>
+                                        <div className="in-item">
+                                          <div className="info-item">
+                                            <span className="icon">
+                                              <i className="fas fa-map-marker-alt" />
+                                            </span>
+                                            <p className="p-item">Địa chỉ: {account?.address}</p>
+                                          </div>
+                                          <div className="info-item">
+                                            <span className="icon"><i class="fas fa-regular fa-clock"></i></span>
+                                            <p className="p-item">Ngày tạo: {login?.timeStamp}</p>
+                                          </div>
+                                          <div className="info-item">
+                                            <span className="icon"><i class="fas fa-solid fa-book-open"></i></span>
+                                            <p className="p-item">Mô Tả: {login?.description}</p>
+                                          </div>
                                         </div>
-                                        <div className="info-item">
-                                          <span className="icon"><i class="fas fa-solid fa-book-open"></i></span>
-                                          <p className="p-item">Mô Tả: {login?.description}</p>
+                                        <div className="dialog-actions">
+                                          <button className="close-btn" onClick={handleClose}>Đóng</button>
                                         </div>
-                                      </div>
-                                      <div className="dialog-actions">
-                                        <button className="close-btn" onClick={handleClose}>Đóng</button>
                                       </div>
                                     </div>
-                                  </div>
-                                ) : (
-                                  <p>Đang tải thông tin...</p>
-                                )}
-                              </Modal.Body>
-                            </Modal>
-                            {/* <button className="btn btn-warning ml-2" onClick={() => CTNV(item.id)}>
+                                  ) : (
+                                    <p>Đang tải thông tin...</p>
+                                  )}
+                                </Modal.Body>
+                              </Modal>
+                              {/* <button className="btn btn-warning ml-2" onClick={() => CTNV(item.id)}>
                               Sửa
                             </button> */}
-                            <IconButton
-                              color="primary"
-                              onClick={() => CTNV(item.id)}
-                              sx={{ padding: "4px" }} // Reduced padding for action buttons
-                            >
-                              <Edit />
-                            </IconButton>
-                          </td>
-                        </tr>
-                      ))}
-                    </tbody>
+                              <IconButton
+                                color="primary"
+                                onClick={() => CTNV(item.id)}
+                                sx={{ padding: "4px" }} // Reduced padding for action buttons
+                              >
+                                <Edit />
+                              </IconButton>
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
 
 
-                  </table>
+                    </table>
+                  ) : (
+                    <div>Không có dữ liệu</div>
+                  )}
+
                   <div className="row">
                     <div className="col-lg-8">
                       {/* Không cần thay đổi gì thêm ở đây */}
@@ -326,20 +350,20 @@ const handleSearchChange = (event) => {
                           <option value="10">10</option>
                           <option value="15">15</option>
                         </select>
-                        <span>{`${indexOfFirstCustomer + 1}-${Math.min(indexOfLastCustomer, items.length)}`}</span>
+                        {/* <span>{`${indexOfFirstCustomer + 1}-${Math.min(indexOfLastCustomer, items.length)}`}</span> */}
                         <div>
                           <button
-                            style={{ padding: "5px", marginRight: "5px", border: "none" }}
-                            onClick={() => handlePageChange(currentPage - 1)}
-                            disabled={currentPage === 1}
+                            onClick={() => handlePageChange(cPage - 1)}
+                            disabled={cPage === 1}
                           >
+
                             &lt;
                           </button>
                           <button
-                            style={{ padding: "5px", border: "none" }}
-                            onClick={() => handlePageChange(currentPage + 1)}
-                            disabled={currentPage === totalPages}
+                            onClick={() => handlePageChange(cPage + 1)}
+                            disabled={cPage === totalPages}
                           >
+
                             &gt;
                           </button>
                         </div>
