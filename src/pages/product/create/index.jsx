@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from "react";
-import { Card } from "react-bootstrap";
-import Textarea from "../../../components/textarea";
 import { handleToast } from "../../../utils/toast";
+import { Editor } from '@tinymce/tinymce-react';
 
 import { useNavigate } from "react-router-dom";
 import {
@@ -284,6 +283,9 @@ function ProductPage() {
     fetchCategory();
   }, []);
 
+  const handleEditorChange = (content) => {
+    setProductInfo({ ...productInfo, description: content });
+  }
   const handleAdd = async (e) => {
     e.preventDefault();
     const mainProduct = {
@@ -423,16 +425,29 @@ function ProductPage() {
               </div>
               <div className="row">
                 <div className="form-floating">
-                  <input
-                    type="text"
-                    className="form-control"
-                    id="description"
-                    placeholder="Loại sản phẩm"
-                    // value={description}
-                    // onChange={(e) => setdescription(e.target.value)}
-
-                    value={productInfo.description}
-                    onChange={(e) => handleInputChange("description", e.target.value)}
+                  <Editor
+                    apiKey='7tl9v670y6tk99ky8gryopwvrpw9re1h6tsvs5wauxsr8gmn'
+                    init={{
+                      plugins: [
+                        // Core editing features
+                        'anchor', 'autolink', 'charmap', 'codesample', 'emoticons', 'image', 'link', 'lists', 'media', 'searchreplace', 'table', 'visualblocks', 'wordcount',
+                        // Your account includes a free trial of TinyMCE premium features
+                        // Try the most popular premium features until Dec 22, 2024:
+                        'checklist', 'mediaembed', 'casechange', 'export', 'formatpainter', 'pageembed', 'a11ychecker', 'tinymcespellchecker', 'permanentpen', 'powerpaste', 'advtable', 'advcode', 'editimage', 'advtemplate', 'ai', 'mentions', 'tinycomments', 'tableofcontents', 'footnotes', 'mergetags', 'autocorrect', 'typography', 'inlinecss', 'markdown',
+                        // Early access to document converters
+                        'importword', 'exportword', 'exportpdf'
+                      ],
+                      toolbar: 'undo redo | blocks fontfamily fontsize | bold italic underline strikethrough | link image media table mergetags | addcomment showcomments | spellcheckdialog a11ycheck typography | align lineheight | checklist numlist bullist indent outdent | emoticons charmap | removeformat',
+                      tinycomments_mode: 'embedded',
+                      tinycomments_author: 'Author name',
+                      mergetags_list: [
+                        { value: 'First.Name', title: 'First Name' },
+                        { value: 'Email', title: 'Email' },
+                      ],
+                      ai_request: (request, respondWith) => respondWith.string(() => Promise.reject('See docs to implement AI Assistant')),
+                    }}
+                    initialValue="Welcome to TinyMCE!"
+                    onEditorChange={handleEditorChange}
                   />
                   <label htmlFor="description">Mô tả</label>
                 </div>
