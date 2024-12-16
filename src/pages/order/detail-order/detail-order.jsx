@@ -25,7 +25,6 @@ export default function DetailOrder({
         const response = await axios.get(`https://localhost:7048/api/Order/${orderId}`);
         setOrder(response.data);
         caculateTotal(response.data);
-        console.log(response.data)
     }
     const [tamTinh, setTamTinh] = useState(0);
     const caculateTotal = (data) => {
@@ -34,21 +33,21 @@ export default function DetailOrder({
             totalItem += item.quantity * item.detailProduct.price;
         })
         if (data.voucher) {
-            caculateVoucher(data.voucher, data.totalPrice, totalItem);
+            caculateVoucher(data.voucher, data.totalPrice, totalItem * 1000);
         }
-        setTamTinh(totalItem);
+        setTamTinh(totalItem * 1000);
     }
     const [voucher, setVoucher] = useState(0);
     const [feeShip, setFeeShip] = useState(0);
     const caculateVoucher = (voucherItem, total, tamTinh) => {
         let voucher1 = 0;
-        if (voucherItem.discountType == "Percentage") {
+        if (voucherItem.discountType === "Percentage") {
             voucher1 = (tamTinh * voucherItem.discount) / 100;
         }
         else {
-            voucher1 = tamTinh - voucherItem.discount
+            voucher1 = voucherItem.discount * 1000
         }
-        setFeeShip(tamTinh - voucher1);
+        setFeeShip(total - (tamTinh - voucher1));
         setVoucher(voucher1);
     }
     const toStringStatus = (status) => {
@@ -143,7 +142,7 @@ export default function DetailOrder({
                                     <p> {order.fullName} </p>
                                     <p> {order.numberPhone} </p>
                                     <p>{order.address}</p>
-                                    <p style={{color:"red"}} >{order.reason}</p>
+                                    <p style={{ color: "red" }} >{order.reason}</p>
                                 </div>
                             </div>
                         </div>
@@ -198,27 +197,27 @@ export default function DetailOrder({
                             <div className="list">
                                 <div className="money-item">
                                     <p>Tạm tính</p>
-                                    <p>{(tamTinh ?? 0).toLocaleString("vi-VN")}.000 VND</p>
+                                    <p>{(tamTinh ?? 0).toLocaleString("vi-VN")} VND</p>
                                 </div>
 
                                 <div className="money-item">
                                     <p>Khuyến mãi</p>
-                                    <p className="minius">- {(voucher ?? 0).toLocaleString("vi-VN")}.000 VND</p>
+                                    <p className="minius">- {(voucher ?? 0).toLocaleString("vi-VN")} VND</p>
                                 </div>
 
                                 <div className="money-item">
                                     <p>Phí vận chuyển</p>
-                                    <p className="plus">+ {(feeShip ?? 0).toLocaleString("vi-VN")}.000 VND</p>
+                                    <p className="plus">+ {(feeShip ?? 0).toLocaleString("vi-VN")} VND</p>
                                 </div>
 
                                 <div className="money-item">
                                     <p>Thành tiền</p>
-                                    <strong>{((tamTinh + feeShip - voucher) ?? 0).toLocaleString("vi-VN")}.000 VND</strong>
+                                    <strong>{((tamTinh + feeShip - voucher) ?? 0).toLocaleString("vi-VN")} VND</strong>
                                 </div>
                             </div>
                             <div className="money-item need-pay-top">
                                 <p>Cần thành toán</p>
-                                <p className="need-pay">{((tamTinh + feeShip - voucher) ?? 0).toLocaleString("vi-VN")}.000 VND</p>
+                                <p className="need-pay">{((tamTinh + feeShip - voucher) ?? 0).toLocaleString("vi-VN")} VND</p>
                             </div>
                         </div>
                     </div>

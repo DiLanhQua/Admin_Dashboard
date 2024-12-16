@@ -161,8 +161,8 @@ function VoucherEdit() {
               onChange={formik.handleChange}
               error={formik.touched.DiscountType && Boolean(formik.errors.DiscountType)}
             >
-              <MenuItem value="%">%</MenuItem>
-              <MenuItem value="Cố định">Cố định</MenuItem>
+              <MenuItem value="Percentage">%</MenuItem>
+              <MenuItem value="Fixed">Cố định</MenuItem>
             </Select>
             {formik.touched.DiscountType && formik.errors.DiscountType && (
               <p style={{ color: "red" }}>{formik.errors.DiscountType}</p>
