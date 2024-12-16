@@ -65,17 +65,30 @@ const EyeCoupons = ({ open, handleClose, selectedData }) => {
           >
             {selectedData?.description}
           </Typography>
-          <span className="code-label">MÃ CODE</span>
-          <Typography variant="body2" className="codeCoupons">
-            {selectedData?.code ? selectedData.code : "Không có mã code"}
-          </Typography>
+          
           {/* Loại giảm giá */}
-          <Box className="discountCoupons">
-            <Typography>
-              {selectedData?.DiscountType === "Percentage" ? "Giảm" : "Giảm trực tiếp"}{" "}
-              {renderDiscount()}
-            </Typography>
-          </Box>
+          
+        </Box>
+        <Box className="boxContainer" sx={{ textAlign: "center", mb: 2 }}>
+          <Typography
+            className="title"
+            variant="h5"
+            sx={{ fontWeight: "bold" }}
+          >
+            <span>Loại</span>
+            <span>: </span>
+            {selectedData?.DiscountType}
+          </Typography>
+          <Typography
+            variant="body1"
+            color="rgb(24, 28, 26)"
+            sx={{ fontWeight: "bold" }}
+          >
+            {selectedData?.description}
+          </Typography>
+          
+          {/* Loại giảm giá */}
+          
         </Box>
         <Grid container spacing={2}>
           {/* Ngày bắt đầu */}
@@ -109,6 +122,46 @@ const EyeCoupons = ({ open, handleClose, selectedData }) => {
               <span>{selectedData?.TimeEnd}</span>
             </Typography>
           </Grid>
+          <Grid
+  item
+  xs={12}
+  sm={6}
+  display="flex"
+  alignItems="center"
+  sx={{ borderBottom: "1px solid #ccc", paddingBottom: 1 }}
+>
+  <DateRangeIcon sx={{ marginRight: 1 }} />
+  <Typography>
+    <span>Giá tối thiểu: </span>
+    <span>
+      {selectedData?.min_Order_Value
+
+        ? new Intl.NumberFormat('vi-VN').format(selectedData.min_Order_Value
+        )
+        : 'N/A'}.000 Đ
+    </span>
+  </Typography>
+</Grid>
+          <Grid
+  item
+  xs={12}
+  sm={6}
+  display="flex"
+  alignItems="center"
+  sx={{ borderBottom: "1px solid #ccc", paddingBottom: 1 }}
+>
+  <DateRangeIcon sx={{ marginRight: 1 }} />
+  <Typography>
+    <span>Giá tối đa: </span>
+    <span>
+      {selectedData?.max_Discount
+        ? new Intl.NumberFormat('vi-VN').format(selectedData.max_Discount)
+        : 'N/A'}.000 Đ
+    </span>
+  </Typography>
+</Grid>
+
+
           {/* Số lượng */}
           <Grid
             item

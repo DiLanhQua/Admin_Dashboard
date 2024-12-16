@@ -20,8 +20,8 @@ function VoucherEdit() {
       DiscountType: "",
       Quantity: "",
       Discount: "",
-      Min_Order_Value: "",
-      Max_Discount: "",
+      min_Order_Value: "",
+      max_Discount: "",
       Status: "",
     },
     validationSchema: Yup.object({
@@ -39,10 +39,10 @@ function VoucherEdit() {
       Discount: Yup.number()
         .required("Mức giảm giá là bắt buộc")
         .min(1, "Giảm giá phải lớn hơn 0"),
-      Min_Order_Value: Yup.number().required(
+      min_Order_Value: Yup.number().required(
         "Giá trị đơn hàng tối thiểu là bắt buộc"
       ),
-      Max_Discount: Yup.number().required("Giảm giá tối đa là bắt buộc"),
+      max_Discount: Yup.number().required("Giảm giá tối đa là bắt buộc"),
       Status: Yup.number().required("Trạng thái là bắt buộc"),
     }),
     onSubmit: async (values) => {
@@ -85,8 +85,8 @@ function VoucherEdit() {
             DiscountType: voucherData.discountType || "",
             Quantity: voucherData.quantity || "",
             Discount: voucherData.discount || "",
-            Min_Order_Value: voucherData.Min_Order_Value || "",
-            Max_Discount: voucherData.Max_Discount || "",
+            min_Order_Value: voucherData.min_Order_Value || "",
+            max_Discount: voucherData.max_Discount || "",
             Status: voucherData.status || "",
           });
         } else {
@@ -199,28 +199,28 @@ function VoucherEdit() {
           <TextField
             fullWidth
             label="Giá trị đơn hàng tối thiểu"
-            name="Min_Order_Value"
+            name="min_Order_Value"
             type="number"
-            value={formik.values.Min_Order_Value}
+            value={formik.values.min_Order_Value}
             onChange={formik.handleChange}
             margin="normal"
             error={
-              formik.touched.Min_Order_Value && Boolean(formik.errors.Min_Order_Value)
+              formik.touched.min_Order_Value && Boolean(formik.errors.min_Order_Value)
             }
-            helperText={formik.touched.Min_Order_Value && formik.errors.Min_Order_Value}
+            helperText={formik.touched.min_Order_Value && formik.errors.min_Order_Value}
           />
         </Grid>
         <Grid item xs={12} sm={6}>
           <TextField
             fullWidth
             label="Giảm giá tối đa"
-            name="Max_Discount"
+            name="max_Discount"
             type="number"
-            value={formik.values.Max_Discount}
+            value={formik.values.max_Discount}
             onChange={formik.handleChange}
             margin="normal"
-            error={formik.touched.Max_Discount && Boolean(formik.errors.Max_Discount)}
-            helperText={formik.touched.Max_Discount && formik.errors.Max_Discount}
+            error={formik.touched.max_Discount && Boolean(formik.errors.max_Discount)}
+            helperText={formik.touched.max_Discount && formik.errors.max_Discount}
           />
         </Grid>
         <Grid item xs={12} sm={6}>

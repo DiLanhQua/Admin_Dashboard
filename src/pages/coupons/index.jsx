@@ -42,8 +42,8 @@ export default function CouponsList() {
         TimeStart: item.timeStart ? fDateVN(item.timeStart) : "Không xác định",
         TimeEnd: item.timeEnd ? fDateVN(item.timeEnd) : "Không xác định",
         Quantity: item.quantity || 0,
-        Min_Order_Value: item.min_Order_Value || 0,
-        Max_Discount: item.max_Discount || 0,
+        min_Order_Value: item.min_Order_Value || 0,
+        max_Discount: item.max_Discount || 0,
         status: item.status === 0 ? "Không hoạt động" : "Hoạt động",
       }));
       console.log(data);

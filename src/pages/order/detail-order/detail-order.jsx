@@ -173,9 +173,9 @@ export default function DetailOrder({
                                         <td>Size {item.detailProduct.size}</td>
                                         <td> {item.colorName} </td>
                                         <td> {item.quantity} </td>
-                                        <td> {item.detailProduct.price.toLocaleString("vi-VN")},000 VND</td>
+                                        <td> {item.detailProduct.price.toLocaleString("vi-VN")}.000 VND</td>
                                         <td>
-                                            <strong>{item.detailProduct.price * item.quantity},000 VND</strong>
+                                            <strong>{item.detailProduct.price * item.quantity}.000 VND</strong>
                                         </td>
                                     </tr>
                                 ))}
