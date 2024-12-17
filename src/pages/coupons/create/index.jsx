@@ -142,8 +142,8 @@ function VoucherCreate() {
               value={formik.values.DiscountType}
               onChange={formik.handleChange}
             >
-              <MenuItem value="%">%</MenuItem>
-              <MenuItem value="Cố định">Cố định</MenuItem>
+              <MenuItem value="Percentage">%</MenuItem>
+              <MenuItem value="Fixed">Cố định</MenuItem>
             </Select>
             {formik.touched.DiscountType && formik.errors.DiscountType && (
               <FormHelperText>{formik.errors.DiscountType}</FormHelperText>
