@@ -19,7 +19,6 @@ export default function ColorForm({
 }) {
 
     const handleSubmit = async (values) => {
-        console.log(values.nameColor);
         let data = {
             nameColor: values.nameColor,
             colorCode: values.colorCode,
@@ -31,7 +30,6 @@ export default function ColorForm({
                 await onAdd(data);
             }
         } catch (error) {
-            console.error("Lỗi khi submit form:", error);
         }
     };
     return (
@@ -92,7 +90,6 @@ export default function ColorForm({
                                                 await onAdd(data);
                                             }
                                         } catch (error) {
-                                            console.error("Lỗi khi submit form:", error);
                                         }
                                     }} variant="contained" color="success">
                                         {isUpdate ? "Cập nhật màu sắc" : "Thêm màu sắc"}

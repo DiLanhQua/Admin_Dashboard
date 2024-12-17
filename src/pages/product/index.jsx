@@ -54,7 +54,8 @@ export default function StaffPage() {
   const [showModal, setShowModal] = useState(false);
   const [showDEModal, setDEShowModal] = useState(false);
   const [colors, setColors] = useState([]);
-
+const [cPage, sPage] = useState(1); 
+  const [itemsPerPage, sitemsPerPage] = useState(5);
 
   const handleOpenModal = () => {
     setShowModal(true);
@@ -67,27 +68,26 @@ export default function StaffPage() {
   const handleShow = () => setShowDetailModal(true);
   const handleClose = () => setShowDetailModal(false);
   const handleDEShow = () => {
-    setDEShowModal(true);  // This will open the modal
-    handleClose();         // This should properly close the other modal (if needed)
+    setDEShowModal(true);  
+    handleClose();        
   };
 
   const handleDEClose = () => {
-    setDEShowModal(false); // This will close the modal
-    handleShow();          // This will open the other modal (if needed)
+    setDEShowModal(false); 
+    handleShow();          
   };
 
   useEffect(() => {
     const GetStall = async () => {
       try {
         const res = await getProductAPI(customersPerPage, currentPage);
-        console.log(res);
+      
         if (Array.isArray(res.data)) {
           setItems(res.data);
         } else {
           setItems([]);
         }
       } catch (er) {
-        console.error("Không thể xuất danh sách: ", er);
       }
     };
     GetStall();
@@ -99,7 +99,6 @@ export default function StaffPage() {
         const brans = await getAllBrandAPI(1000, currentPage);
         setBrands(brans.data);
       } catch (error) {
-        console.error("Lỗi khi lấy media cho sản phẩm:", error);
       }
     };
 
@@ -113,7 +112,7 @@ export default function StaffPage() {
         const categorys = await getAllCategoryAPI(customersPerPage, currentPage);
         setCategorys(categorys.data);
       } catch (error) {
-        console.error("Lỗi khi lấy media cho sản phẩm:", error);
+        
       }
     };
 
@@ -129,7 +128,7 @@ export default function StaffPage() {
         const resolvedMedias = await Promise.all(mediaPromises);
         setMedias(resolvedMedias);
       } catch (error) {
-        console.error("Lỗi khi lấy media cho sản phẩm:", error);
+        
       }
     };
     if (items.length > 0) {
@@ -147,10 +146,9 @@ export default function StaffPage() {
           }));
         });
         const resolvedImages = await Promise.all(imagePromises);
-        // console.log("resolvedImages: ", JSON.stringify(resolvedImages, null, 2));
         setImages(resolvedImages);
       } catch (error) {
-        console.error("Lỗi khi lấy media cho sản phẩm:", error);
+        
       }
     };
 
@@ -162,30 +160,28 @@ export default function StaffPage() {
     try {
       const response = await getAllColorAPI(customersPerPage, currentPage);
       if (Array.isArray(response.data)) {
-        console.log("fetchColors ", response.data);
         setColors(response.data);
       } else {
         setColors([]);
-      } // Cập nhật state colors với dữ liệu màu sắc
+      } 
     } catch (error) {
-      console.error("Lỗi khi lấy dữ liệu màu:", error);
+      
     }
   };
 
-  // Gọi API khi component được render
   useEffect(() => {
     fetchColors();
   }, []);
-  const indexOfLastCustomer = currentPage * customersPerPage;
-  const indexOfFirstCustomer = indexOfLastCustomer - customersPerPage;
-  const currentCustomers = items.slice(indexOfFirstCustomer, indexOfLastCustomer);
-  const totalPages = Math.ceil(items.length / customersPerPage);
+  // const indexOfLastCustomer = currentPage * customersPerPage;
+  // const indexOfFirstCustomer = indexOfLastCustomer - customersPerPage;
+  // const currentCustomers = items.slice(indexOfFirstCustomer, indexOfLastCustomer);
+  // const totalPages = Math.ceil(items.length / customersPerPage);
 
-  const handlePageChange = (newPage) => {
-    if (newPage >= 1 && newPage <= totalPages) {
-      setCurrentPage(newPage);
-    }
-  };
+  // const handlePageChange = (newPage) => {
+  //   if (newPage >= 1 && newPage <= totalPages) {
+  //     setCurrentPage(newPage);
+  //   }
+  // };
 
   let [pro, setPro] = useState({});
   const detaile = async (item) => {
@@ -196,38 +192,52 @@ export default function StaffPage() {
       setSelectedProduct(item);
       handleShow();
     } catch (error) {
-      console.error("Lỗi khi tải thông tin chi tiết sản phẩm: ", error);
+      
     }
   };
   const CTNV = async (item) => {
     try {
-      const response = await getProduct(item.id); // Lấy thông tin sản phẩm
+      const response = await getProduct(item.id); 
 
       const resolvedImages = await getImageAPI(item.id)
-      setallImages(resolvedImages); // Lưu các hình ảnh vào state
-      setProduct(response); // Cập nhật thông tin sản phẩm
-      setSelectedProduct(item); // Lưu sản phẩm đã chọn
-      handleOpenModal(); // Mở modal
+      setallImages(resolvedImages);
+      setProduct(response);
+      setSelectedProduct(item); 
+      handleOpenModal(); 
       return response.data;
     } catch (err) {
-      console.error("Lỗi: " + err);
+      
     }
   };
 
   const CTSP = async (detail, id) => {
     try {
-      // Gọi API để lấy thông tin sản phẩm chi tiết
       const response = await getdetailAPI(detail.id, id);
 
-      console.log("thông tin chi tiết sản phẩm: ", response);
-      // Cập nhật dữ liệu sản phẩm vào state
       setSelectedDeProduct(response);
-      // Mở modal để hiển thị thông tin sản phẩm
       handleDEShow();
       handleCloseModal();
       return response.data;
     } catch (err) {
-      console.error("Lỗi khi lấy dữ liệu sản phẩm: " + err);
+      
+    }
+  };
+  const filteredItems = items.filter(item => {
+    return item.productName.toLowerCase().includes(searchTerm.toLowerCase()); // Tìm kiếm không phân biệt chữ hoa, chữ thường
+  });
+  const currentItems = filteredItems.slice(
+    (cPage - 1) * itemsPerPage,
+    cPage * itemsPerPage
+  );
+  const indexOfLastCustomer = itemsPerPage * cPage;
+  const indexOfFirstCustomer = indexOfLastCustomer - itemsPerPage;
+  // Tổng số trang
+  const totalPages = Math.ceil(filteredItems.length / itemsPerPage);
+
+  // Hàm chuyển trang
+  const handlePageChange = (newPage) => {
+    if (newPage >= 1 && newPage <= totalPages) {
+      sPage(newPage);
     }
   };
   const handleVariantChange = (index, field, value) => {
@@ -237,8 +247,8 @@ export default function StaffPage() {
   };
   const handleDEInputChange = (field, value) => {
     setSelectedDeProduct(prevState => ({
-      ...prevState,  // Giữ lại các thuộc tính khác
-      [field]: value // Cập nhật giá trị của trường được chọn
+      ...prevState, 
+      [field]: value 
     }));
   };
 
@@ -254,30 +264,24 @@ export default function StaffPage() {
   const handleChangeImage = async (imageId, file) => {
     if (!file) return;
     try {
-      // Chuyển đổi file gốc sang Base64
       const base64Link = await fileToBase64(file);
-      // Tạo đối tượng dữ liệu cần gửi lên backend
       const newImageLink = {
         isPrimary: false,
         link: base64Link,
       };
 
-      // Gửi yêu cầu API để thay đổi ảnh
       const response = await postMediaAPI(imageId, selectedProduct.id, newImageLink);
       const updatedImages = allimages.map((img) => {
         if (img.mediaIds === imageId) {
-          console.log("Đang thay đổi ảnh:", imageId);
           return { ...img, imageUrl: base64Link };
         }
         return img;
       });
       setallImages(updatedImages);
-      console.log("response ", response);
     } catch (error) {
-      console.error("Error when changing image:", error);
+      
     }
   };
-  // Hàm xử lý chọn ảnh chính
   const handleSetPrimaryImage = async (imageId) => {
     try {
       const response = await isPrimaryImageProduct(imageId);
@@ -285,27 +289,22 @@ export default function StaffPage() {
       if (response) {
         alert("Cập nhật ảnh chính thành công")
         const resolvedImages = await getImageAPI(response.productId)
-        setallImages(resolvedImages); // Lưu các hình ảnh vào state
+        setallImages(resolvedImages); 
       }
     } catch (error) {
-      console.error('Error when setting primary image:', error);
+      
     }
   };
 
   const handleDeleteImage = async (imageId) => {
     try {
-      console.log("Xóa media ID:", imageId);
-
-      // Gửi yêu cầu xóa ảnh đến API
       const response = await deleteMesiaAPI(imageId);
-      console.log("Response từ API:", response);
 
       const updatedImages = allimages.filter((img) => img.mediaIds !== imageId);
-      setallImages(updatedImages); // Cập nhật state
-      console.log("Đã xóa thành công ảnh:", imageId);
+      setallImages(updatedImages); 
 
     } catch (error) {
-      console.error("Lỗi khi gọi API xóa ảnh:", error);
+      
       alert("Đã xảy ra lỗi khi xóa ảnh! Vui lòng kiểm tra kết nối.");
     }
   };
@@ -318,12 +317,10 @@ export default function StaffPage() {
     }
     const base64Link = await fileToBase64(newImageFile);
 
-    // Tạo đối tượng dữ liệu cần gửi lên backend
     const newImageLink = {
       isPrimary: false,
       link: base64Link,
     };
-    // Gửi tệp ảnh tới API
     const response = await postMesiaAPI(selectedProduct.id, newImageLink);
     const newImage = {
       id: response.data.id,
@@ -348,7 +345,6 @@ export default function StaffPage() {
     formData.append("brandId", product.brandId);
     try {
       const response = await updateProductAPI(product.id, formData);
-      // console.log("Response:", response);
       if (response) {
         alert("Cập nhật sản phẩm thành công!");
         window.location.reload();
@@ -356,7 +352,7 @@ export default function StaffPage() {
         alert("Cập nhật sản phẩm thất bại!");
       }
     } catch (error) {
-      console.error("Lỗi khi lưu:", error);
+      
       alert("Có lỗi xảy ra, vui lòng thử lại.");
     }
   };
@@ -376,17 +372,11 @@ export default function StaffPage() {
         setDetailproduct(productsDetail);
       }
     } catch (error) {
-      console.error("Lỗi khi lưu:", error);
+      
       alert("Có lỗi xảy ra, vui lòng thử lại.");
     }
   };
 
-  // const handleFileChange = (e) => {
-  //   const file = e.target.files[0];
-  //   if (file) {
-  //     handleAddImage(file);
-  //   }
-  // };
   const handleInputChange = (field, value) => {
     setProduct(prevProduct => ({
       ...prevProduct,
@@ -407,13 +397,13 @@ export default function StaffPage() {
   });
 
   const closeCreate = () => {
-    setOpenCreate(false); // This will close the modal
+    setOpenCreate(false); 
     handleShow();
   }
   const onChangeCreate = (field, value) => {
     setDetailProduct(prevState => ({
-      ...prevState,  // Giữ lại các thuộc tính khác
-      [field]: value // Cập nhật giá trị của trường được chọn
+      ...prevState,  
+      [field]: value 
     }));
   };
 
@@ -437,14 +427,12 @@ export default function StaffPage() {
       }
     }
     catch (err) {
-      console.log(err);
+      
       alert("Thêm chi tiết sản phẩm thất bại");
     }
   }
 
   //#endregion
-
-  // Hàm render input sản phẩm
   const renderInput = (label, value, key) => (
     <div className="col-md-4">
       <div className="form-floating custom-floating-label">
@@ -491,41 +479,6 @@ export default function StaffPage() {
       ],
     }));
   };
-  // const fileToBase64 = (file) => {
-  //   return new Promise((resolve, reject) => {
-  //     const reader = new FileReader();
-  //     reader.readAsDataURL(file);
-  //     reader.onload = () => resolve(reader.result);
-  //     reader.onerror = (error) => reject(error);
-  //   });
-  // };
-
-  // const handleImageChange = (e) => {
-  //   const file = e.target.files?.[0] || null; 
-  //   if (file) {
-  //     setallImages(file);
-  //     setmagePreview(URL.createObjectURL(file));
-
-  //     // Cập nhật danh sách ảnh với ảnh mới
-  //     setallImages((prevImages) => [
-  //       ...prevImages,
-  //       { imageUrl: URL.createObjectURL(file), isPrimary: false }, // Tùy chỉnh `isPrimary`
-  //     ]);
-  //   } else {
-  //     setallImages(null);
-  //     setImagePreview(null);
-  //   }
-  // };
-
-  // // Xử lý khi xóa hình ảnh
-  // const handleDeleteImage = (index) => {
-  //   setProductImages((prev) => prev.filter((_, i) => i !== index));
-  //   setProductInfo((prev) => ({
-  //     ...prev,
-  //     medias: prev.medias.filter((_, i) => i !== index),
-  //   }));
-  // };
-
   const changeStatus = async (id) => {
     try {
       const reponse = await axios.patch(`https://localhost:7048/api/Products/change-status/${id}`)
@@ -535,7 +488,7 @@ export default function StaffPage() {
       }
     }
     catch (err) {
-      console.log(err);
+      
       alert("Cập nhật trạng thái thất bại")
     }
   }
@@ -559,9 +512,6 @@ export default function StaffPage() {
                 />
                 <label htmlFor="search">Tìm kiếm</label>
               </div>
-              {/* <a href="/dashboard/staff/create" className="create-stall">
-                  Thêm mới
-                </a> */}
               <Link to={"/dashboard/product/create"}>
                 <Button
                   variant="primary"
@@ -587,12 +537,12 @@ export default function StaffPage() {
                   </tr>
                 </thead>
                 <tbody>
-                  {currentCustomers.map((item, stt) => {
+                  {currentItems.map((item, stt) => {
                     const productBrans = brands.filter((bran) => bran.id === item.brandId);
                     const productCategorys = categories.filter((catego) => catego.id === item.categoryId);
                     return (
-                      <tr key={item.id}>
-                        <th scope="row">{indexOfFirstCustomer + stt + 1}</th>
+                      <tr key={stt}>
+                        <th scope="row">{item.id}</th>
                         <td>
                           <img
                             src={`https://localhost:7048/${item.imagePrimary}`}
@@ -1118,10 +1068,10 @@ export default function StaffPage() {
                 </tbody>
               </table>
               <div className="row">
-                <div className="col-lg-8">
+                <div className="col-lg-9">
 
                 </div>
-                <div className="col-lg-4">
+                <div className="col-lg-3">
                   <div
                     style={{
                       display: "flex",
@@ -1133,28 +1083,26 @@ export default function StaffPage() {
                     <span>Số dòng mỗi trang</span>
                     <select
                       style={{ padding: "5px", border: "none" }}
-                      value={customersPerPage}
-                      onChange={(e) => setCustomersPerPage(Number(e.target.value))}
+                      value={itemsPerPage}
+                      onChange={(e) => sitemsPerPage(Number(e.target.value))}
                     >
                       <option value="5">5</option>
                       <option value="10">10</option>
                       <option value="15">15</option>
                       <option value="25">25</option>
                     </select>
-                    <span>{`${indexOfFirstCustomer + 1}-${Math.min(indexOfLastCustomer, items.length)}`}</span>
+                    <span>{`${indexOfFirstCustomer + 1}-${Math.min(indexOfLastCustomer, items.length)}`} trong {items.length}</span>
                     <div>
-                      <button
-                        style={{ padding: "5px", marginRight: "5px", border: "none" }}
-                        onClick={() => handlePageChange(currentPage - 1)}
-                        disabled={currentPage === 1}
-                      >
+                    <button
+                            onClick={() => handlePageChange(cPage - 1)}
+                            disabled={cPage === 1}
+                          >
                         &lt;
                       </button>
                       <button
-                        style={{ padding: "5px", border: "none" }}
-                        onClick={() => handlePageChange(currentPage + 1)}
-                        disabled={currentPage === totalPages}
-                      >
+                            onClick={() => handlePageChange(cPage + 1)}
+                            disabled={cPage === totalPages}
+                          >
                         &gt;
                       </button>
                     </div>

@@ -30,11 +30,9 @@ export default function BannerCollection() {
   const handleEdit = (index) => {
     const idBanner = index.id;
     navigate(`/dashboard/bannercollection/edit/${idBanner}`);
-    console.log("Edit", index);
   };
   const handleDelete = useCallback(
     (index) => {
-      console.log(index);
       DeleteConfirmationModal({
         title: "Xác nhận xóa banner",
         content: "Bạn có chắc chắn muốn xóa banner này không?",

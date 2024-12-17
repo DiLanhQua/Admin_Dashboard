@@ -24,7 +24,7 @@ const EditWebConfigDialog = ({ open, onClose, initialValues, onSave }) => {
     },
     validationSchema: WebconFigValidate,
     onSubmit: (values) => {
-      console.log("values", values);
+      
       onSave(values);
     },
   });

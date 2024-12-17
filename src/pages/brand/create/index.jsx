@@ -47,9 +47,7 @@ export default function BrandForm({
       formData.append("Picture", imageFile);
     }
     for (let pair of formData.entries()) {
-      console.log(pair[0] + ': ' + pair[1]);
     }
-    console.log("image file:", imageFile);
 
     try {
       if (isUpdate) {
@@ -58,7 +56,6 @@ export default function BrandForm({
         await onAdd(formData);
       }
     } catch (error) {
-      console.error("Lỗi khi submit form:", error);
     }
   };
 

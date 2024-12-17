@@ -79,7 +79,7 @@ const DashAnalytics = () => {
     const GetStatistics = async () => {
       try {
         const res = await getStatisticsAPI();
-        console.log("Dữ liệu trả về từ getStatisticsAPI:", res);
+
     
         if (res) {
           setItems(res);
@@ -91,7 +91,6 @@ const DashAnalytics = () => {
           }));
     
           const response = await AddStatisticsAPI(viewType);
-          console.log("Dữ liệu trả về từ AddStatisticsAPI:", response);
     
           if (response && response.labels && response.numbers) {
             // Cập nhật dữ liệu cho chart
@@ -106,13 +105,11 @@ const DashAnalytics = () => {
               }]
             });
           } else {
-            console.error("Dữ liệu trả về từ AddStatisticsAPI không hợp lệ.");
           }
         } else {
           setItems([]);
         }
       } catch (er) {
-        console.error("Không thể xuất danh sách:", er);
       }
     };
     

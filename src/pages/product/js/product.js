@@ -80,10 +80,10 @@ export const getdetailAPI = (id,productid) => {
 export const UPDE = async (id, formData) => {
     try {
       const response = await axiosDE.put(`${END_POINT.UPDetailproduct}/${id}`,formData);
-      console.log("Response ID:", response.data);
+      
       return response;
     } catch (error) {
-      console.error("POST Error:", error);
+      
       throw error;
     }
   };
@@ -118,17 +118,17 @@ export const postProductAPI = async (productData) =>  {
         const response = await axiosS.post(`${END_POINT.AddProduct}`, productData);
         return response;
     } catch (error) {
-        console.error("POST Error:", error);
+        
         throw error;
     }
 }
 export const postIsMediaAPI = async (selectedProductId, imageId) => {
   try {
     const response = await axiosMedia.put(`${END_POINT.PostIsMedia}?productId=${selectedProductId}&imageId=${imageId}`);
-    console.log("Response ID:", response.data);
+    
     return response;
   } catch (error) {
-    console.error("POST Error:", error);
+    
     throw error;
   }
 };
@@ -136,12 +136,12 @@ export const postIsMediaAPI = async (selectedProductId, imageId) => {
 // Hàm gửi yêu cầu API để thay đổi ảnh
 export const postMediaAPI = async (imageId,selectedProductId,  newImageLink) => {
   try {
-    // console.log("newImageLink", newImageLink);?productId=6&imageId=9
+    // ?productId=6&imageId=9
     const response = await axiosMedia.put(`${END_POINT.PostMedia}?productId=${selectedProductId}&imageId=${imageId}`, newImageLink);
-    console.log("Response ID:", response.data);
+    
     return response;
   } catch (error) {
-    console.error("POST Error:", error);
+    
     throw error;
   }
 };
@@ -150,17 +150,17 @@ export const updateProductAPI = async (id,formData) =>  {
         const response = await axiosS.put(`${END_POINT.UpProduct}/${id}`, formData);
         return response;
     } catch (error) {
-        console.error("POST Error:", error);
+        
         throw error;
     }
 }
 export const postMesiaAPI = async (id,productData) =>  {
     try {
         const response = await axiosMedia.post(`${END_POINT.AddMedia}/${id}`, productData);
-        console.log("ID Response:", productData); 
+        
         return response;
     } catch (error) {
-        console.error("POST Error:", error);
+        
         throw error;
     }
 }
@@ -169,7 +169,7 @@ export const deleteMesiaAPI = async (id) =>  {
         const response = await axiosMedia.delete(`${END_POINT.DeleteMedia}/${id}`);
         return response;
     } catch (error) {
-        console.error("Error:", error);
+        
         throw error;
     }
 }
@@ -178,10 +178,10 @@ export const postDEProductAPI = async (formData) =>  {
     try {
         const response = await axiosDE.post(`${END_POINT.AddDetailproduct}`, formData);
       
-        console.log("ID Response:", formData); 
+        
         return response;
     } catch (error) {
-        console.error("POST Error:", error);
+        
         throw error;
     }
 }
@@ -190,10 +190,10 @@ export const postImageAPI = async (formData) =>  {
     try {
         const response = await axiosImage.post(`${END_POINT.PostIsMedia}`, formData);
       
-        console.log("ID Response:", formData); 
+        
         return response;
     } catch (error) {
-        console.error("POST Error:", error);
+        
         throw error;
     }
 }

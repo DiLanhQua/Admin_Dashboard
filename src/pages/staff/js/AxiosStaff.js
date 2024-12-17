@@ -26,12 +26,12 @@ export const postStaffAPI = async (formData) =>  {
    
         try {
             const response = await axiosS.post(`${END_POINT.PostStaff}`, formData);
-            console.log("ID Response:", formData); 
-            console.log("Full POST Response:", response); // Log toàn bộ phản hồi POST
-            console.log("POST Response Data:", response.data); // Log thuộc tính data của phản hồi POST
+            
+            // Log toàn bộ phản hồi POST
+            // Log thuộc tính data của phản hồi POST
             return response;
         } catch (error) {
-            console.error("POST Error:", error);
+            
             throw error;
         }
 }
@@ -40,12 +40,12 @@ export const upStaffAPI = async (id,formData) =>  {
     try {
         const response = await axiosS.put(`${END_POINT.UpStaff}/${id}`, formData);
       
-        console.log("ID Response:", formData); 
-        console.log("Full POST Response:", response); // Log toàn bộ phản hồi POST
-        console.log("POST Response Data:", response.data); // Log thuộc tính data của phản hồi POST
+        
+        // Log toàn bộ phản hồi POST
+        // Log thuộc tính data của phản hồi POST
         return response;
     } catch (error) {
-        console.error("POST Error:", error);
+        
         throw error;
     }
 }
@@ -53,7 +53,7 @@ export const upStaffAPI = async (id,formData) =>  {
 //     try {
 //         return  axiosC.get(`${END_POINT.GioHang}`)// Trả về toàn bộ phản hồi
 //     } catch (error) {
-//         console.error("GET Error:", error);
+//         
 //         throw error;
 //     }
 // }

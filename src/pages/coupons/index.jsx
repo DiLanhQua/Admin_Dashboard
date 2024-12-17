@@ -46,10 +46,9 @@ export default function CouponsList() {
         max_Discount: item.max_Discount || 0,
         status: item.status === 0 ? "Không hoạt động" : "Hoạt động",
       }));
-      console.log(data);
       setCoupons(data);
     } catch (error) {
-      console.error("Lỗi khi tải dữ liệu:", error.message || error);
+
       handleToast("error", "Không thể tải danh sách mã giảm giá");
     }
   };
@@ -68,7 +67,6 @@ export default function CouponsList() {
   );
 
   const handleEye = (index) => {
-    console.log(index);
 
     setSelectedData(index);
     setOpen(true);
@@ -93,7 +91,6 @@ export default function CouponsList() {
             handleToast("success", "Xóa mã giảm giá thành công");
             fetchCoupons(); // Tải lại danh sách sau khi xóa
           } catch (error) {
-            console.error("Lỗi khi xóa mã giảm giá:", error);
             handleToast("error", "Xóa mã giảm giá thất bại");
           }
         },
@@ -106,7 +103,6 @@ export default function CouponsList() {
     <>
       <ReusableTable
         handleEdit={handleEdit}
-        handleDelete={handleDelete}
         data={coupons}
         columns={columns}
         handleEye={handleEye}
@@ -117,7 +113,6 @@ export default function CouponsList() {
           open={open}
           handleClose={handleClose}
           selectedData={selectedData}
-          handleDelete={handleDelete}
           handleEdit={handleEdit}
         />
       )}

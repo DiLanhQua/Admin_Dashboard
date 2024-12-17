@@ -55,7 +55,6 @@ const ImageUploader = ({
           "state_changed",
           null, // No progress tracking
           (error) => {
-            console.error("Upload failed:", error);
             setUploadError("Vui lòng tải lên hình ảnh PNG hoặc JPG hợp lệ.");
           },
           () => {
@@ -79,13 +78,11 @@ const ImageUploader = ({
 
       deleteObject(imageRefs[index])
         .then(() => {
-          console.log("File deleted successfully");
           setDownloadURLs((prevURLs) => prevURLs.filter((_, i) => i !== index)); // Remove URL
           setImageRefs((prevRefs) => prevRefs.filter((_, i) => i !== index)); // Remove reference
           if (onDelete) onDelete();
         })
         .catch((error) => {
-          console.error("Error deleting file:", error);
           setUploadError("Error deleting the file, please try again later.");
         });
     },

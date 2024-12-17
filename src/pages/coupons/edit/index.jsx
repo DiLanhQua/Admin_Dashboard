@@ -61,7 +61,7 @@ function VoucherEdit() {
       handleToast("success", "Cập nhật voucher thành công");
       navigate("/dashboard/coupons");
     } catch (error) {
-      console.error("Lỗi khi cập nhật voucher:", error.response?.data || error);
+
       handleToast("error", "Lỗi khi cập nhật voucher");
     } finally {
       setIsSubmitting(false);
@@ -93,7 +93,6 @@ function VoucherEdit() {
           handleToast("error", "Dữ liệu voucher không hợp lệ");
         }
       } catch (error) {
-        console.error("Lỗi khi tải dữ liệu voucher:", error.response?.data || error);
         handleToast("error", "Lỗi khi tải dữ liệu voucher");
       }
     };

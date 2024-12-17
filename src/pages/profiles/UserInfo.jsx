@@ -26,7 +26,7 @@ const UserProfileForm = () => {
           image: userInfo.image || "",
         });
       } catch (error) {
-        console.error("Lỗi khi parse dữ liệu userInfo:", error);
+        
       }
     }
   }, []);
@@ -41,7 +41,7 @@ const UserProfileForm = () => {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    console.log("Thông tin đã được cập nhật:", user);
+    
   };
 
   return (

@@ -33,7 +33,7 @@ const EditStaff = () => {
 
   useEffect(() => {
     if (!id) {
-      console.log("ID không hợp lệ");
+      
       return;
     }
 
@@ -41,7 +41,7 @@ const EditStaff = () => {
       try {
         const res = await getDeStaffAPI(id);
         const nhanV = res;
-        console.log("id: " + res);  // Kiểm tra dữ liệu trả về từ API
+        // Kiểm tra dữ liệu trả về từ API
         // Cập nhật các state tương ứng khi dữ liệu nhân viên được lấy về
         setFullName(nhanV.fullName);
         setUserName(nhanV.userName);
@@ -55,7 +55,7 @@ const EditStaff = () => {
           setImagePreview(nhanV.image);
         }
       } catch (err) {
-        console.log("Lỗi: ", err);
+        
       }
     };
 
@@ -165,14 +165,14 @@ const EditStaff = () => {
 
       if (data.address) {
         const fullAddress = `${data.address.road || ''},  ${data.address.city || ''}, ${data.address.country || ''}`;
-        console.log('Địa chỉ: ', fullAddress);
+        
         return fullAddress;
       } else {
-        console.error('Không tìm thấy địa chỉ');
+        
         return null;
       }
     } catch (error) {
-      console.error('Lỗi khi gọi API: ', error);
+      
       return null;
     }
   };
@@ -192,7 +192,7 @@ const EditStaff = () => {
           setSelectedLocation({ lat, lng: lon });
         }
       } catch (error) {
-        console.error("Lỗi khi geocode địa chỉ:", error);
+        
       }
     } else {
       setSelectedLocation(null);

@@ -35,7 +35,7 @@ export default function SiteConfig() {
     }
   }, [status, webConfig]);
   const handleEdit = (data) => {
-    console.log("Edit", data);
+    
     setSelectedDataEdit(data); // Pass dữ liệu được chọn vào Edit dialog
     setOpenEdit(true); // Mở dialog chỉnh sửa
   };

@@ -25,7 +25,6 @@ const ParentTableComponent = () => {
 
     const handleDeleteSelected = () => {
         // Thực hiện xóa các mục đã chọn
-        console.log("Xóa các hàng đã chọn:", selectedRows);
         // Cập nhật dữ liệu (tùy theo cách bạn quản lý dữ liệu)
         setSelectedRows([]); // Xóa danh sách đã chọn sau khi xóa
     };

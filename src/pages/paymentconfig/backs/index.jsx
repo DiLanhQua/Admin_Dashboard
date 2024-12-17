@@ -16,7 +16,6 @@ const VietQRBankList = ({ data, valuedata }) => {
             setBanks(data.data);
           })
           .catch((error) => {
-            console.error("Error fetching banks:", error);
           });
       }, 300),
     []

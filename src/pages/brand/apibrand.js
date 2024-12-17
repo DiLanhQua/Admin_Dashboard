@@ -5,10 +5,10 @@ import { useNavigate, useParams } from "react-router-dom";
 
 const API_URL = "https://localhost:7048/api/Brand";
 
-export const fetchBrands = async (maxPageSize, rowsPerPage, page) => {
+export const fetchBrands = async (maxPageSize, rowsPerPage, page,searchTerm) => {
   try {
     const response = await axios.get(
-      `${API_URL}/get-all-brand?maxPageSize=${maxPageSize}&PageSize=${rowsPerPage}&PageNumber=${page + 1}`
+      `${API_URL}/get-all-brand?maxPageSize=${maxPageSize}&PageSize=${rowsPerPage}&PageNumber=${page + 1}&Search=${searchTerm}`
     );
     if (response.data && Array.isArray(response.data.data)) {
       return response.data.data.map((item) => ({
@@ -23,7 +23,6 @@ export const fetchBrands = async (maxPageSize, rowsPerPage, page) => {
     }
   } catch (error) {
     handleToast("error", "Lỗi khi tải danh sách thương hiệu");
-    console.error("Error loading brands:", error);
     return [];
   }
 };
@@ -35,7 +34,6 @@ export const addBrand = async (formData) => {
     });
     handleToast("success", "Thương hiệu đã được thêm thành công");
   } catch (error) {
-    console.error("Error adding brand:", error);
     if (error.response && error.response.status === 400 && error.response.data === "Tên thương hiệu đã tồn tại.") {
       handleToast("error", "Tên thương hiệu đã tồn tại.");
     } else {
@@ -49,7 +47,6 @@ export const updateBrand = async (id, formData) => {
     await axios.put(`${API_URL}/update-brand-by-id/${id}`, formData);
     handleToast("success", "Thương hiệu đã được cập nhật thành công");
   } catch (error) {
-    console.error("Error updating brand:", error);
     if (error.response && error.response.status === 400 && error.response.data === "Tên thương hiệu đã tồn tại.") {
       handleToast("error", "Tên thương hiệu đã tồn tại.");
     } else {
@@ -62,7 +59,6 @@ export const deleteBrand = async (id) => {
   try {
     await axios.delete(`${API_URL}/delete-brand-by-id/${id}`);
   } catch (error) {
-    console.error("Error deleting brand:", error);
     handleToast("error", "Lỗi khi xóa thương hiệu");
   }
 };

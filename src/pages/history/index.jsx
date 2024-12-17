@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import axios from "axios";
 import ReusableTable from "@/components/table";
 import { handleToast } from "../../utils/toast";  // Assuming you have a toast utility
+import { useLocation } from "react-router-dom"; // Import useLocation from react-router-dom
 
 // Helper functions for date and time formatting
 export const fDateVN = (dateString) => {
@@ -28,20 +29,18 @@ export default function History() {
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(1000);
   const [totalCount, setTotalCount] = useState(1000); // Tổng số bản ghi
-
+  
   // Fetch data from the API
   const fetchHistoryData = async () => {
     try {
       const response = await axios.get(`https://localhost:7048/api/Login/get-all-login?maxPageSize=${totalCount}&PageSize=${rowsPerPage}&PageNumber=${page + 1}`); // Replace with your actual API URL
 
       // Log the entire response to inspect the data structure
-      console.log("API Response:", response);
 
-      // Get the listLogins from the responsenpm
+      // Get the listLogins from the response
       const responseData = response.data.listLogins;
 
       // Log the raw listLogins data
-      console.log("Logins Data:", responseData);
 
       if (responseData && Array.isArray(responseData)) {
         // Map the data to match the required columns
@@ -60,7 +59,6 @@ export default function History() {
         throw new Error("Dữ liệu không hợp lệ");
       }
     } catch (error) {
-      console.error("Lỗi khi tải dữ liệu:", error.message || error);
       handleToast("error", "Không thể tải lịch sử");
     }
   };
@@ -69,18 +67,19 @@ export default function History() {
     fetchHistoryData();
   }, []); // Empty dependency array means this will run once on component mount
 
+  // Use `useLocation` to determine if we're on the history page
+  const location = useLocation();
 
+  // Check if the URL contains 'history' to hide the 'Hành động' column
+  const isHistoryPage = location.pathname.includes("history");
 
   const handleDelete = (index) => {
-    console.log("Delete", index);
   };
 
   return (
     <ReusableTable
-
-      handleDelete={handleDelete}
       data={historyData}
-      columns={columns}
+      columns={columns.filter(column => !(isHistoryPage && column.field === "acac"))} // Filter out "Hành động" column if on history page
     />
   );
 }

@@ -3,9 +3,9 @@ import { DeleteConfirmationModal, handleToast } from "../../utils/toast";
 import { Navigate, useNavigate } from "react-router-dom";
 
 const BASE_URL = "https://localhost:7048/api/Category";
-export const fetchCategories = async (maxPageSize, rowsPerPage, page) => {
+export const fetchCategories = async (maxPageSize, rowsPerPage, page,searchTerm) => {
   try {
-    const response = await axios.get(`${BASE_URL}/get-all-category?maxPageSize=${maxPageSize}&PageSize=${rowsPerPage}&PageNumber=${page + 1}`);
+    const response = await axios.get(`${BASE_URL}/get-all-category?maxPageSize=${maxPageSize}&PageSize=${rowsPerPage}&PageNumber=${page + 1}&Search=${searchTerm}`);
     if (response.data && Array.isArray(response.data.data)) {
       return response.data.data.map((item) => ({
         id: item.id,
@@ -17,7 +17,6 @@ export const fetchCategories = async (maxPageSize, rowsPerPage, page) => {
     }
   } catch (error) {
     handleToast("error", "Lỗi khi tải danh sách danh mục");
-    console.error("Error loading:", error);
   }
 };
 
@@ -26,7 +25,6 @@ export const fetchCategoryById = async (id) => {
     const response = await axios.get(`${BASE_URL}/get-category-by-id/${id}`);
     return response.data;
   } catch (error) {
-    console.error("Lỗi khi tải dữ liệu danh mục:", error);
     handleToast("error", "Lỗi khi tải dữ liệu danh mục");
   }
 };
@@ -37,7 +35,6 @@ export const updateCategory = async (id, formData) => {
     }); 
     handleToast("success", "Cập nhật danh mục thành công");
   } catch (error) {
-    console.error("Lỗi khi cập nhật danh mục:", error);
     if (error.response && error.response.status === 400 && error.response.data === "Tên danh mục đã tồn tại.") {
       handleToast("error", "Tên danh mục đã tồn tại.");
     } else {
@@ -54,7 +51,6 @@ export const addCategory = async (formData) => {
     handleToast("success", "Thêm danh mục thành công");
     Navigate(`/dashboard/category`)
   } catch (error) {
-    console.error("Error adding category:", error);
     if (error.response && error.response.status === 400 && error.response.data === "Tên danh mục đã tồn tại.") {
       handleToast("error", "Tên danh mục đã tồn tại.");
     } else {

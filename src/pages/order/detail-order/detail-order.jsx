@@ -25,7 +25,6 @@ export default function DetailOrder({
         const response = await axios.get(`https://localhost:7048/api/Order/${orderId}`);
         setOrder(response.data);
         caculateTotal(response.data);
-        console.log(response.data)
     }
     const [tamTinh, setTamTinh] = useState(0);
     const caculateTotal = (data) => {
@@ -72,7 +71,6 @@ export default function DetailOrder({
             }
         }
         catch (error) {
-            console.log(error);
         }
     }
     const setColorStatus = (status) => {

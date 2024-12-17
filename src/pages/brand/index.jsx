@@ -12,7 +12,7 @@ export default function BrandPage() {
   const [maxPageSize, setMaxPageSize] = useState(100);
   const [rowsPerPage, setRowsPerPage] = useState(100);
   const [page, setPage] = useState(0);
-
+  const [search, setSearch] = useState("");
   const [initialValues, setInitialValues] = useState({
     BrandName: "",
     image: "",
@@ -26,13 +26,13 @@ export default function BrandPage() {
   ];
 
   const loadBrands = async () => {
-    const brandData = await fetchBrands(maxPageSize, rowsPerPage, page);
+    const brandData = await fetchBrands(maxPageSize, rowsPerPage, page,search);
     setItems(brandData);
   };
 
   useEffect(() => {
     loadBrands();
-  }, [maxPageSize, rowsPerPage, page]);
+  }, [maxPageSize, rowsPerPage, page,search]);
 
   const handleEdit = (brand) => {
     setInitialValues({
@@ -67,10 +67,12 @@ export default function BrandPage() {
     <Grid container spacing={2}>
       <Grid item xs={5}>
         <ReusableTable
+        
           columns={columns}
           data={items}
           handleEdit={handleEdit}
-          handleDelete={handleDelete}
+          search={search}  
+          setSearch={setSearch} 
         />
       </Grid>
       <Grid item xs={7}>

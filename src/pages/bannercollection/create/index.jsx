@@ -111,7 +111,6 @@ function AddBannerCollection() {
     validateOnBlur: true,
     onSubmit: (values, { resetForm }) => {
       dispatch(createBannerCollection(values)).then((result) => {
-        console.log(result);
         if (
           result.type === "bannerCollection/createBannerCollection/fulfilled"
         ) {
@@ -121,7 +120,6 @@ function AddBannerCollection() {
           handleToast("error", "Thêm bộ sưu tập banner thất bại");
         }
       });
-      console.log(values);
     },
   });
 

@@ -89,7 +89,6 @@ function AddPost() {
     }
     catch (err) {
       alert('Thêm bài viết thất bại')
-      console.log(err);
     }
   }
   return (

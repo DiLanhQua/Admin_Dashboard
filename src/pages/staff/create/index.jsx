@@ -65,7 +65,7 @@ function AddStaff() {
   //   }
   // }, [status, error, dispatch]);
   // const handleUploadComplete = (url) => {
-  //   console.log("Image uploaded:", url);
+  //   
   //   formik.setFieldValue("avatar", url);
   // };
 
@@ -183,14 +183,14 @@ if (!passwordRegex.test(password)) {
 
       if (data.address) {
         const fullAddress = `${data.address.road || ''}, ${data.address.city || ''}, ${data.address.country || ''}`;
-        console.log('Địa chỉ: ', fullAddress);
+        
         return fullAddress;
       } else {
-        console.error('Không tìm thấy địa chỉ');
+        
         return null;
       }
     } catch (error) {
-      console.error('Lỗi khi gọi API: ', error);
+      
       return null;
     }
   };
@@ -209,7 +209,7 @@ if (!passwordRegex.test(password)) {
           setSelectedLocation({ lat, lng: lon });
         }
       } catch (error) {
-        console.error("Lỗi khi geocode địa chỉ:", error);
+        
       }
     } else {
       setSelectedLocation(null);  // Nếu không có địa chỉ, xóa tọa độ đã chọn

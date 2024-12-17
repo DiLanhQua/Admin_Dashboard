@@ -11,7 +11,6 @@ instance.interceptors.response.use(
         return response.data
     },
     (error) => {
-        console.log(error);
     }
 );
 export const getColors = async () => {

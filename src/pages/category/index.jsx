@@ -22,13 +22,14 @@ function CategoryPage() {
   const [rowsPerPage, setRowsPerPage] = useState(100);
   const [page, setPage] = useState(0);
 
+  const [search, setSearch] = useState("");
   const columns = [
     { label: "Tên danh mục", field: "CategoryName" },
     { label: "Hình ảnh", field: "image" },
   ];
 
   const fetchCategoriesData = useCallback(async () => {
-    const data = await fetchCategories(maxPageSize, rowsPerPage, page);
+    const data = await fetchCategories(maxPageSize, rowsPerPage, page,search);
     if (data) {
       setCategories(data);
     }
@@ -71,8 +72,9 @@ function CategoryPage() {
             <ReusableTable
               columns={columns}
               handleEdit={handleEdit}
-              handleDelete={handleDelete}
               data={categories}
+              search={search}  
+              setSearch={setSearch} 
               navigate={"/dashboard/category/create"}
             />
           </Item>

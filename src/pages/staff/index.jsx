@@ -38,44 +38,43 @@ export default function StaffPage() {
   const [account, setAccount] = useState();
   const [login, setLogin] = useState();
   const [cPage, sPage] = useState(1); // Trang hiện tại
-  const itemsPerPage = 5;
+  const [itemsPerPage, sitemsPerPage] = useState(5);
   useEffect(() => {
     const GetStall = async () => {
       try {
         const res = await getAPIStaff(currentMax, customersPerPage, currentPage);
-        console.log("Dữ liệu trả về:", res);
+       
 
         if (res && res.data) {
-          setItems(res.data); // Lưu danh sách nhân viên vào state
-          // setTotalItems(res.pageCount * customersPerPage);  // Cập nhật tổng số nhân viên
+          setItems(res.data); 
         } else {
           setItems([]);
         }
       } catch (er) {
-        console.error("Không thể xuất danh sách:", er);
+        alert("Không thể xuất danh sách:", er);
       }
     };
 
     GetStall();
   }, [currentMax, customersPerPage, currentPage]);
   const filteredItems = items.filter(item => {
-    return item.fullName.toLowerCase().includes(searchTerm.toLowerCase()); // Tìm kiếm không phân biệt chữ hoa, chữ thường
+    return item.fullName.toLowerCase().includes(searchTerm.toLowerCase()); 
   });
   const currentItems = filteredItems.slice(
     (cPage - 1) * itemsPerPage,
     cPage * itemsPerPage
   );
+  const indexOfLastCustomer = itemsPerPage * cPage;
+  const indexOfFirstCustomer = indexOfLastCustomer - itemsPerPage;
 
-  // Tổng số trang
   const totalPages = Math.ceil(filteredItems.length / itemsPerPage);
 
-  // Hàm chuyển trang
+
   const handlePageChange = (newPage) => {
     if (newPage >= 1 && newPage <= totalPages) {
       sPage(newPage);
     }
   };
-  // const totalPages = Math.ceil(filteredItems.length / customersPerPage);
   const handleChangePage = (event, newPage) => {
     setRowsPerPage(newPage);
   };
@@ -86,48 +85,19 @@ export default function StaffPage() {
   };
   const handleSearchChange = (event) => {
     setSearchTerm(event.target.value);
-    setCurrentPage(0); // Đặt lại trang khi tìm kiếm mới
+    setCurrentPage(0); 
   };
 
 
-
-
-  // const handleChangePage = (event, newPage) => {
-  //   setRowsPerPage(newPage);
-  // };
-  // const handleChangeRowsPerPage = (event) => {
-  //   setCustomersPerPage(+event.target.value);
-  //   setRowsPerPage(0);
-  // };
   const detaile = async (id) => {
-    console.log("id ", id)
     const response = await getDeStaffAPI(id);
     const responsee = await getDeLoginAPI(id);
     setAccount(response);
     setLogin(responsee);
-    // handleShow(); 
-    console.log("de: " + response);
     handleShow();
   };
 
 
-  // const totalPages = Math.ceil(currentMax / customersPerPage);
-  // console.log("totalPages ", totalPages);// Tính tổng số trang
-  // const indexOfLastCustomer = currentPage * customersPerPage;
-  // console.log("indexOfFirstCustomer ", indexOfLastCustomer);
-  // const indexOfFirstCustomer = indexOfLastCustomer - customersPerPage;
-
-  // console.log("indexOfFirstCustomer ", indexOfFirstCustomer);
-  // // Lọc ra dữ liệu của trang hiện tại
-  // const currentCustomers = items.slice(indexOfFirstCustomer, indexOfLastCustomer);
-
-  // console.log("currentCustomers ", currentCustomers);
-
-  // const handlePageChange = (newPage) => {
-  //   if (newPage > 0 && newPage <= totalPages) {
-  //     setCurrentPage(newPage);  // Cập nhật trang hiện tại
-  //   }
-  // };
 
   const openDetailModal = (employee) => {
     setSelectedEmployee(employee);
@@ -139,7 +109,7 @@ export default function StaffPage() {
       navigate(`/dashboard/staff/edit/${id}`);
       return response.data;
     } catch (err) {
-      console.error("Lỗi: " + err);
+      alert("Lỗi: " + err);
     }
   };
 
@@ -154,15 +124,13 @@ export default function StaffPage() {
           <Col sm={12}>
             <Card>
 
-              {/* Left side: Search Input and Filters */}
-
 
 
               <div className="bg-light rounded text-center h-100 p-4">
                 <div className="d-flex align-items-center justify-content-between mb-4">
                   <div className="form-floating">
                     <input
-                      type="text" // Thay đổi từ "password" thành "text" cho tìm kiếm
+                      type="text" 
                       className="form-control"
                       id="search"
                       value={searchTerm}
@@ -170,16 +138,8 @@ export default function StaffPage() {
                       placeholder="Tìm kiếm"
                       required
                     />
-                    <label htmlFor="search">Tìm kiếm</label> {/* Thay đổi nhãn từ "Mật Khẩu" thành "Tìm kiếm" */}
+                    <label htmlFor="search">Tìm kiếm</label>
                   </div>
-
-
-                  {/* <a href="/dashboard/staff/create"
-                    className="create-stall"
-
-                  >
-                    Thêm mới
-                  </a> */}
                   <Link to={"/dashboard/staff/create"}>
                     <Button
                       variant="primary"
@@ -220,15 +180,11 @@ export default function StaffPage() {
                               <IconButton
                                 color="primary"
                                 onClick={() => detaile(item.id)}
-                                sx={{ padding: "4px" }} // Reduced padding for action buttons
+                                sx={{ padding: "4px" }} 
                               >
                                 <RemoveRedEyeIcon />
                               </IconButton>
-                              {/* <Button variant="primary" onClick={() => detaile(item.id)}>
-        Xem 
-      </Button> */}
-
-                              {/* Modal hiển thị thông tin chi tiết nhân viên */}
+                              
                               <Modal show={showDetailModal} onHide={handleClose} size="lg">
                                 <Modal.Header closeButton>
                                   <Modal.Title>Thông Tin Chi Tiết Nhân Viên</Modal.Title>
@@ -306,13 +262,11 @@ export default function StaffPage() {
                                   )}
                                 </Modal.Body>
                               </Modal>
-                              {/* <button className="btn btn-warning ml-2" onClick={() => CTNV(item.id)}>
-                              Sửa
-                            </button> */}
+                              
                               <IconButton
                                 color="primary"
                                 onClick={() => CTNV(item.id)}
-                                sx={{ padding: "4px" }} // Reduced padding for action buttons
+                                sx={{ padding: "4px" }}
                               >
                                 <Edit />
                               </IconButton>
@@ -328,10 +282,9 @@ export default function StaffPage() {
                   )}
 
                   <div className="row">
-                    <div className="col-lg-8">
-                      {/* Không cần thay đổi gì thêm ở đây */}
+                    <div className="col-lg-9">
                     </div>
-                    <div className="col-lg-4">
+                    <div className="col-lg-3">
                       <div
                         style={{
                           display: "flex",
@@ -343,14 +296,14 @@ export default function StaffPage() {
                         <span>Số dòng mỗi trang</span>
                         <select
                           style={{ padding: "5px", border: "none" }}
-                          value={customersPerPage}
-                          onChange={(e) => setCustomersPerPage(Number(e.target.value))}
+                          value={itemsPerPage}
+                          onChange={(e) => sitemsPerPage(Number(e.target.value))}
                         >
                           <option value="5">5</option>
                           <option value="10">10</option>
                           <option value="15">15</option>
                         </select>
-                        {/* <span>{`${indexOfFirstCustomer + 1}-${Math.min(indexOfLastCustomer, items.length)}`}</span> */}
+                        <span>{`${indexOfFirstCustomer + 1}-${Math.min(indexOfLastCustomer, items.length)}`} trong {items.length}</span>
                         <div>
                           <button
                             onClick={() => handlePageChange(cPage - 1)}

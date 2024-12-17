@@ -6,7 +6,6 @@ if (storedUserInfo) {
     const userInfo = JSON.parse(storedUserInfo); // Chỉ parse khi dữ liệu không rỗng
     role = userInfo.role || null;
   } catch (error) {
-    console.error("Lỗi khi parse dữ liệu userInfo:", error);
   }
 }
 

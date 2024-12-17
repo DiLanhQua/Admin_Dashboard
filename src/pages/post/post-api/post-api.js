@@ -8,18 +8,16 @@ instance.interceptors.response.use(
         return response.data
     },
     (error) => {
-        console.log(error);
     }
 );
 const URL_API = 'https://localhost:7048/api/Blog';
 
 export const getBlog = async () => {
     try{
-        const response = await instance.get(`${URL_API}/get-all-blog?maxPageSize=100&Pagesize=100`);
+        const response = await instance.get(`${URL_API}/get-all-blog?maxPageSize=100&Pagesize=100&PageNumber=1`);
         return response.data
     }
     catch(error){
-        console.log(error);
     }
 }
 
@@ -29,7 +27,6 @@ export const createBlog = async (data) => {
         return response
     }
     catch(error){
-        console.log(error);
     }
 }
 
@@ -39,7 +36,6 @@ export const updateBlog = async (id, data) => {
         return response
     }
     catch(error){
-        console.log(error);
     }
 }
 
@@ -49,7 +45,7 @@ export const isPrimaryBlogImage = async (idImage) => {
         return response;
     }
     catch(error){
-        console.log(error);
+
     }
 }
 
@@ -59,7 +55,7 @@ export const blogById = async (id) => {
         return response
     }
     catch(error){
-        console.log(error);
+
     }
 }
 export const imageBlogByIdBlog = async (idBlog) => {
@@ -68,7 +64,7 @@ export const imageBlogByIdBlog = async (idBlog) => {
         return response
     }
     catch(error){
-        console.log(error);
+
     }
 }
 
@@ -78,7 +74,7 @@ export const deleteImageById = async (idImage) => {
         return response
     }
     catch(error){
-        console.log(error);
+
     }
 }
 
@@ -88,6 +84,6 @@ export const deleteBlogApi = async (id) => {
        return response;
     }
     catch(error){
-        console.log(error);
+
     }
 }

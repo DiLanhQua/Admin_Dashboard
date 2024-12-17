@@ -116,7 +116,6 @@ function EditBannerCollection() {
     }
   }, [statusBanner, dataBanner]);
 
-  //   console.log("dataBanner", dataBanner);
   const navigate = useNavigate();
 
   const formik = useFormik({

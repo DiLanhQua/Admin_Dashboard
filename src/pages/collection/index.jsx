@@ -25,7 +25,6 @@ export default function CollectionPage() {
   ];
 
   const handleEdit = (index) => {
-    console.log(index);
     setEditOpen(true);
     setCollectionData(index);
   };
@@ -78,7 +77,6 @@ export default function CollectionPage() {
   }, [dispatch, deleteStatus]);
   const handleCreate = (data) => {
     dispatch(createCollection(data)).then((res) => {
-      console.log(res);
       if (res.type === "collection/createCollection/fulfilled") {
         handleToast("success", "Tạo bộ sưu tập thành công");
         dispatch(getAllCollections());

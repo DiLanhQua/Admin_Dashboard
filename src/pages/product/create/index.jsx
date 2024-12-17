@@ -122,7 +122,7 @@ function ProductPage() {
   //     const correctedText = data.choices[0].text.trim();
   //     setProductInfo({ ...productInfo, description: correctedText });
   //   } catch (error) {
-  //     console.error("Lỗi khi kiểm tra ngữ pháp:", error);
+  //     
   //   } finally {
   //     setIsChecking(false);
   //   }
@@ -142,7 +142,7 @@ function ProductPage() {
   };
 
   // const handleSave = () => {
-  //   console.log("Saved Data:", productInfo);
+  //   
   // };
 
 
@@ -233,14 +233,14 @@ function ProductPage() {
     const fetchBrand = async () => {
       try {
         const brandPromises = await getAllBrandAPI(customersPerPage, currentPage);
-        // console.log("brandPromises ", brandPromises);
+        // 
         if (Array.isArray(brandPromises.data)) {
           setBrand(brandPromises.data);
         } else {
           setBrand([]);
         }
       } catch (error) {
-        console.error("Lỗi khi lấy media cho sản phẩm:", error);
+        
       }
     };
 
@@ -256,7 +256,7 @@ function ProductPage() {
         setColors([]);
       } // Cập nhật state colors với dữ liệu màu sắc
     } catch (error) {
-      console.error("Lỗi khi lấy dữ liệu màu:", error);
+      
     }
   };
 
@@ -274,7 +274,7 @@ function ProductPage() {
         setCategorys([]);
       } // Cập nhật state colors với dữ liệu màu sắc
     } catch (error) {
-      console.error("Lỗi khi lấy dữ liệu màu:", error);
+      
     }
   };
 
@@ -335,7 +335,7 @@ function ProductPage() {
       handleToast("success", "Sản phẩm đã được lưu thành công!", "top-right");
       navigate("/dashboard/product");
     } catch (error) {
-      console.error("Error saving product:", error);
+      
       handleToast("error", "Có lỗi khi lưu sản phẩm.", "top-right");
     } finally {
       setIsLoading(false);

@@ -12,11 +12,12 @@ export default function UserPage() {
   const [rowsPerPage, setRowsPerPage] = useState(100); 
   const [page, setPage] = useState(0);
 
+  const [search, setSearch] = useState("");
   // Fetch customers from API
   const fetchCustomers = useCallback(async (pageNumber = 1) => {
     setLoading(true);
     try {
-      const response = await axios.get(`https://localhost:7048/api/Account/get-all-account?maxPageSize=${maxPageSize}&PageSize=${rowsPerPage}&PageNumber=${page + 1}`, {
+      const response = await axios.get(`https://localhost:7048/api/Account/get-all-account?maxPageSize=${maxPageSize}&PageSize=${rowsPerPage}&PageNumber=${page + 1}&Search=${search}`, {
         params: { pageNumber, pageSize: pagination.pageSize },
       });
 
@@ -34,7 +35,7 @@ export default function UserPage() {
       }));
 
       setItems(formattedData);
-      setPagination({ pageSize, pageNumber: currentPage, pageCount });
+      setPagination({ pageSize, pageNumber: currentPage, pageCount,search });
     } catch {
       handleToast("error", "Hiển thị người dùng thất bại", "top-right");
     } finally {
@@ -44,11 +45,11 @@ export default function UserPage() {
 
   useEffect(() => {
     fetchCustomers();
-  }, [fetchCustomers, maxPageSize, rowsPerPage, page]);
+  }, [fetchCustomers, maxPageSize, rowsPerPage, page,search]);
 
   // Approve action
 const handleApprove = useCallback(async (id) => {
-  console.log("Approved User ID:", id);  
+  
   try {
     await axios.post(`https://localhost:7048/api/Account/un-block-account/${id}`);
     handleToast("success", "Người dùng đã được cho phép hoạt động!", "top-right");
@@ -60,7 +61,7 @@ const handleApprove = useCallback(async (id) => {
 
 // Reject action
 const handleReject = useCallback(async (id) => {
-  console.log("Approved User ID:", id);  
+  
   try {
     await axios.post(`https://localhost:7048/api/Account/block-account/${id}`);
     handleToast("error", "Người dùng đã bị cấm đăng nhập!", "top-right");
@@ -91,6 +92,8 @@ const handleReject = useCallback(async (id) => {
         columns={columns}
         handleApprove={handleApprove}
         handleReject={handleReject}
+        search={search}  
+        setSearch={setSearch} 
       />
 
     </LoadingWrapper>

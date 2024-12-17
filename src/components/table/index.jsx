@@ -70,7 +70,7 @@ const ReusableTable = ({
       const matchesStatus =
         statusFilter === "" ||
         statusFilter === "all" ||
-        row.status?.toLowerCase() === statusFilter.toLowerCase();
+        row.status?.toLowerCase() === statusFilter.toLowerCase() ;
       const matchesOrderStatus =
         orderStatusFilter === "" ||
         row.orderStatus?.toLowerCase() === orderStatusFilter.toLowerCase();
@@ -181,6 +181,8 @@ ReusableTable.propTypes = {
   StatusOrder: propTypes.array,
   handleApprove: propTypes.func.isRequired,  // Added prop validation for handleApprove
   handleReject: propTypes.func.isRequired,   // Added prop validation for handleReject
+  search: propTypes.string.isRequired,  // Thêm prop search
+  setSearch: propTypes.func.isRequired,
 };
 
 export default ReusableTable;

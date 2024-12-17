@@ -78,7 +78,7 @@ export default function WarehousePage() {
   }, [status, warehouses, error]);
 
   const handleUpdate = (values) => {
-    console.log(values);
+    
     dispatch(updateWarehouse({ warehouseId: values.id, data: values })).then(
       (res) => {
         if (res.type === "warehouse/updateWarehouse/fulfilled") {

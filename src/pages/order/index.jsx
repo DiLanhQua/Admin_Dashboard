@@ -31,7 +31,6 @@ export default function OrderPage() {
       setData(data.orders);
     }
     catch (error) {
-      console.log(error);
     }
   }
   useState(() => {
@@ -56,7 +55,7 @@ export default function OrderPage() {
   };
 
   const handleDelete = (data) => {
-    console.log(data);
+
   };
 
   const handleSubmit = async (status) => {
@@ -79,7 +78,6 @@ export default function OrderPage() {
       }
     }
     catch (error) {
-      console.log(error);
     }
   };
 
@@ -89,7 +87,6 @@ export default function OrderPage() {
         columns={columns}
         data={data}
         handleEdit={handleEdit}
-        handleDelete={handleDelete}
         StatusOrder={statusOptions}
         handleEye={handleEye}
       />

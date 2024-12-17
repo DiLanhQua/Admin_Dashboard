@@ -24,7 +24,6 @@ function EditPost() {
       setEditorContent(blogResponse.content)
       setImageRes(imageResponse)
     } catch (error) {
-      console.error("Error fetching data:", error);
     }
   };
 
@@ -69,7 +68,6 @@ function EditPost() {
         fetchData(id);
       }
     } catch (error) {
-      console.log(error);
     }
   }
 
@@ -91,7 +89,6 @@ function EditPost() {
       }
     }
     catch (error) {
-      console.log(error);
     }
   };
 
@@ -122,7 +119,6 @@ function EditPost() {
     }
     catch (err) {
       alert('Cập nhật bài viết thất bại')
-      console.log(err);
     }
   }
   return (

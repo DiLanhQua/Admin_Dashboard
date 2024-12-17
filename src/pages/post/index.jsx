@@ -8,19 +8,32 @@ import { getBlog, deleteBlogApi } from "./post-api/post-api";
 
 export default function PostList() {
   const [data, setData] = useState([]);
+  const [cPage, sPage] = useState(1);
+  const [itemsPerPage, sitemsPerPage] = useState(5);
+  const [searchTerm, setSearchTerm] = useState("");
   const getAllBlog = async () => {
     try {
       const response = await getBlog();
       setData(response);
     } catch (error) {
-      console.log(error);
+      alert(error);
     }
   };
 
   useEffect(() => {
     getAllBlog();
   }, []);
+  const filteredItems = data.filter(item => {
+    return item.headLine.toLowerCase().includes(searchTerm.toLowerCase()); 
+  });
+  const currentItems = filteredItems.slice(
+    (cPage - 1) * itemsPerPage,
+    cPage * itemsPerPage
+  );
+  const indexOfLastCustomer = itemsPerPage * cPage;
+  const indexOfFirstCustomer = indexOfLastCustomer - itemsPerPage;
 
+  const totalPages = Math.ceil(filteredItems.length / itemsPerPage);
   const deleteBlog = async (id) => {
     try {
       const response = await deleteBlogApi(id);
@@ -30,10 +43,14 @@ export default function PostList() {
       }
     }
     catch (error) {
-      console.log(error);
+      alert(error);
     }
   }
-
+  const handlePageChange = (newPage) => {
+    if (newPage >= 1 && newPage <= totalPages) {
+      sPage(newPage);
+    }
+  };
   return (
     <>
       <Row>
@@ -45,6 +62,8 @@ export default function PostList() {
                   type="text"
                   className="form-control"
                   id="search"
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
                   placeholder="Tìm kiếm"
                 />
                 <label htmlFor="search">Tìm kiếm</label>
@@ -76,8 +95,8 @@ export default function PostList() {
                   </tr>
                 </thead>
                 <tbody>
-                  {data.map((item, index) => (
-                    <tr>
+                  {currentItems.map((item, index) => (
+                    <tr key={index}>
                       <th>
                         {index + 1}
                       </th>
@@ -118,6 +137,49 @@ export default function PostList() {
                   ))}
                 </tbody>
               </table>
+              <div className="row">
+                <div className="col-lg-9">
+
+                </div>
+                <div className="col-lg-3">
+                  <div
+                    style={{
+                      display: "flex",
+                      justifyContent: "space-between",
+                      alignItems: "center",
+                      marginTop: "10px",
+                    }}
+                  >
+                    <span>Số dòng mỗi trang</span>
+                    <select
+                      style={{ padding: "5px", border: "none" }}
+                      value={itemsPerPage}
+                      onChange={(e) => sitemsPerPage(Number(e.target.value))}
+                    >
+                      <option value="5">5</option>
+                      <option value="10">10</option>
+                      <option value="15">15</option>
+                      <option value="25">25</option>
+                    </select>
+                    <span>{`${indexOfFirstCustomer + 1}-${Math.min(indexOfLastCustomer, data.length)}`} trong {data.length}</span>
+                    <div>
+                      <button
+                        onClick={() => handlePageChange(cPage - 1)}
+                        disabled={cPage === 1}
+                      >
+                        &lt;
+                      </button>
+                      <button
+                        onClick={() => handlePageChange(cPage + 1)}
+                        disabled={cPage === totalPages}
+                      >
+                        &gt;
+                      </button>
+                    </div>
+                  </div>
+
+                </div>
+              </div>
             </div>
           </div>
         </Col>

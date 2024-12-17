@@ -47,7 +47,7 @@ export default function ImageProductAttributes({
           "state_changed",
           null,
           (error) => {
-            console.error("Upload failed:", error);
+            
             setUploadError("Upload failed. Please try again.");
           },
           async () => {
@@ -63,7 +63,7 @@ export default function ImageProductAttributes({
               });
               setImageRefs((prevRefs) => [...prevRefs, storageRef]);
             } catch (error) {
-              console.error("Error getting download URL:", error);
+              
               setUploadError("Error getting download URL. Please try again.");
             }
           }
@@ -86,7 +86,7 @@ export default function ImageProductAttributes({
           if (onDelete) onDelete(downloadURLs[index]);
         })
         .catch((error) => {
-          console.error("Error deleting file:", error);
+          
           setUploadError("Error deleting the file, please try again later.");
         });
     },

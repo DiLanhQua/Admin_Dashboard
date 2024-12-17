@@ -96,7 +96,7 @@ export default function VariantPage() {
       );
     }
     if (status === "failed") {
-      console.log("Failed to fetch data");
+      
     }
     dispatch(resetState({ key: "status", value: "idle" }));
   }, [status, data, dispatch]);

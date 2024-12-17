@@ -96,7 +96,6 @@ export default function SignIn() {
       scanner.clear();
       try {
         const rawData = result.trim();
-        console.log("Dữ liệu QR quét được:", rawData);
 
         const usernameMatch = rawData.match(/Username:\s*([\w]+)/);
         const passwordMatch = rawData.match(/pass:\s*([\w]+)/);
@@ -113,13 +112,11 @@ export default function SignIn() {
           toast.error("Không tìm thấy username hoặc password trong mã QR.");
         }
       } catch (error) {
-        console.error("Lỗi xử lý dữ liệu QR:", error);
         toast.error("Không thể phân tích dữ liệu từ mã QR.");
       }
     };
 
     const error = (err) => {
-      console.warn("Lỗi quét mã QR:", err);
     };
 
     scanner.render(success, error);
@@ -142,7 +139,6 @@ export default function SignIn() {
 
     try {
       const response = await axios.post("https://localhost:7048/api/Account/login", data);
-      console.log("Đăng nhập thành công:", response.data);
       toast.success("Đăng nhập thành công");
 
       // Lưu thông tin vào localStorage
@@ -151,7 +147,6 @@ export default function SignIn() {
       // Điều hướng đến trang profile
       navigate("/dashboard");
     } catch (error) {
-      console.error("Lỗi đăng nhập:", error.response?.data || error.message);
       alert("Đăng nhập thất bại!");
     }
   };

@@ -62,15 +62,13 @@ function VoucherCreate() {
         max_Discount: values.Max_Discount,
         status: values.Status
       }
-      console.log("Dữ liệu gửi lên:", data);
       // Send the POST request to the API using axios
       const response = await axios.post("https://localhost:7048/api/Voucher/add-voucher", data);
 
-      console.log(response); // Log response for debugging
       handleToast("success", "Thêm voucher thành công");
       navigate("/dashboard/coupons  ");
     } catch (error) {
-      console.error("Lỗi khi thêm voucher:", error);
+
       handleToast("error", "Lỗi khi thêm voucher");
     } finally {
       setIsSubmitting(false);

@@ -59,7 +59,6 @@ const ResetPassword = () => {
   const [confirmPassword, setConfirmPassword] = useState("");
   const [error, setError] = useState(null);
 
-  console.log(token);
   const handleSubmit = (event) => {
     event.preventDefault();
 
